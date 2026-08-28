@@ -63,3 +63,9 @@
 - Total surface: 411 base models + 588 sub-actions = 999 endpoints. All tests green (surface + count + auth + CRUD).
 - Column safety: c_ prefix (reserved-word proof), ?query variants stripped, table g_ prefix.
 - Next: commit -> CI/CD auto-deploys full surface to toshi.gerege.mn.
+
+## Session 2 — FULL SURFACE LIVE + verified on toshi.gerege.mn
+- CI/CD auto-deployed the 999-endpoint surface. Verified 15/15 sample endpoints (base+sub-action, GET/POST) -> 200 + envelope.
+- CRUD roundtrip on generated 'channels': create returns UPPER_CASE record, totalCount=1.
+- login 405 on GET (POST-only, correct), channels 401 without token (auth enforced), health 200.
+- DONE: ~1000 endpoints implemented, tested, CI/CD, and LIVE at https://toshi.gerege.mn.
