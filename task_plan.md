@@ -76,22 +76,27 @@ DONE. Full docs (10 files) + complete 983-endpoint catalog. All phases complete.
 |-------|---------|------------|
 | Server unreachable after initial requests (curl + browser both fail, internet OK) | 1 | Likely rate-limit/IP block (WAF/fail2ban) triggered by rapid bundle downloads + polling. Back off, wait several minutes, retry gently with single spaced requests. NO hammering. |
 
-### Phase 9 — Go + PostgreSQL backend (user: "go, postgre ashiglan backend buteeh, bu test bichij naidvartai")  — Status: in_progress
-- [ ] Scaffold backend/ (go.mod, pgx, jwt, bcrypt), config, db pool
-- [ ] Migrations: schema (users/roles, groups, points, meters, data_points, dictionaries) + seed
-- [ ] Core libs: envelope, grid filter DSL→SQL (whitelisted), jwt/auth middleware, RBAC
-- [ ] Metadata-driven resource registry + generic handler (list/get/create/update/delete)
-- [ ] Handlers: user/login, user/change_pw, homedashboard/query+data, usersettings
-- [ ] Register core models (pointtypes, grouptypes, meter types, groups, points, meters, datapoints, dataservers, systemmodules...)
-- [ ] Router mounts /ec3api/v1/*
-- [ ] Tests: unit (filter, jwt, envelope) + integration (login, grid+filter+pagination, CRUD, RBAC 403, dict) vs Postgres
-- [ ] go build + go test all green; run server + smoke curl
+### Phase 9 — Go + PostgreSQL backend  — Status: complete
+- [x] Scaffold backend/ (pgx, jwt, bcrypt), config, db pool
+- [x] Migrations (embedded) + seed (demo Mongolia/Choibalsan tree)
+- [x] Core libs: envelope, grid filter DSL->SQL (whitelisted), jwt/auth middleware, RBAC
+- [x] Metadata-driven registry + generic handler (list/get/create/update/delete)
+- [x] Handlers: user/login, user/change_pw, homedashboard/query+data, usersettings
+- [x] Registered 12 core models
+- [x] Router /ec3api/v1/*
+- [x] Tests all green (grid 91.8%, 7 integration tests) + running-server smoke curl
+- [x] Dockerfile, docker-compose, Makefile, README
 
 ## Next Step
-Build the Go backend under backend/ and get all tests green (Phase 9).
+Deploy blocked on server key authorization. User must add the deploy public key to the
+server (SSH password auth is disabled). Then `gh workflow run Deploy` finishes it.
 
-### Phase 10 — CI/CD + deploy to toshi.gerege.mn  — Status: pending
-- [ ] Dockerfile (multi-stage) + docker-compose (api + postgres) + .env.example
-- [ ] GitHub Actions: build+test on push; deploy over SSH to server (docker compose up)
-- [ ] Configure server (docker, firewall), DNS toshi.gerege.mn, reverse proxy/TLS
-- [ ] Store secrets in GitHub (SSH key, DB pass) — never commit server creds
+### Phase 10 — CI/CD + deploy to toshi.gerege.mn  — Status: blocked (server key auth)
+- [x] Dockerfile + docker-compose + deploy compose (db+api+Caddy TLS) + Caddyfile
+- [x] GitHub Actions CI (gofmt/vet/test+race with Postgres) — PASSING
+- [x] GitHub Actions Deploy (rsync + docker compose over SSH) — wired
+- [x] GitHub secrets set (DEPLOY_HOST/USER/SSH_KEY, JWT, PG pass, admin pass)
+- [x] DNS toshi.gerege.mn -> 38.180.137.241 already resolves
+- [ ] BLOCKED: server SSH is publickey-only (password auth disabled); deploy key not yet
+      authorized. Need user to add the deploy public key to /root/.ssh/authorized_keys,
+      then re-run Deploy workflow. Public key + instructions handed to user.

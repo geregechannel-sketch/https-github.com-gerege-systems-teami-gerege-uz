@@ -38,3 +38,11 @@
 - Extracted 748 CSS design tokens (light-dark() -> light+dark) + metrics (Roboto 12px, radius 4px, header 70px, sidebar 220px, 11 button colors) from live app.
 - Built docs/toshi-theme/: toshi-theme.css (tokens + .toshi-* components), preview.html, README.
 - Verified both light & dark render matches real TOSH screens.
+
+## Session 2 — Go+Postgres backend + CI/CD (user asked to build backend, test, reliable; deploy to toshi.gerege.mn)
+- Built Go+PostgreSQL backend (metadata-driven, st-token JWT, RBAC, grid DSL, generic CRUD). 12 models.
+- Tests all green: grid 91.8% cov, 7 integration tests (login/auth/dict/dashboard/CRUD/grid/RBAC) vs Postgres. Running-server smoke curl OK.
+- Repo gerege-systems/teami-gerege-uz (private); redacted live password before push.
+- CI (GitHub Actions) PASSING: gofmt/vet/test+race with Postgres service.
+- Deploy workflow + Caddy TLS deploy stack wired; secrets set. DNS toshi.gerege.mn already -> server.
+- BLOCKED: server SSH is publickey-only (password disabled). Deploy key generated + set in secrets; user must authorize it on the server, then Deploy runs.
