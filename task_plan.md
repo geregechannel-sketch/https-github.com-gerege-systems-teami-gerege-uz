@@ -110,3 +110,12 @@ server (SSH password auth is disabled). Then `gh workflow run Deploy` finishes i
 - [x] Virtual model + SubAction generic handlers; router auto-mounts full surface
 - [x] Total: 411 base models + 588 sub-actions = 999 endpoints; all tests green
 - [x] Console logged out (user request)
+
+### Phase 12 — Frontend (replicate all screens, own stack)  — Status: complete (LIVE)
+- [x] Stack: Vite + React + TS + React Router + MapLibre GL + Toshi theme
+- [x] Login (POST user/login -> st-token), auth context, protected routes
+- [x] App shell: TOSH header (user, theme toggle) + dark sidebar (real module menu)
+- [x] Dashboard: 3 KPI tiles (homedashboard/data) + module cards
+- [x] Generic Module page: any {model} -> grid (columns from response) + detail form (CRUD) + grid query
+- [x] GIS page: MapLibre + OSM + point markers
+- [x] All done: Vite+React+TS+MapLibre+Toshi theme; login/shell/dashboard/generic-grid/archives/GIS; LIVE at https://toshi.gerege.mn; CI/CD builds+deploys frontend.

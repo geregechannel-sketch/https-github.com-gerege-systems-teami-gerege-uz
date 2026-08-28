@@ -23,6 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Build frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci && npm run build
+        working-directory: frontend
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -30,11 +37,14 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Sync backend to server
+      - name: Sync backend + frontend to server
         run: |
           rsync -az --delete --exclude '.env' --exclude 'bin/' \
             -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
             backend/ "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/opt/toshi/backend/"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
+            frontend/dist/ "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/opt/toshi/frontend/"
 
       - name: Write .env and deploy stack
         env:
@@ -54,9 +64,9 @@ jobs:
           SEED_ADMIN_USER=admin
           SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
           ENV
-          # install host nginx site ONLY on first deploy; certbot's TLS edits to this
-          # file must be preserved on subsequent deploys, so never overwrite it.
-          if [ ! -f /etc/nginx/sites-available/toshi.gerege.mn ]; then
+          # install host nginx site (self-contained: static SPA + /ec3api proxy + TLS).
+          # Only apply once the Let's Encrypt cert exists, so nginx -t never fails.
+          if [ -f /etc/letsencrypt/live/toshi.gerege.mn/fullchain.pem ]; then
             cp deploy/nginx-toshi.conf /etc/nginx/sites-available/toshi.gerege.mn
             ln -sf /etc/nginx/sites-available/toshi.gerege.mn /etc/nginx/sites-enabled/toshi.gerege.mn
             nginx -t && systemctl reload nginx || true
@@ -72,3 +82,4 @@ jobs:
             curl -fsS https://toshi.gerege.mn/health && break || sleep 5
           done
           curl -fsS https://toshi.gerege.mn/health
+          curl -fsS https://toshi.gerege.mn/ | grep -q "TEAMI Enterprise" && echo "frontend OK"

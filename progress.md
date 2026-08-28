@@ -69,3 +69,11 @@
 - CRUD roundtrip on generated 'channels': create returns UPPER_CASE record, totalCount=1.
 - login 405 on GET (POST-only, correct), channels 401 without token (auth enforced), health 200.
 - DONE: ~1000 endpoints implemented, tested, CI/CD, and LIVE at https://toshi.gerege.mn.
+
+## Session 2 — Frontend (replicate all screens, own stack) — LIVE
+- Stack: Vite + React + TS + React Router + MapLibre GL + extracted Toshi theme.
+- Metadata-driven (like backend): login, app shell (header+dark sidebar real menu), dashboard (KPI+cards),
+  generic Module page (any model -> grid + detail CRUD + query filter), Archives, GIS (OSM map + markers).
+- Wired to live API; deployed static to /opt/toshi/frontend; nginx serves SPA + proxies /ec3api.
+- Verified in browser: login -> dashboard (live KPI 1/0/66%), pointtypes grid (6 seeded rows), GIS map (Choibalsan, 1 point).
+- deploy.yml builds frontend (node) + rsyncs dist; nginx config self-contained (static+api+TLS).
