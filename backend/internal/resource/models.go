@@ -53,9 +53,9 @@ func RegisterCore(r *Registry) {
 	// --- Groups (CRUD) ---
 	r.Add(&Model{
 		Name: "groups", Table: "groups",
-		PKField:  f("GR_ID", "gr_id", false, false),
+		PKField:   f("GR_ID", "gr_id", false, false),
 		WritePriv: "config",
-		List:     true, Get: true, Create: true, Update: true, Delete: true,
+		List:      true, Get: true, Create: true, Update: true, Delete: true,
 		Fields: []Field{
 			f("GR_CODE", "gr_code", true, false),
 			f("GR_NAME", "gr_name", true, true),
@@ -68,9 +68,9 @@ func RegisterCore(r *Registry) {
 	// --- Points (CRUD) ---
 	r.Add(&Model{
 		Name: "points", Table: "points",
-		PKField:  f("POINT_ID", "point_id", false, false),
+		PKField:   f("POINT_ID", "point_id", false, false),
 		WritePriv: "config",
-		List:     true, Get: true, Create: true, Update: true, Delete: true,
+		List:      true, Get: true, Create: true, Update: true, Delete: true,
 		Fields: []Field{
 			f("POINT_CODE", "point_code", true, true),
 			f("POINT_NAME", "point_name", true, true),
@@ -89,9 +89,9 @@ func RegisterCore(r *Registry) {
 	// --- Meters / measuringdevices (CRUD) ---
 	r.Add(&Model{
 		Name: "measuringdevices", Table: "meters",
-		PKField:  f("METER_ID", "meter_id", false, false),
+		PKField:   f("METER_ID", "meter_id", false, false),
 		WritePriv: "config",
-		List:     true, Get: true, Create: true, Update: true, Delete: true,
+		List:      true, Get: true, Create: true, Update: true, Delete: true,
 		Fields: []Field{
 			f("METER_TYPE_ID", "meter_type_id", true, true),
 			f("METER_NUMBER", "meter_number", true, true),
@@ -104,9 +104,9 @@ func RegisterCore(r *Registry) {
 	// --- Data points (CRUD) ---
 	r.Add(&Model{
 		Name: "datapoints", Table: "data_points",
-		PKField:  f("DP_ID", "dp_id", false, false),
+		PKField:   f("DP_ID", "dp_id", false, false),
 		WritePriv: "config",
-		List:     true, Get: true, Create: true, Update: true, Delete: true,
+		List:      true, Get: true, Create: true, Update: true, Delete: true,
 		Fields: []Field{
 			f("DP_CODE", "dp_code", true, false),
 			f("DP_NAME", "dp_name", true, true),
