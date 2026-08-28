@@ -56,6 +56,7 @@ func setup(t *testing.T) (*httptest.Server, *pgxpool.Pool) {
 	mgr := auth.NewManager("test-secret", time.Hour)
 	reg := resource.NewRegistry()
 	resource.RegisterCore(reg)
+	resource.RegisterGenerated(reg)
 	srv := httptest.NewServer(router.New(pool, mgr, reg))
 	t.Cleanup(func() { srv.Close(); pool.Close() })
 	return srv, pool

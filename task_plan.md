@@ -103,3 +103,10 @@ server (SSH password auth is disabled). Then `gh workflow run Deploy` finishes i
 - [x] Deployed: docker compose (api+db) behind host nginx (80/443 already taken by nginx),
       TLS via certbot (Let's Encrypt). LIVE: https://toshi.gerege.mn/health OK, login OK.
 - [x] deploy.yml wired to same flow; GitHub secrets synced; CI deploy key authorized.
+
+### Phase 11 — Full ~1000-endpoint implementation (user: "chi barag 1000 api bichih ystoi")  — Status: complete
+- [x] cmd/gen: generator reads docs/endpoints-params.txt -> tables + registry models + sub-actions
+- [x] 0003_generated.sql (251 tables) + generated.go (399 models + 588 sub-actions)
+- [x] Virtual model + SubAction generic handlers; router auto-mounts full surface
+- [x] Total: 411 base models + 588 sub-actions = 999 endpoints; all tests green
+- [x] Console logged out (user request)

@@ -52,16 +52,42 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 		httpx.OK(w, map[string]interface{}{"DB_TIME": t})
 	}))
 
-	// Generic model routes.
+	// Track registered "METHOD pattern" to avoid duplicate mounts (panic).
+	seen := map[string]bool{}
+	handle := func(pattern string, h http.Handler) {
+		if seen[pattern] {
+			return
+		}
+		seen[pattern] = true
+		mux.Handle(pattern, h)
+	}
+
+	// Generic base model routes (CRUD + grid).
 	for _, name := range reg.Names() {
 		m, _ := reg.Get(name)
 		p := base + name
-		mux.Handle("GET "+p, protected(func(w http.ResponseWriter, r *http.Request) { rh.List(w, r, m) }))
-		mux.Handle("POST "+p+"/query", protected(func(w http.ResponseWriter, r *http.Request) { rh.Query(w, r, m) }))
-		mux.Handle("GET "+p+"/{id}", protected(func(w http.ResponseWriter, r *http.Request) { rh.GetOne(w, r, m, r.PathValue("id")) }))
-		mux.Handle("POST "+p, protected(func(w http.ResponseWriter, r *http.Request) { rh.Create(w, r, m) }))
-		mux.Handle("PUT "+p+"/{id}", protected(func(w http.ResponseWriter, r *http.Request) { rh.Update(w, r, m, r.PathValue("id")) }))
-		mux.Handle("DELETE "+p+"/{id}", protected(func(w http.ResponseWriter, r *http.Request) { rh.Delete(w, r, m, r.PathValue("id")) }))
+		handle("GET "+p, protected(func(w http.ResponseWriter, r *http.Request) { rh.List(w, r, m) }))
+		handle("POST "+p+"/query", protected(func(w http.ResponseWriter, r *http.Request) { rh.Query(w, r, m) }))
+		handle("GET "+p+"/{id}", protected(func(w http.ResponseWriter, r *http.Request) { rh.GetOne(w, r, m, r.PathValue("id")) }))
+		handle("POST "+p, protected(func(w http.ResponseWriter, r *http.Request) { rh.Create(w, r, m) }))
+		handle("PUT "+p+"/{id}", protected(func(w http.ResponseWriter, r *http.Request) { rh.Update(w, r, m, r.PathValue("id")) }))
+		handle("DELETE "+p+"/{id}", protected(func(w http.ResponseWriter, r *http.Request) { rh.Delete(w, r, m, r.PathValue("id")) }))
+	}
+
+	// Generic sub-action routes ({model}/{action}) for the full endpoint surface.
+	for _, sa := range resource.GeneratedSubActions() {
+		if sa.Action == "query" {
+			continue // reserved for the grid route above
+		}
+		baseModel, _ := reg.Get(sa.Base)
+		p := base + sa.Base + "/" + sa.Action
+		bm := baseModel
+		if sa.Get {
+			handle("GET "+p, protected(func(w http.ResponseWriter, r *http.Request) { rh.SubAction(w, r, bm) }))
+		}
+		if sa.Post {
+			handle("POST "+p, protected(func(w http.ResponseWriter, r *http.Request) { rh.SubAction(w, r, bm) }))
+		}
 	}
 
 	return cors(mux)

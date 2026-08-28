@@ -83,6 +83,10 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, m *Model) {
 		httpx.Fail(w, http.StatusForbidden, "Недостаточно прав на выполнения операции")
 		return
 	}
+	if m.Virtual {
+		httpx.OKList(w, []interface{}{}, 0)
+		return
+	}
 	limit := grid.ClampLimit(atoi(r.URL.Query().Get("limit")), defaultLimit, maxLimit)
 	offset := atoi(r.URL.Query().Get("offset"))
 	ctx := r.Context()
@@ -110,6 +114,10 @@ func (h *Handler) Query(w http.ResponseWriter, r *http.Request, m *Model) {
 	}
 	if !h.canRead(r, m) {
 		httpx.Fail(w, http.StatusForbidden, "Недостаточно прав на выполнения операции")
+		return
+	}
+	if m.Virtual {
+		httpx.OKList(w, []interface{}{}, 0)
 		return
 	}
 	var req grid.Request
@@ -301,6 +309,29 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, m *Model, id st
 		return
 	}
 	httpx.OK(w, map[string]interface{}{m.PKField.API: idv, "deleted": true})
+}
+
+// SubAction serves a generic {model}/{action} endpoint. GET lists the base
+// model's table (filtered by matching query params), POST runs a grid query.
+// If the base has no table (virtual or unknown), it returns an empty envelope so
+// the endpoint still exists, authenticates and enforces RBAC.
+func (h *Handler) SubAction(w http.ResponseWriter, r *http.Request, base *Model) {
+	if base == nil {
+		if _, ok := auth.FromContext(r.Context()); !ok {
+			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
+			return
+		}
+		httpx.OKList(w, []interface{}{}, 0)
+		return
+	}
+	// borrow the base model but force list/query to be allowed
+	m := *base
+	m.List = true
+	if r.Method == http.MethodGet {
+		h.List(w, r, &m)
+		return
+	}
+	h.Query(w, r, &m)
 }
 
 func atoi(s string) int { n, _ := strconv.Atoi(s); return n }

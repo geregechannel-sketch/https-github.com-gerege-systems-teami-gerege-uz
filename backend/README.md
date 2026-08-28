@@ -53,8 +53,13 @@ make up      # docker compose (api + postgres)
 
 Бүртгэсэн model: `grouptypes, pointtypes, measuringdevicetypes, ecocategories,
 ecoprofiles, dataservers, systemmodules, groups, points, measuringdevices, datapoints, events`.
-Бусад 900+ endpoint-ыг registry-д model нэмэх замаар өргөтгөнө
-([../docs/endpoints-params.txt](../docs/endpoints-params.txt)).
+**Бүрэн гадаргуу (~999 endpoint):** `cmd/gen` нь [../docs/endpoints-params.txt](../docs/endpoints-params.txt)-ээс
+бүх non-core root-д Postgres хүснэгт + registry model (CRUD+grid) болон sub-action route-уудыг
+**автоматаар үүсгэнэ** (`internal/db/migrations/0003_generated.sql`, `internal/resource/generated.go`).
+Дахин үүсгэх: `go run ./cmd/gen`. Нийт: 411 base model + 588 sub-action = **999 endpoint**.
+Entity бүхий root бодит CRUD/grid; хүснэгтгүй (menu/action) root-ууд зөв дугтуйтай хоосон
+өгөгдөл буцаана (auth+RBAC хэвээр). Метадатагаас гаралгүй тусгай логик (SQL-driven тайлан
+г.м.)-ийг цаашид тухайлан хэрэгжүүлж болно.
 
 ## Тест
 - Unit: grid filter DSL (injection-ээс хамгаалалт), JWT (roundtrip/tamper/expiry).

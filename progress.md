@@ -55,3 +55,11 @@
 - Host nginx (already on 80/443, serving open/osb.gerege.mn) reverse-proxies toshi.gerege.mn; TLS via certbot.
 - LIVE + verified: https://toshi.gerege.mn/health -> {success:true}; http->https 301; login -> JWT.
 - deploy.yml aligned (nginx first-deploy-only to preserve certbot TLS); secrets synced.
+
+## Session 2 — FULL ~1000-endpoint backend (user: build ~1000 APIs)
+- Logged out VNC console.
+- Built cmd/gen generator: parses docs/endpoints-params.txt -> 0003_generated.sql (251 tables) + generated.go (399 base models + 588 sub-actions).
+- Added Virtual model + generic SubAction handler; router auto-mounts base CRUD/grid + every {model}/{action}.
+- Total surface: 411 base models + 588 sub-actions = 999 endpoints. All tests green (surface + count + auth + CRUD).
+- Column safety: c_ prefix (reserved-word proof), ?query variants stripped, table g_ prefix.
+- Next: commit -> CI/CD auto-deploys full surface to toshi.gerege.mn.

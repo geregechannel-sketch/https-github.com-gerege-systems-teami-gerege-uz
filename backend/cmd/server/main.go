@@ -40,6 +40,7 @@ func main() {
 	mgr := auth.NewManager(cfg.JWTSecret, cfg.JWTTTL)
 	reg := resource.NewRegistry()
 	resource.RegisterCore(reg)
+	resource.RegisterGenerated(reg) // full ~983-endpoint surface
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,

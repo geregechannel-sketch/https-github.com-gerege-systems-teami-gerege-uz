@@ -23,8 +23,21 @@ type Model struct {
 	ReadPriv  string // privilege required to read (""=any authenticated)
 	WritePriv string // privilege required to create/update/delete
 
+	// Virtual models have no backing table; List/Query return an empty envelope
+	// so the endpoint still exists, authenticates and enforces RBAC.
+	Virtual bool
+
 	// Enabled actions.
 	List, Get, Create, Update, Delete bool
+}
+
+// SubActionSpec describes a generic {model}/{action} endpoint mounted against a
+// base model's table (GET -> list, POST -> grid query), or empty if virtual.
+type SubActionSpec struct {
+	Base   string
+	Action string
+	Get    bool
+	Post   bool
 }
 
 // resolve returns the db column for an API name if it is a known field of the model.
