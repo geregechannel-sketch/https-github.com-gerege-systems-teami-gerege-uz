@@ -77,3 +77,9 @@
 - Wired to live API; deployed static to /opt/toshi/frontend; nginx serves SPA + proxies /ec3api.
 - Verified in browser: login -> dashboard (live KPI 1/0/66%), pointtypes grid (6 seeded rows), GIS map (Choibalsan, 1 point).
 - deploy.yml builds frontend (node) + rsyncs dist; nginx config self-contained (static+api+TLS).
+
+## Session 2 — Branded login screen + app starts from login
+- Fetched real TOSH logo (assets/img/logo.png) and embedded it.
+- Rebuilt Login as a branded full-page screen: logo, "TEAMI Enterprise 3.0", login/password, language selector, error, footer, subtle gradient bg, themed (light/dark).
+- Confirmed app entry: root "/" redirects to /login when unauthenticated -> starts from login.
+- Verified live: login screen renders, login -> dashboard works. Deployed to toshi.gerege.mn.
