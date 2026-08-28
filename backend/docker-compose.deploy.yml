@@ -25,21 +25,10 @@ services:
       SEED_ADMIN_USER: ${SEED_ADMIN_USER:-admin}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-admin123}
       ADDR: ":8080"
-    restart: unless-stopped
-
-  caddy:
-    image: caddy:2-alpine
-    depends_on: [api]
+    # Host nginx (ports 80/443) reverse-proxies toshi.gerege.mn -> here.
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      - "127.0.0.1:8080:8080"
     restart: unless-stopped
 
 volumes:
   pgdata:
-  caddy_data:
-  caddy_config:
