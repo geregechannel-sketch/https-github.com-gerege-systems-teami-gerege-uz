@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="mn" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toshi Theme — Preview</title>
+<link rel="stylesheet" href="toshi-theme.css">
+<style>
+  html,body{margin:0;height:100%}
+  body{font-family:var(--toshi-font);background:var(--bodyBg);color:var(--textColor)}
+  .layout{display:flex;height:100vh}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .body{flex:1;overflow:auto;padding:20px;background:var(--contentBg)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+  h3{color:var(--textColorHover);margin:24px 0 8px}
+  .swatch{display:inline-flex;flex-direction:column;gap:4px;align-items:center;font-size:10px}
+  .swatch i{width:44px;height:28px;border-radius:4px;display:block}
+</style>
+</head>
+<body class="toshi">
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="toshi-menu">
+    <div style="padding:14px 16px;font-weight:700">TOSH<span style="opacity:.7">ELECTROAPPARAT</span></div>
+    <div class="toshi-menu__item is-active">Просмотр архивов</div>
+    <div class="toshi-menu__item">Качество показаний</div>
+    <div class="toshi-menu__item">Регистр событий</div>
+    <div class="toshi-menu__item">Считывание показаний</div>
+    <div class="toshi-menu__item">Конфигурация системы</div>
+    <div class="toshi-menu__item">Отчеты</div>
+    <div class="toshi-menu__item">GIS</div>
+    <div class="toshi-menu__item">Управление нагрузкой</div>
+  </nav>
+
+  <div class="main">
+    <!-- Header -->
+    <header class="toshi-header">
+      <button class="toshi-header__btn">☰</button>
+      <strong style="color:var(--textColorHover)">TEAMI ENTERPRISE 3.0</strong>
+      <div class="row" style="margin:0">
+        <button class="toshi-header__btn" title="Theme" onclick="toggleTheme()">◐</button>
+        <button class="toshi-header__btn">ERDENEBATT</button>
+      </div>
+    </header>
+
+    <div class="body">
+      <!-- KPI stats -->
+      <div class="cards">
+        <div class="toshi-stat"><div>Всего действительных точек учета</div><div class="toshi-stat__value">87 шт.</div></div>
+        <div class="toshi-stat"><div>Всего действительных точек считывания</div><div class="toshi-stat__value">30 шт.</div></div>
+        <div class="toshi-stat"><div>Процент доступных каналов связи</div><div class="toshi-stat__value">100 %</div></div>
+      </div>
+
+      <!-- Module cards -->
+      <h3>Модулийн карт (.toshi-card)</h3>
+      <div class="cards">
+        <div class="toshi-card"><div class="toshi-card__title">Просмотр архивов</div>
+          <div>Модуль для просмотра данных точек измерения и учета.</div>
+          <div class="row"><button class="toshi-btn toshi-btn--lightblue">Открыть</button></div></div>
+        <div class="toshi-card"><div class="toshi-card__title">Конфигурация системы</div>
+          <div>Конфигурирование параметров, классификаторов, пользователей.</div>
+          <div class="row"><button class="toshi-btn toshi-btn--lightblue">Открыть</button></div></div>
+      </div>
+
+      <!-- Buttons -->
+      <h3>Товчлуур (.toshi-btn--*)</h3>
+      <div class="row">
+        <button class="toshi-btn">Default</button>
+        <button class="toshi-btn toshi-btn--green">Green</button>
+        <button class="toshi-btn toshi-btn--blue">Blue</button>
+        <button class="toshi-btn toshi-btn--lightblue">Lightblue</button>
+        <button class="toshi-btn toshi-btn--red">Red</button>
+        <button class="toshi-btn toshi-btn--orange">Orange</button>
+        <button class="toshi-btn toshi-btn--yellow">Yellow</button>
+        <button class="toshi-btn toshi-btn--purple">Purple</button>
+        <button class="toshi-btn toshi-btn--crimson">Crimson</button>
+        <button class="toshi-btn toshi-btn--emerald">Emerald</button>
+        <button class="toshi-btn toshi-btn--green" disabled>Disabled</button>
+      </div>
+
+      <!-- Form -->
+      <h3>Форм (.toshi-input / select / checkbox / radio)</h3>
+      <div class="row">
+        <input class="toshi-input" placeholder="Наименование точки">
+        <input class="toshi-input" placeholder="Код точки">
+        <select class="toshi-select"><option>Типы точек…</option></select>
+        <label><input type="checkbox" class="toshi-checkbox" checked> Действителен</label>
+        <label><input type="checkbox" class="toshi-checkbox"> Коммерческий</label>
+        <label><input type="radio" class="toshi-radio" name="r" checked> По ресурсу</label>
+        <label><input type="radio" class="toshi-radio" name="r"> По дискретности</label>
+      </div>
+
+      <!-- Tabs -->
+      <h3>Таб (.toshi-tab)</h3>
+      <div class="toshi-tabs">
+        <div class="toshi-tab is-active">По ресурсу</div>
+        <div class="toshi-tab">По дискретности</div>
+        <div class="toshi-tab">Поиск</div>
+        <div class="toshi-tab">Настройки</div>
+      </div>
+
+      <!-- Grid -->
+      <h3>Хүснэгт (.toshi-grid)</h3>
+      <table class="toshi-grid">
+        <thead><tr><th>METER_ID</th><th>METER_NUMBER</th><th>METER_CLASS</th><th>POINT_NAME</th></tr></thead>
+        <tbody>
+          <tr><td>101</td><td>SN-00291</td><td>0.5S</td><td>ТП 43 ЖКН№8</td></tr>
+          <tr><td>102</td><td>SN-00292</td><td>1.0</td><td>Дорнод-РЭС</td></tr>
+          <tr class="is-selected"><td>103</td><td>SN-00293</td><td>0.5S</td><td>г.Чойбалсан</td></tr>
+          <tr><td>104</td><td>SN-00294</td><td>1.0</td><td>Монголия</td></tr>
+        </tbody>
+      </table>
+
+      <!-- Popup + Tree + Panel -->
+      <h3>Popup / Мод / Панел</h3>
+      <div class="row" style="align-items:flex-start">
+        <div class="toshi-popup" style="width:260px">
+          <div class="toshi-popup__head">Свойства точки</div>
+          <div style="padding:12px"><input class="toshi-input" placeholder="Наименование"><div class="row"><button class="toshi-btn toshi-btn--green">Сохранить</button><button class="toshi-btn toshi-btn--red">Удалить</button></div></div>
+        </div>
+        <div class="toshi-tree" style="width:220px;padding:8px">
+          <div class="toshi-tree__item">Монголия</div>
+          <div class="toshi-tree__item" style="padding-left:16px">г.Чойбалсан, ЖКН№8</div>
+          <div class="toshi-tree__item is-active" style="padding-left:32px">ТП 43 ЖКН№8</div>
+        </div>
+        <div style="width:220px">
+          <div class="toshi-panel__head">Выбор ТУ</div>
+          <div class="toshi-accordion__head is-active">Присвоенные профили точки</div>
+          <div class="toshi-accordion__head">Тарифные планы точки</div>
+        </div>
+      </div>
+
+      <!-- Palette -->
+      <h3>Товчлуурын палитр</h3>
+      <div class="row">
+        <span class="swatch"><i style="background:var(--btnGreenBg)"></i>green</span>
+        <span class="swatch"><i style="background:var(--btnBlueBg)"></i>blue</span>
+        <span class="swatch"><i style="background:var(--btnLightblueBg)"></i>lightblue</span>
+        <span class="swatch"><i style="background:var(--btnRedBg)"></i>red</span>
+        <span class="swatch"><i style="background:var(--btnOrangeBg)"></i>orange</span>
+        <span class="swatch"><i style="background:var(--btnYellowBg)"></i>yellow</span>
+        <span class="swatch"><i style="background:var(--btnPurpleBg)"></i>purple</span>
+        <span class="swatch"><i style="background:var(--btnCrimsonPurpleBg)"></i>crimson</span>
+        <span class="swatch"><i style="background:var(--btnEmeraldBg)"></i>emerald</span>
+      </div>
+
+      <div class="row"><span class="toshi-loader"></span> ачаалж байна…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleTheme(){
+  var r=document.documentElement;
+  r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+</script>
+</body>
+</html>

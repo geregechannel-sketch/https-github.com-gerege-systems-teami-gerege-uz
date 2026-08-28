@@ -1,0 +1,14 @@
+# Go
+backend/bin/
+backend/server
+*.exe
+*.test
+*.out
+# scratch / bundles
+scratchpad/
+bundle/
+*.log
+.DS_Store
+# env
+.env
+backend/.env
