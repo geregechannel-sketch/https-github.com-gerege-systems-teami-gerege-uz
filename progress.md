@@ -46,3 +46,12 @@
 - CI (GitHub Actions) PASSING: gofmt/vet/test+race with Postgres service.
 - Deploy workflow + Caddy TLS deploy stack wired; secrets set. DNS toshi.gerege.mn already -> server.
 - BLOCKED: server SSH is publickey-only (password disabled). Deploy key generated + set in secrets; user must authorize it on the server, then Deploy runs.
+
+## Session 2 — DEPLOYED to toshi.gerege.mn (LIVE)
+- Server SSH was key-only + no keys present (fresh Ubuntu 26.04). Password auth off.
+- Entered via provider VNC console (38.180.91.53:5902) with vncdotool.
+- QEMU VNC keymap breaks shifted symbols; `key <symbol>` hangs. Solved: generated a no-'+' ed25519 key, wrote via `tee` (no redirect), fixed underscore in filename via backtick+printf '\137'.
+- Installed nothing extra (docker preinstalled). Deployed docker compose (api+db), api on 127.0.0.1:8080.
+- Host nginx (already on 80/443, serving open/osb.gerege.mn) reverse-proxies toshi.gerege.mn; TLS via certbot.
+- LIVE + verified: https://toshi.gerege.mn/health -> {success:true}; http->https 301; login -> JWT.
+- deploy.yml aligned (nginx first-deploy-only to preserve certbot TLS); secrets synced.
