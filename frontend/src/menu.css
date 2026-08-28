@@ -1,0 +1,76 @@
+/* Cascading flyout sidebar menu (mirrors the real TEAMI behaviour). */
+.tm-menu {
+  width: 240px;
+  flex: 0 0 240px;
+  background: var(--menuBg);
+  color: var(--menuTextColor);
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+.tm-brand {
+  display: block;
+  padding: 14px 16px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tm-brand small { opacity: 0.6; font-size: 11px; }
+
+.tm-list,
+.tm-flyout {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tm-item {
+  position: relative;
+}
+.tm-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 16px;
+  color: var(--menuTextColor);
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.tm-link:hover,
+.tm-item.is-open > .tm-link {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--textColorHover);
+}
+.tm-link.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--textColorHover);
+}
+.tm-caret { opacity: 0.55; font-size: 11px; }
+
+/* flyout panel to the right, shown on hover of the parent item */
+.tm-flyout {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 220px;
+  background: var(--menuBg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  display: none;
+  z-index: 50;
+}
+.tm-item:hover > .tm-flyout {
+  display: block;
+}
+.tm-flyout .tm-link {
+  padding: 9px 16px;
+}
+
+.tm-section {
+  padding: 12px 16px 4px;
+  opacity: 0.45;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}

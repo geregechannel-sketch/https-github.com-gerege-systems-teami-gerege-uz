@@ -1,7 +1,8 @@
-import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MENU, DICTS, MenuNode } from "../menu";
 import { api } from "../api";
+import "../menu.css";
+import logo from "../assets/logo.png";
 
 function toggleTheme() {
   const r = document.documentElement;
@@ -12,69 +13,86 @@ function toggleTheme() {
   } catch {}
 }
 
-function Node({ node, depth }: { node: MenuNode; depth: number }) {
-  const [open, setOpen] = useState(depth === 0 ? false : true);
+function target(n: MenuNode): string | undefined {
+  return n.model ? `/m/${n.model}` : n.path;
+}
+
+function Item({ node }: { node: MenuNode }) {
   const nav = useNavigate();
   const loc = useLocation();
-  const target = node.model ? `/m/${node.model}` : node.path;
-  const active = target && loc.pathname === target;
+  const t = target(node);
+  const active = t && loc.pathname === t;
+  const hasChildren = !!node.children?.length;
 
-  if (node.children) {
-    return (
-      <div>
-        <div
-          className="toshi-menu__item"
-          style={{ paddingLeft: 12 + depth * 12, cursor: "pointer", justifyContent: "space-between" }}
-          onClick={() => setOpen(!open)}
-        >
-          <span>{node.label}</span>
-          <span style={{ opacity: 0.6 }}>{open ? "▾" : "▸"}</span>
-        </div>
-        {open && node.children.map((c, i) => <Node key={i} node={c} depth={depth + 1} />)}
-      </div>
-    );
-  }
   return (
-    <div
-      className={"toshi-menu__item" + (active ? " is-active" : "")}
-      style={{ paddingLeft: 12 + depth * 12, cursor: "pointer" }}
-      onClick={() => target && nav(target)}
-    >
-      {node.label}
-    </div>
+    <li className="tm-item">
+      <div
+        className={"tm-link" + (active ? " is-active" : "")}
+        onClick={() => (t ? nav(t) : undefined)}
+      >
+        <span>{node.label}</span>
+        {hasChildren && <span className="tm-caret">▸</span>}
+      </div>
+      {hasChildren && (
+        <ul className="tm-flyout">
+          {node.children!.map((c, i) => (
+            <Item key={i} node={c} />
+          ))}
+        </ul>
+      )}
+    </li>
   );
 }
+
+const HEADER_ICONS = [
+  { t: "Инфо", i: "ℹ" },
+  { t: "Статистика", i: "▤" },
+  { t: "Сообщения", i: "✉" },
+  { t: "Настройки", i: "⚙" },
+];
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const nav = useNavigate();
   const user = (() => {
     try {
-      return localStorage.getItem("userName") || "ERDENEBATT";
+      return localStorage.getItem("userName") || "ADMIN";
     } catch {
-      return "ERDENEBATT";
+      return "ADMIN";
     }
   })();
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      <nav className="toshi-menu" style={{ width: 240, flex: "0 0 240px", overflowY: "auto" }}>
-        <Link to="/" style={{ display: "block", padding: "14px 16px", fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-          TEAMI ENTERPRISE <span style={{ opacity: 0.6, fontSize: 11 }}>3.0</span>
+      <nav className="tm-menu">
+        <Link to="/" className="tm-brand">
+          TEAMI ENTERPRISE <small>3.0</small>
         </Link>
-        {MENU.map((n, i) => <Node key={i} node={n} depth={0} />)}
-        <div style={{ padding: "10px 16px", opacity: 0.5, fontSize: 11, marginTop: 12 }}>СПРАВОЧНИКИ</div>
-        {DICTS.map((n, i) => <Node key={"d" + i} node={n} depth={1} />)}
+        <ul className="tm-list">
+          {MENU.map((n, i) => (
+            <Item key={i} node={n} />
+          ))}
+        </ul>
+        <div className="tm-section">СПРАВОЧНИКИ</div>
+        <ul className="tm-list">
+          {DICTS.map((n, i) => (
+            <Item key={"d" + i} node={n} />
+          ))}
+        </ul>
       </nav>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <header className="toshi-header" style={{ flex: "0 0 auto" }}>
-          <button className="toshi-header__btn" onClick={() => nav(-1)}>←</button>
-          <strong style={{ color: "var(--textColorHover)", letterSpacing: 1 }}>TOSH ELECTROAPPARAT</strong>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button className="toshi-header__btn" title="Тема" onClick={toggleTheme}>◐</button>
-            <button className="toshi-header__btn">{user}</button>
+        <header className="toshi-header" style={{ flex: "0 0 auto", justifyContent: "space-between", position: "relative" }}>
+          <button className="toshi-header__btn" title="Меню">☰</button>
+          <img src={logo} alt="TOSH ELECTROAPPARAT" style={{ height: 46, position: "absolute", left: "50%", transform: "translateX(-50%)" }} />
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <button className="toshi-header__btn" title="Профиль">👤 {user}</button>
+            {HEADER_ICONS.map((h, i) => (
+              <button key={i} className="toshi-header__btn" title={h.t}>{h.i}</button>
+            ))}
+            <button className="toshi-header__btn" title="Тема" onClick={toggleTheme}>☾</button>
+            <button className="toshi-header__btn" title="Помощь">?</button>
             <button
               className="toshi-header__btn"
-              title="Гарах"
+              title="Выход"
               onClick={() => {
                 api.logout();
                 nav("/login");
