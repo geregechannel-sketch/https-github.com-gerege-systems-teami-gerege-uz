@@ -89,3 +89,9 @@ DONE. Full docs (10 files) + complete 983-endpoint catalog. All phases complete.
 
 ## Next Step
 Build the Go backend under backend/ and get all tests green (Phase 9).
+
+### Phase 10 — CI/CD + deploy to toshi.gerege.mn  — Status: pending
+- [ ] Dockerfile (multi-stage) + docker-compose (api + postgres) + .env.example
+- [ ] GitHub Actions: build+test on push; deploy over SSH to server (docker compose up)
+- [ ] Configure server (docker, firewall), DNS toshi.gerege.mn, reverse proxy/TLS
+- [ ] Store secrets in GitHub (SSH key, DB pass) — never commit server creds
