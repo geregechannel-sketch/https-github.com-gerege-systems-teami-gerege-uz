@@ -39,8 +39,6 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// StrictMode intentionally omitted: it double-invokes effects, which breaks the
+// MapLibre map lifecycle (create -> remove -> create) on the GIS screen.
+createRoot(document.getElementById("root")!).render(<App />);
