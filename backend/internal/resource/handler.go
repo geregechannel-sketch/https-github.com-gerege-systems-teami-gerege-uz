@@ -311,6 +311,79 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, m *Model, id st
 	httpx.OK(w, map[string]interface{}{m.PKField.API: idv, "deleted": true})
 }
 
+// Import bulk-upserts rows (UPPER_CASE keyed, incl. PK) into a model's table.
+// POST /ec3api/v1/admin/import/{model}?replace=1  body: [ {FIELD:value,...}, ... ]
+// With replace=1 the table is cleared first (loads real IDs cleanly).
+func (h *Handler) Import(w http.ResponseWriter, r *http.Request, m *Model) {
+	if !h.canWrite(r, m) {
+		httpx.Fail(w, http.StatusForbidden, "Недостаточно прав на выполнения операции")
+		return
+	}
+	if m.Virtual || m.Table == "" {
+		httpx.Fail(w, http.StatusBadRequest, "model has no table")
+		return
+	}
+	var rows []map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&rows); err != nil {
+		httpx.Fail(w, http.StatusBadRequest, "expected a JSON array of rows")
+		return
+	}
+	ctx := r.Context()
+	if r.URL.Query().Get("replace") == "1" {
+		if _, err := h.pool.Exec(ctx, "DELETE FROM "+m.Table); err != nil {
+			httpx.Fail(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+	fields := m.allFields()
+	n := 0
+	for _, row := range rows {
+		var cols, ph []string
+		var args []interface{}
+		i := 1
+		for _, f := range fields {
+			if v, ok := lookupCI(row, f.API); ok {
+				cols = append(cols, f.Col)
+				ph = append(ph, fmt.Sprintf("$%d", i))
+				args = append(args, normalize(v))
+				i++
+			}
+		}
+		if len(cols) == 0 {
+			continue
+		}
+		var upd []string
+		for _, c := range cols {
+			if c != m.PKField.Col {
+				upd = append(upd, fmt.Sprintf("%s=EXCLUDED.%s", c, c))
+			}
+		}
+		conflict := "DO NOTHING"
+		if len(upd) > 0 {
+			conflict = "DO UPDATE SET " + strings.Join(upd, ",")
+		}
+		sql := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) ON CONFLICT (%s) %s",
+			m.Table, strings.Join(cols, ","), strings.Join(ph, ","), m.PKField.Col, conflict)
+		if _, err := h.pool.Exec(ctx, sql, args...); err == nil {
+			n++
+		}
+	}
+	// keep BIGSERIAL sequence ahead of imported ids
+	_, _ = h.pool.Exec(ctx, fmt.Sprintf(
+		"SELECT setval(pg_get_serial_sequence('%s','%s'), GREATEST((SELECT COALESCE(MAX(%s),1) FROM %s),1))",
+		m.Table, m.PKField.Col, m.PKField.Col, m.Table))
+	httpx.OK(w, map[string]interface{}{"imported": n})
+}
+
+// normalize coerces empty strings for numeric-looking values to nil so imports
+// don't fail on integer columns.
+func normalize(v interface{}) interface{} {
+	if s, ok := v.(string); ok && s == "" {
+		return nil
+	}
+	return v
+}
+
 // SubAction serves a generic {model}/{action} endpoint. GET lists the base
 // model's table (filtered by matching query params), POST runs a grid query.
 // If the base has no table (virtual or unknown), it returns an empty envelope so

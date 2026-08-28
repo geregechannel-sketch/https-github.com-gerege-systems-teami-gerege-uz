@@ -62,6 +62,16 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 		mux.Handle(pattern, h)
 	}
 
+	// Bulk import (admin): POST /ec3api/v1/admin/import/{model}
+	mux.Handle("POST "+base+"admin/import/{model}", protected(func(w http.ResponseWriter, r *http.Request) {
+		m, ok := reg.Get(r.PathValue("model"))
+		if !ok {
+			httpx.Fail(w, http.StatusNotFound, "unknown model")
+			return
+		}
+		rh.Import(w, r, m)
+	}))
+
 	// Generic base model routes (CRUD + grid).
 	for _, name := range reg.Names() {
 		m, _ := reg.Get(name)
