@@ -5,8 +5,10 @@
   background: var(--menuBg);
   color: var(--menuTextColor);
   height: 100%;
-  overflow-y: auto;
-  overflow-x: visible;
+  /* overflow must stay visible so hover flyouts can escape horizontally
+     (any *-auto turns the other axis into a clipping container). */
+  overflow: visible;
+  padding-bottom: 20px;
 }
 .tm-brand {
   display: block;

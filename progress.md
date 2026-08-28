@@ -83,3 +83,11 @@
 - Rebuilt Login as a branded full-page screen: logo, "TEAMI Enterprise 3.0", login/password, language selector, error, footer, subtle gradient bg, themed (light/dark).
 - Confirmed app entry: root "/" redirects to /login when unauthenticated -> starts from login.
 - Verified live: login screen renders, login -> dashboard works. Deployed to toshi.gerege.mn.
+
+## Session 2 — Real data import + flyout menu + real-logo header
+- Added POST /ec3api/v1/admin/import/{model} (upsert incl PK, replace mode). Dropped FKs + relaxed NOT NULL (0005) for importing real, partial data.
+- Imported REAL data from source system (browser-mediated, cross-origin to my API): grouptypes 17, pointtypes 6, meter types 21, ecocategories 4, ecoprofiles 7, dataservers 7, systemmodules 35, measuringdevices 89, datapoints 31, points 87 (derived from meters).
+- Dashboard now shows real 87 accounting points / 31 reading points.
+- Rebuilt sidebar as cascading hover FLYOUT menu (nested), matching real TEAMI; header uses real TOSH logo centered + right icon cluster.
+- 0004 dedup fixed duplicated seeded dictionaries.
+- Verified live: /m/points shows real 87 points; flyout submenu opens on hover.
