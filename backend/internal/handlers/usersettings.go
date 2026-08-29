@@ -27,8 +27,8 @@ func (u *UserSettings) List(w http.ResponseWriter, r *http.Request) {
 	module := r.URL.Query().Get("uv_module")
 	rows, err := u.pool.Query(r.Context(), `
 		SELECT uv_id, uv_name, uv_public, uv_module, uv_type, uv_subtype, uv_tech_info,
-		       (SELECT user_name FROM users WHERE user_id=us.user_id) AS user_name,
-		       to_char(now(),'YYYY-MM-DD HH24:MI:SS') AS db_time
+		       COALESCE(uv_author, (SELECT user_name FROM users WHERE user_id=us.user_id)) AS uv_author,
+		       to_char(db_time,'YYYY-MM-DD HH24:MI:SS') AS db_time
 		  FROM user_settings us
 		 WHERE (user_id=$1 OR uv_public=1)
 		   AND ($2='' OR uv_module=$2)
@@ -41,13 +41,13 @@ func (u *UserSettings) List(w http.ResponseWriter, r *http.Request) {
 	out := []map[string]interface{}{}
 	for rows.Next() {
 		var (
-			id                       int64
-			public                   int
-			name, module, dbTime, un string
-			utype, subtype           *string
-			tech                     []byte
+			id                         int64
+			public                     int
+			name, module, dbTime, auth string
+			utype, subtype             *string
+			tech                       []byte
 		)
-		if err := rows.Scan(&id, &name, &public, &module, &utype, &subtype, &tech, &un, &dbTime); err != nil {
+		if err := rows.Scan(&id, &name, &public, &module, &utype, &subtype, &tech, &auth, &dbTime); err != nil {
 			httpx.Fail(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -58,10 +58,24 @@ func (u *UserSettings) List(w http.ResponseWriter, r *http.Request) {
 		out = append(out, map[string]interface{}{
 			"UV_ID": id, "UV_NAME": name, "UV_PUBLIC": public, "UV_MODULE": module,
 			"UV_TYPE": deref(utype), "UV_SUBTYPE": deref(subtype), "UV_TECH_INFO": techVal,
-			"USER_NAME": un, "DB_TIME": dbTime,
+			"UV_AUTHOR": auth, "USER_NAME": auth, "DB_TIME": dbTime,
 		})
 	}
 	httpx.OK(w, out)
+}
+
+// Delete: DELETE usersettings/{id}
+func (u *UserSettings) Delete(w http.ResponseWriter, r *http.Request) {
+	if _, ok := auth.FromContext(r.Context()); !ok {
+		httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
+		return
+	}
+	id := r.PathValue("id")
+	if _, err := u.pool.Exec(r.Context(), `DELETE FROM user_settings WHERE uv_id=$1`, id); err != nil {
+		httpx.Fail(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	httpx.OK(w, map[string]interface{}{"UV_ID": id})
 }
 
 type saveReq struct {

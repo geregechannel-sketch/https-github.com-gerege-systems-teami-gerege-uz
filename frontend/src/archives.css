@@ -152,3 +152,21 @@
   background: color-mix(in srgb, var(--btnLightblueBg) 14%, transparent);
   color: var(--btnLightblueBg);
 }
+
+/* Сохраненные формы — leaves + form editor */
+.uv-leaf { display: flex; align-items: center; gap: 7px; padding: 4px 10px; cursor: pointer; font-size: 13px; color: var(--gridTextColor); }
+.uv-leaf:hover { background: var(--rowHoverBg); }
+.uv-leaf.sel { background: var(--rowSelectedBg); color: #fff; }
+.uv-name { flex: 0 1 auto; }
+.uv-open { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--btnLightblueBg); border-radius: 3px; }
+.uv-form { padding: 14px 16px; max-width: 760px; }
+.uv-row { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 10px; margin-bottom: 10px; }
+.uv-row label { font-size: 13px; color: var(--textColor); }
+.uv-row input { height: 32px; border: 1px solid var(--borderColor); border-radius: 4px; background: var(--inputBg); color: var(--inputColor); padding: 0 10px; font-size: 13px; }
+.uv-public { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--btnGreenBg); border-radius: 4px; padding: 7px 12px; margin: 4px 0 12px; cursor: pointer; font-size: 13px; }
+.uv-public .uv-check { width: 22px; height: 22px; border-radius: 3px; background: var(--btnGreenBg); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.uv-public:not(.on) .uv-check { background: var(--wellBg); }
+.uv-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.uv-save, .uv-del { height: 38px; border: 0; border-radius: 4px; color: #fff; font-size: 13px; cursor: pointer; }
+.uv-save { background: var(--btnLightblueBg); }
+.uv-del { background: var(--btnRedBg); }

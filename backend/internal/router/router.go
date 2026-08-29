@@ -44,6 +44,7 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	// User settings
 	mux.Handle("GET "+base+"usersettings", protected(us.List))
 	mux.Handle("POST "+base+"usersettings", protected(us.Save))
+	mux.Handle("DELETE "+base+"usersettings/{id}", protected(us.Delete))
 
 	// appinfo/db_time (nice-to-have, protected)
 	mux.Handle("GET "+base+"appinfo/db_time", protected(func(w http.ResponseWriter, r *http.Request) {
