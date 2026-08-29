@@ -6,6 +6,7 @@ import {
   IcClock, IcChevron, IcSearch, IcFunnel, IcReset, IcInfo, IcHelp, IcGear,
   IcEye, IcSitemap, IcFolder,
 } from "../icons";
+import { MENU_ICONS } from "../icons";
 
 type Row = Record<string, any>;
 type PNode = { n: string; c?: PNode[] };
@@ -79,7 +80,9 @@ export default function Archives() {
       <>
         <div className="atree__node" style={{ paddingLeft: 10 + depth * 16 }} onClick={() => toggle(id)}>
           <span className="tw">{hasChildren ? (open ? "−" : "+") : ""}</span>
-          <IcFolder size={14} color="#8a97a5" />
+          {depth === 0
+            ? <span className="gico gico--root">{(() => { const G = MENU_ICONS.gis; return <G size={13} color="#fff" />; })()}</span>
+            : <span className="gico gico--grp"><IcFolder size={12} color="#fff" /></span>}
           <span>{g.GR_NAME || g.GR_CODE}</span>
         </div>
         {open && (
@@ -188,7 +191,7 @@ export default function Archives() {
           <div className="atree">
             <div className="atree__node" onClick={() => setOpenSvc(!openSvc)}>
               <span className="tw">{openSvc ? "−" : "+"}</span>
-              <IcFolder size={14} color="#8a97a5" />
+              <span className="gico gico--svc"><IcSitemap size={11} color="#fff" /></span>
               <span className="chip">Служебные группы</span>
             </div>
             {openSvc && <div className="atree__empty" style={{ paddingLeft: 40 }}>Список пустой</div>}

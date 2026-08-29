@@ -31,8 +31,8 @@
   display: flex; align-items: center;
 }
 .pbtn:hover { filter: brightness(1.05); }
-.pbtn.grid { padding: 0 8px; background: var(--windowHeader); }
-.pbtn.grid svg { fill: #fff; }
+.pbtn.grid { padding: 0 8px; background: var(--wellBg); border: 1px solid var(--borderColor); }
+.pbtn.grid svg { fill: #3a4654; }
 .adate {
   height: 30px; width: 130px; border: 1px solid var(--borderColor); border-radius: 3px;
   background: var(--inputBg); color: var(--inputColor); padding: 0 10px; font-size: 12px; text-align: center;
@@ -170,3 +170,9 @@
 .uv-save, .uv-del { height: 38px; border: 0; border-radius: 4px; color: #fff; font-size: 13px; cursor: pointer; }
 .uv-save { background: var(--btnLightblueBg); }
 .uv-del { background: var(--btnRedBg); }
+
+/* typed group-node icon boxes (match real colored tree) */
+.gico { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border-radius: 3px; flex: 0 0 17px; }
+.gico--root { background: #2c7be5; }
+.gico--grp { background: #27ae60; }
+.gico--svc { background: #7a8896; }
