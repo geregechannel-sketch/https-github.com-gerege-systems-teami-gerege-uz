@@ -16,11 +16,42 @@ export const MENU: MenuNode[] = [
     label: "Регистр событий",
     icon: "events",
     children: [
-      { label: "События", model: "events" },
+      {
+        label: "События",
+        children: [
+          { label: "Все сообщения", model: "events" },
+          { label: "Сообщения Oracle", model: "event_log_oracle" },
+          { label: "Сообщения программ", model: "event_log_software" },
+          { label: "Сообщения связи", model: "event_log_connection" },
+          { label: "Сообщения данных", model: "event_log_data" },
+          { label: "Сообщения системы", model: "event_log_system" },
+        ],
+      },
       { label: "Подтверждение событий", model: "ev_ack" },
-      { label: "Аудит", model: "audit" },
-      { label: "Статистика связи", model: "op_log" },
-      { label: "Журналы устройств", model: "eventsdevlog" },
+      {
+        label: "Аудит",
+        children: [
+          { label: "Аудит", model: "audit" },
+          { label: "Аудит файлов", model: "audit_files" },
+          { label: "Подключения к системе", model: "user_sessions" },
+        ],
+      },
+      {
+        label: "Статистика связи",
+        children: [
+          { label: "Статистика источников", model: "src_statistics" },
+          { label: "Статистика каналов", model: "ph_statistics" },
+          { label: "Первичные запросы", model: "prq_statistics" },
+        ],
+      },
+      {
+        label: "Журналы устройств",
+        children: [
+          { label: "Журналы счетчиков", model: "meter_log" },
+          { label: "Журналы контроллеров", model: "controller_log" },
+        ],
+      },
+      { label: "Лимиты", model: "limiter" },
     ],
   },
   { label: "Считывание показаний", icon: "read", model: "dataservers" },
@@ -39,8 +70,7 @@ export const MENU: MenuNode[] = [
           { label: "Группы", model: "groups" },
           { label: "Экономические профили", model: "ecoprofiles" },
           { label: "Расписания", model: "schedules" },
-          { label: "Каналы", model: "channels" },
-          { label: "Источники", model: "sources" },
+          { label: "Нормативно справ. инф.", model: "classification" },
         ],
       },
       {
@@ -51,9 +81,24 @@ export const MENU: MenuNode[] = [
           { label: "Data items", model: "dataitems" },
         ],
       },
-      { label: "Серверы сбора (DAS)", model: "dataservers" },
-      { label: "Точки данных", model: "datapoints" },
-      { label: "Устройства", model: "devices" },
+      {
+        label: "Конфигурация сбора",
+        children: [
+          { label: "Серверы сбора (DAS)", model: "dataservers" },
+          { label: "Устройства", model: "devices" },
+          { label: "Приоритеты связи", model: "linkpriorities" },
+        ],
+      },
+      {
+        label: "Информация контроллеров",
+        children: [
+          { label: "Архив точек данных", model: "datapoints" },
+          { label: "Точки данных", model: "dp_show" },
+        ],
+      },
+      { label: "Параметрирование контроллеров", model: "controllerconfig" },
+      { label: "Параметрирование счетчиков", model: "meterconfig" },
+      { label: "Администрирование пользователей", model: "usermanagement" },
     ],
   },
   {
