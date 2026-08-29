@@ -158,7 +158,6 @@ export default function Archives() {
         <button className="abtn blue" onClick={view} disabled={!sel}><IcEye size={15} color="#fff" /> Просмотр (гр.)</button>
       </div>
 
-      <div className="aw__status">Статус: 0 / {points.length} / 0 / 0</div>
     </div>
   );
 }

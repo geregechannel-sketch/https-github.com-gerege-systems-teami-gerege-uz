@@ -5,14 +5,16 @@ export interface MenuNode {
   model?: string; // -> /m/<model>
   path?: string; // special route
   children?: MenuNode[];
+  icon?: string; // key into MENU_ICONS (top-level rows)
 }
 
 export const MENU: MenuNode[] = [
-  { label: "Сохраненные формы", model: "usersettings" },
-  { label: "Просмотр архивов", path: "/archives" },
-  { label: "Качество показаний", model: "qualityreports" },
+  { label: "Сохраненные формы", icon: "saved", model: "usersettings" },
+  { label: "Просмотр архивов", icon: "archive", path: "/archives" },
+  { label: "Качество показаний", icon: "quality", model: "qualityreports" },
   {
     label: "Регистр событий",
+    icon: "events",
     children: [
       { label: "События", model: "events" },
       { label: "Подтверждение событий", model: "ev_ack" },
@@ -21,9 +23,10 @@ export const MENU: MenuNode[] = [
       { label: "Журналы устройств", model: "eventsdevlog" },
     ],
   },
-  { label: "Считывание показаний", model: "dataservers" },
+  { label: "Считывание показаний", icon: "read", model: "dataservers" },
   {
     label: "Конфигурация системы",
+    icon: "config",
     children: [
       {
         label: "Классификаторы и списки",
@@ -55,16 +58,19 @@ export const MENU: MenuNode[] = [
   },
   {
     label: "Отчеты",
+    icon: "reports",
     children: [
       { label: "Отчеты", model: "reports" },
       { label: "Журнал отчетов", model: "reportslog" },
       { label: "Типы отчетов", model: "reporttypes" },
     ],
   },
-  { label: "Телесигналы", model: "discretesignals" },
-  { label: "GIS", path: "/gis" },
+  { label: "Телесигналы", icon: "signals", model: "discretesignals" },
+  { label: "Схемы", icon: "schema", model: "schemas" },
+  { label: "GIS", icon: "gis", path: "/gis" },
   {
     label: "Управление нагрузкой",
+    icon: "load",
     children: [
       { label: "BGA", model: "bga" },
       { label: "RGB план", model: "pobj" },

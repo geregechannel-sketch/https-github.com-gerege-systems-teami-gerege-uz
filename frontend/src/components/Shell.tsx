@@ -3,6 +3,10 @@ import { MENU, DICTS, MenuNode } from "../menu";
 import { api } from "../api";
 import "../menu.css";
 import logo from "../assets/logo.png";
+import {
+  MENU_ICONS, IcEyeSlash, IcUser, IcInfo, IcChart, IcMonitor, IcSliders,
+  IcMoon, IcHelpCircle, IcLogout, IcResize,
+} from "../icons";
 
 function toggleTheme() {
   const r = document.documentElement;
@@ -23,6 +27,7 @@ function Item({ node }: { node: MenuNode }) {
   const t = target(node);
   const active = t && loc.pathname === t;
   const hasChildren = !!node.children?.length;
+  const Ico = node.icon ? MENU_ICONS[node.icon] : null;
 
   return (
     <li className="tm-item">
@@ -30,7 +35,8 @@ function Item({ node }: { node: MenuNode }) {
         className={"tm-link" + (active ? " is-active" : "")}
         onClick={() => (t ? nav(t) : undefined)}
       >
-        <span>{node.label}</span>
+        {Ico && <span className="tm-ico"><Ico size={16} /></span>}
+        <span className="tm-label">{node.label}</span>
         {hasChildren && <span className="tm-caret">▸</span>}
       </div>
       {hasChildren && (
@@ -44,13 +50,6 @@ function Item({ node }: { node: MenuNode }) {
   );
 }
 
-const HEADER_ICONS = [
-  { t: "Инфо", i: "ℹ" },
-  { t: "Статистика", i: "▤" },
-  { t: "Сообщения", i: "✉" },
-  { t: "Настройки", i: "⚙" },
-];
-
 export default function Shell({ children }: { children: React.ReactNode }) {
   const nav = useNavigate();
   const user = (() => {
@@ -60,23 +59,42 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       return "ADMIN";
     }
   })();
+
+  const hbtn = (title: string, node: React.ReactNode, onClick?: () => void) => (
+    <button className="toshi-header__btn" title={title} onClick={onClick}>{node}</button>
+  );
+
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <nav className="tm-menu">
         <Link to="/" className="tm-brand">
           TEAMI ENTERPRISE <small>3.0</small>
         </Link>
-        <ul className="tm-list">
-          {MENU.map((n, i) => (
-            <Item key={i} node={n} />
-          ))}
-        </ul>
-        <div className="tm-section">СПРАВОЧНИКИ</div>
-        <ul className="tm-list">
-          {DICTS.map((n, i) => (
-            <Item key={"d" + i} node={n} />
-          ))}
-        </ul>
+        <div className="tm-body">
+          <ul className="tm-list">
+            {MENU.map((n, i) => (
+              <Item key={i} node={n} />
+            ))}
+          </ul>
+          <div className="tm-section">СПРАВОЧНИКИ</div>
+          <ul className="tm-list">
+            {DICTS.map((n, i) => (
+              <Item key={"d" + i} node={n} />
+            ))}
+          </ul>
+        </div>
+        <div className="tm-foot">
+          <img src={logo} alt="TOSH ELECTROAPPARAT" className="tm-foot__logo" />
+          <div className="tm-status">
+            <span>Статус:</span>
+            <b style={{ color: "#fff" }}>0</b><span className="tm-status__sep">/</span>
+            <b style={{ color: "#2ecc71" }}>0</b><span className="tm-status__sep">/</span>
+            <b style={{ color: "#f39c12" }}>0</b><span className="tm-status__sep">/</span>
+            <b style={{ color: "#e74c3c" }}>0</b>
+            <span className="sp" style={{ flex: 1 }} />
+            <IcResize size={13} color="#fff" />
+          </div>
+        </div>
       </nav>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
@@ -84,22 +102,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <button className="toshi-header__btn" title="Меню">☰</button>
           <img src={logo} alt="TOSH ELECTROAPPARAT" style={{ height: 46, position: "absolute", left: "50%", transform: "translateX(-50%)" }} />
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <button className="toshi-header__btn" title="Профиль">👤 {user}</button>
-            {HEADER_ICONS.map((h, i) => (
-              <button key={i} className="toshi-header__btn" title={h.t}>{h.i}</button>
-            ))}
-            <button className="toshi-header__btn" title="Тема" onClick={toggleTheme}>☾</button>
-            <button className="toshi-header__btn" title="Помощь">?</button>
-            <button
-              className="toshi-header__btn"
-              title="Выход"
-              onClick={() => {
-                api.logout();
-                nav("/login");
-              }}
-            >
-              ⎋
-            </button>
+            {hbtn("Скрыть", <IcEyeSlash size={16} />)}
+            {hbtn("Профиль", <span style={{ display: "flex", alignItems: "center", gap: 6 }}><IcUser size={15} /> {user}</span>)}
+            {hbtn("Инфо", <IcInfo size={15} />)}
+            {hbtn("Статистика", <IcChart size={15} />)}
+            {hbtn("Сообщения", <IcMonitor size={15} />)}
+            {hbtn("Настройки", <IcSliders size={15} />)}
+            {hbtn("Тема", <IcMoon size={16} />, toggleTheme)}
+            {hbtn("Помощь", <IcHelpCircle size={15} />)}
+            {hbtn("Выход", <IcLogout size={15} />, () => { api.logout(); nav("/login"); })}
           </div>
         </header>
         <main className="toshi-content" style={{ flex: 1, overflow: "auto", padding: 18 }}>{children}</main>

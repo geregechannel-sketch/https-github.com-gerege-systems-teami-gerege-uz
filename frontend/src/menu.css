@@ -5,11 +5,13 @@
   background: var(--menuBg);
   color: var(--menuTextColor);
   height: 100%;
+  display: flex;
+  flex-direction: column;
   /* overflow must stay visible so hover flyouts can escape horizontally
      (any *-auto turns the other axis into a clipping container). */
   overflow: visible;
-  padding-bottom: 20px;
 }
+.tm-body { flex: 1 1 auto; overflow: visible; }
 .tm-brand {
   display: block;
   padding: 14px 16px;
@@ -76,3 +78,19 @@
   font-size: 11px;
   letter-spacing: 0.5px;
 }
+
+/* menu-item icon + label */
+.tm-ico { display: flex; align-items: center; width: 18px; flex: 0 0 18px; opacity: .9; }
+.tm-ico svg { fill: currentColor; }
+.tm-label { flex: 1; }
+
+/* sidebar footer: TOSH logo + status bar (copied from source) */
+.tm-foot { margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+.tm-foot__logo { display: block; width: 150px; margin: 4px auto 8px; }
+.tm-status {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px; font-size: 11px; color: #fff;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.tm-status__sep { opacity: .5; }
+.tm-status svg { fill: #fff; }
