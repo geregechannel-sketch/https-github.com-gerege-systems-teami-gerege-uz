@@ -275,8 +275,14 @@
 .toshi-infobox{ background: var(--infoboxBg); border-radius: var(--toshi-radius); padding: 12px; }
 
 /* KPI stat tile (dashboard дээрх ногоон том тоо) */
-.toshi-stat { border-radius: var(--toshi-radius); padding: 16px; color: #fff; background: var(--btnGreenBg); }
-.toshi-stat__value { font-size: 28px; font-weight: 500; text-align: right; }
+.toshi-stat {
+  border-radius: var(--toshi-radius); padding: 18px 20px; color: #fff;
+  background: var(--btnGreenBg);
+  min-height: 190px;
+  display: flex; flex-direction: column;
+}
+.toshi-stat > div:first-child { font-size: 18px; font-weight: 500; }
+.toshi-stat__value { font-size: 34px; font-weight: 500; text-align: right; margin-top: auto; }
 
 /* =============================================================================
    6) ФОРМ — input / select / checkbox / radio
