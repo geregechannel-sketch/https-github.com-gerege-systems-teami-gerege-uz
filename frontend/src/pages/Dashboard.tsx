@@ -38,7 +38,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 16 }}>
         {tiles.map((t, i) => (
           <div key={i} className="toshi-stat" style={{ background: t.COLOR || "var(--btnGreenBg)" }}>
             <div>{t.TITLE}</div>
@@ -49,7 +49,7 @@ export default function Dashboard() {
       </div>
 
       <h3 style={{ color: "var(--textColorHover)", margin: "22px 0 10px" }}>Модули</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 16 }}>
         {MENU.map((m, i) => {
           const target = m.model ? `/m/${m.model}` : m.path || "/";
           const Ico = m.icon ? MENU_ICONS[m.icon] : null;
