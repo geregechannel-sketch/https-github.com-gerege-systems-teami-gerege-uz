@@ -8,6 +8,7 @@ import {
 } from "../icons";
 
 type Row = Record<string, any>;
+type PNode = { n: string; c?: PNode[] };
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 const ddmmyyyy = (s: string) => s.split("-").reverse().join("-");
 
@@ -22,6 +23,8 @@ export default function Archives() {
   const [to, setTo] = useState(iso(new Date()));
   const [rows, setRows] = useState<Row[] | null>(null);
   const [tab, setTab] = useState("res");
+  const [paramOpen, setParamOpen] = useState<Set<string>>(new Set(["Суточный профиль: Получасовые", "Р мощность"]));
+  const [selParam, setSelParam] = useState<string>("Р мощность");
 
   useEffect(() => {
     api.get("groups?limit=5000").then((e) => setGroups((e.data as Row[]) || []));
@@ -96,6 +99,37 @@ export default function Archives() {
     );
   }
 
+  const PARAM_TREE: PNode[] = [
+    {
+      n: "Суточный профиль: Получасовые",
+      c: [
+        { n: "Р мощность", c: [{ n: "Средняя Р+ мощность за 30 минут" }, { n: "Средняя Р- мощность за 30 минут" }] },
+        { n: "Q мощность", c: [{ n: "Средняя Q+ мощность за 30 минут" }, { n: "Средняя Q- мощность за 30 минут" }] },
+      ],
+    },
+    { n: "Суточные данные: Суточные", c: [{ n: "Активная энергия A+" }, { n: "Активная энергия A-" }, { n: "Реактивная энергия R+" }, { n: "Реактивная энергия R-" }] },
+    { n: "Нарастающие показания: Суточные", c: [{ n: "Показание A+" }, { n: "Показание A-" }] },
+    { n: "Нарастающие показания: Месячные", c: [{ n: "Показание A+" }, { n: "Показание A-" }] },
+    { n: "Мгновенные данные: Мгновенные", c: [{ n: "Напряжение" }, { n: "Ток" }, { n: "Cos φ" }] },
+  ];
+  function toggleParam(n: string) {
+    setParamOpen((e) => { const s = new Set(e); s.has(n) ? s.delete(n) : s.add(n); return s; });
+  }
+  function ParamNode({ node, depth }: { node: PNode; depth: number }) {
+    const has = !!node.c?.length;
+    const open = paramOpen.has(node.n);
+    return (
+      <>
+        <div className="pnode" style={{ paddingLeft: 8 + depth * 20 }}>
+          {has ? <span className="pw" onClick={() => toggleParam(node.n)}>{open ? "−" : "+"}</span> : <span className="pw pw--leaf" />}
+          {depth === 0 ? <span className="pdots">●○</span> : <span className="pbolt">⚡</span>}
+          <span className={"plabel" + (selParam === node.n ? " sel" : "")} onClick={() => setSelParam(node.n)}>{node.n}</span>
+        </div>
+        {has && open && node.c!.map((c, i) => <ParamNode key={i} node={c} depth={depth + 1} />)}
+      </>
+    );
+  }
+
   function period(kind: "day" | "week" | "month" | "year") {
     const now = new Date(), f = new Date();
     if (kind === "week") f.setDate(now.getDate() - 7);
@@ -165,9 +199,9 @@ export default function Archives() {
             <button className="fbtn" onClick={() => setSel(null)}>Снять отм. всем</button>
             <span className="muted">{sel ? "Выбрано: 1" : "Выделенных элементов нет"}</span>
             <span className="sp" />
-            <button className="ic sm"><IcInfo size={15} color="#5a6b7b" /></button>
-            <button className="ic sm"><IcHelp size={15} color="#5a6b7b" /></button>
-            <button className="ic sm"><IcGear size={15} color="#5a6b7b" /></button>
+            <button className="ic sm"><IcInfo size={14} color="#fff" /></button>
+            <button className="ic sm"><IcHelp size={14} color="#fff" /></button>
+            <button className="ic sm"><IcGear size={14} color="#fff" /></button>
           </div>
         </div>
 
@@ -186,10 +220,14 @@ export default function Archives() {
                   <tr key={i}>{Object.keys(rows[0]).map((c) => <td key={c}>{String(r[c] ?? "")}</td>)}</tr>
                 ))}</tbody>
               </table>
+            ) : sel ? (
+              <div className="ptree">
+                {PARAM_TREE.map((n, i) => <ParamNode key={i} node={n} depth={0} />)}
+              </div>
             ) : (
               <div className="aempty">
                 <IcSitemap size={120} color="var(--treeEmptyColor)" />
-                <div>{rows ? "Нет данных за выбранный период" : "Список пустой"}</div>
+                <div>Список пустой</div>
               </div>
             )}
           </div>

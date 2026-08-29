@@ -17,7 +17,8 @@
 }
 .aw__title svg { fill: #fff; }
 .aw__sets { font-size: 11px; opacity: .9; margin-right: 4px; }
-.aw__title .ic { background: transparent; border: 0; color: #fff; cursor: pointer; padding: 2px; display: flex; opacity: .9; }
+.aw__title .ic { background: transparent; border: 0; color: #fff; cursor: pointer; padding: 3px; display: flex; opacity: 1; }
+.aw__title .ic:hover { background: rgba(255,255,255,0.18); border-radius: 3px; }
 .aw__title .ic:hover { opacity: 1; }
 
 .aw__tools {
@@ -100,6 +101,8 @@
 }
 .apane__foot .muted { color: var(--textColor); opacity: .8; }
 .apane__foot .ic { background: transparent; border: 0; cursor: pointer; padding: 2px; display: flex; }
+.apane__foot .ic.sm { background: var(--btnLightblueBg); border-radius: 4px; padding: 5px; width: 26px; height: 26px; align-items: center; justify-content: center; }
+.apane__foot .ic.sm svg { fill: #fff; }
 
 .atabs { display: flex; gap: 6px; padding: 8px; border-bottom: 1px solid var(--borderColor); }
 .atab {
@@ -128,3 +131,24 @@
 
 .aw__status { padding: 4px 10px; font-size: 11px; color: var(--textColor); opacity: .7; border-top: 1px solid var(--borderColor); }
 .atree__item .bolt { color: #f1c40f; margin-right: 2px; }
+
+/* Выбор параметра — parameter tree */
+.ptree {
+  border: 1px solid var(--borderColor); border-radius: 3px; background: var(--inputBg);
+  padding: 8px 6px; height: 100%; overflow: auto;
+}
+.pnode { display: flex; align-items: center; gap: 7px; padding: 3px 4px; font-size: 13px; white-space: nowrap; }
+.pw {
+  width: 15px; height: 15px; line-height: 13px; text-align: center;
+  border: 1px solid var(--borderColor); border-radius: 2px; cursor: pointer;
+  font-size: 12px; color: var(--textColor); background: var(--wellBg); flex: 0 0 15px;
+}
+.pw--leaf { border: 0; background: transparent; }
+.pdots { color: #9aa7b4; font-size: 8px; letter-spacing: 2px; }
+.pbolt { color: #f1c40f; }
+.plabel { cursor: pointer; color: var(--gridTextColor); }
+.plabel.sel {
+  border: 1px solid #7ea9e0; border-radius: 3px; padding: 0 7px;
+  background: color-mix(in srgb, var(--btnLightblueBg) 14%, transparent);
+  color: var(--btnLightblueBg);
+}
