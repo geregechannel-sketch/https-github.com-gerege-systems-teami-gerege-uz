@@ -41,6 +41,7 @@ func main() {
 	reg := resource.NewRegistry()
 	resource.RegisterCore(reg)
 	resource.RegisterGenerated(reg) // full ~983-endpoint surface
+	resource.RegisterExtras(reg)   // deep menu-leaf models (event logs, audit, stats, config)
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,
