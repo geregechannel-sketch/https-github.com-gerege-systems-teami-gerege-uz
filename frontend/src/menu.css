@@ -7,6 +7,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-bottom-right-radius: 12px;
   /* overflow must stay visible so hover flyouts can escape horizontally
      (any *-auto turns the other axis into a clipping container). */
   overflow: visible;
