@@ -35,7 +35,7 @@ export default function Archives() {
   // Build the group tree (children + points per group). Roots = groups whose
   // parent is null/absent from the set; skip system groups so only the topology
   // (Монголия → … → КРУ) shows, matching the real "Выбор ТУ".
-  const { roots, childrenOf, pointsOf } = useMemo(() => {
+  const { roots, childrenOf, pointsOf, sysRoots } = useMemo(() => {
     const byId = new Map(groups.map((g) => [String(g.GR_ID), g]));
     const childrenOf = new Map<string, Row[]>();
     const pointsOf = new Map<string, Row[]>();
@@ -55,7 +55,12 @@ export default function Archives() {
       const p = g.PARENT_GR_ID != null ? String(g.PARENT_GR_ID) : "";
       return (!p || !byId.has(p)) && hasPoints(String(g.GR_ID));
     });
-    return { roots, childrenOf, pointsOf };
+    const sysRoots = groups.filter((g) => {
+      if (Number(g.GR_TYPE_ID) !== 2) return false;
+      const p = g.PARENT_GR_ID != null ? String(g.PARENT_GR_ID) : "";
+      return !p || !byId.has(p);
+    });
+    return { roots, childrenOf, pointsOf, sysRoots };
   }, [groups, points]);
 
   const s = q.trim().toLowerCase();
@@ -70,24 +75,26 @@ export default function Archives() {
     });
   }
 
-  function GroupNode({ g, depth }: { g: Row; depth: number }) {
+  function GroupNode({ g, depth, sys }: { g: Row; depth: number; sys?: boolean }) {
     const id = String(g.GR_ID);
     const kids = childrenOf.get(id) || [];
-    const pts = (pointsOf.get(id) || []).filter(match);
-    const open = expanded.has(id) || depth === 0;
+    const pts = sys ? [] : (pointsOf.get(id) || []).filter(match);
+    const open = expanded.has(id) || (depth === 0 && !sys);
     const hasChildren = kids.length > 0 || pts.length > 0;
     return (
       <>
         <div className="atree__node" style={{ paddingLeft: 10 + depth * 16 }} onClick={() => toggle(id)}>
           <span className="tw">{hasChildren ? (open ? "−" : "+") : ""}</span>
-          {depth === 0
+          {sys
+            ? <span className="gico gico--svc"><IcSitemap size={11} color="#fff" /></span>
+            : depth === 0
             ? <span className="gico gico--root">{(() => { const G = MENU_ICONS.gis; return <G size={13} color="#fff" />; })()}</span>
             : <span className="gico gico--grp"><IcFolder size={12} color="#fff" /></span>}
           <span>{g.GR_NAME || g.GR_CODE}</span>
         </div>
         {open && (
           <>
-            {kids.map((c) => <GroupNode key={c.GR_ID} g={c} depth={depth + 1} />)}
+            {kids.map((c) => <GroupNode key={c.GR_ID} g={c} depth={depth + 1} sys={sys} />)}
             {pts.map((p) => (
               <div key={p.POINT_ID}
                 className={"atree__item" + (sel?.POINT_ID === p.POINT_ID ? " sel" : "")}
@@ -194,7 +201,9 @@ export default function Archives() {
               <span className="gico gico--svc"><IcSitemap size={11} color="#fff" /></span>
               <span className="chip">Служебные группы</span>
             </div>
-            {openSvc && <div className="atree__empty" style={{ paddingLeft: 40 }}>Список пустой</div>}
+            {openSvc && (sysRoots.length
+              ? sysRoots.map((g) => <GroupNode key={g.GR_ID} g={g} depth={0} sys />)
+              : <div className="atree__empty" style={{ paddingLeft: 40 }}>Список пустой</div>)}
             {roots.length ? roots.map((g) => <GroupNode key={g.GR_ID} g={g} depth={0} />)
               : <div className="atree__empty">Список пустой</div>}
           </div>
