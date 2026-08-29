@@ -339,3 +339,24 @@
 .toshi-loader { width: 30px; height: 30px; border: 2px solid var(--loaderBorder);
   border-top-color: var(--textColorHover); border-radius: 50%; animation: toshi-spin .6s linear infinite; }
 @keyframes toshi-spin { to { transform: rotate(360deg); } }
+
+/* Dashboard module cards (1:1 with real TEAMI) */
+.mod-card {
+  display: flex; flex-direction: column;
+  min-height: 190px;
+  border: 1px solid var(--borderColor);
+  border-radius: 6px;
+  background: var(--contentBg);
+  padding: 16px;
+  box-shadow: 0 1px 3px var(--boxShadowCommonColor);
+}
+.mod-card__head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mod-card__ico {
+  width: 40px; height: 40px; flex: 0 0 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--btnLightblueBg) 15%, transparent);
+  border-radius: 8px;
+}
+.mod-card__title { color: var(--btnLightblueBg); font-size: 15px; font-weight: 600; }
+.mod-card__desc { flex: 1; font-size: 12.5px; line-height: 1.5; color: var(--textColor); opacity: .9; }
+.mod-card__foot { display: flex; justify-content: flex-end; margin-top: 12px; }
