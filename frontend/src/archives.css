@@ -127,3 +127,4 @@
 .abtn:disabled { opacity: .5; cursor: default; }
 
 .aw__status { padding: 4px 10px; font-size: 11px; color: var(--textColor); opacity: .7; border-top: 1px solid var(--borderColor); }
+.atree__item .bolt { color: #f1c40f; margin-right: 2px; }
