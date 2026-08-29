@@ -9,7 +9,7 @@ export interface MenuNode {
 }
 
 export const MENU: MenuNode[] = [
-  { label: "Сохраненные формы", icon: "saved", model: "usersettings" },
+  { label: "Сохраненные формы", icon: "saved", path: "/saved" },
   { label: "Просмотр архивов", icon: "archive", path: "/archives" },
   { label: "Качество показаний", icon: "quality", model: "qualityreports" },
   {

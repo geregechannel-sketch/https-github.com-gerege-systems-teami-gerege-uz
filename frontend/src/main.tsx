@@ -10,6 +10,7 @@ import Module from "./pages/Module";
 import Gis from "./pages/Gis";
 import Archives from "./pages/Archives";
 import Points from "./pages/Points";
+import SavedForms from "./pages/SavedForms";
 
 // Theme init (mirrors the real app).
 try {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/" element={<Protected><Dashboard /></Protected>} />
         <Route path="/archives" element={<Protected><Archives /></Protected>} />
         <Route path="/gis" element={<Protected><Gis /></Protected>} />
+        <Route path="/saved" element={<Protected><SavedForms /></Protected>} />
         <Route path="/m/points" element={<Protected><Points /></Protected>} />
         <Route path="/m/:model" element={<Protected><Module /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
