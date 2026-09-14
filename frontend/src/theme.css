@@ -1,0 +1,370 @@
+/* =============================================================================
+   TOSHI THEME  (toshi-theme)
+   TEAMI Enterprise / EMCOS EC3-ийн бүх дэлгэцийн дизайн системийг гаргаж авсан,
+   дахин ашиглах боломжтой theme.
+   - Амьд аппаас (http://82.215.77.202:8080/teami) computed CSS token-уудыг олборлов.
+   - Light + Dark хоёр горим нэг токенд: CSS `light-dark(гэрэл, харанхуй)`.
+   - Фонт: Roboto. Суурь хэмжээ 12px. Өнцөг radius 4px.
+   Хэрэглэх:
+     <html> дээр  style="color-scheme: light dark"  (эсвэл доорх :root аль хэдийн зарлана)
+     Гар аргаар сэлгэх:  <html data-theme="dark">  эсвэл  data-theme="light"
+     Товч:  <button class="toshi-btn toshi-btn--green">...</button>
+   ============================================================================= */
+
+/* --- Фонт (аппд Roboto суулгасан; интернетээс fallback) --------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
+
+/* =============================================================================
+   1) ДИЗАЙН ТОКЕН (light-dark: эхнийх нь light, хоёр дахь нь dark утга)
+   ============================================================================= */
+:root {
+  color-scheme: light dark;
+
+  /* --- Суурь өнгө / гадаргуу --- */
+  --bodyBg:        light-dark(hsl(0, 0%, 97%),  hsl(218, 19%, 25%));
+  --contentBg:     light-dark(hsl(0, 0%, 100%), hsl(218, 19%, 25%));
+  --windowBg:      light-dark(hsl(0, 0%, 100%), hsl(218, 19%, 25%));
+  --wellBg:        light-dark(hsl(0, 0%, 96%),  hsl(0, 0%, 17%));
+  --wellWhiteBg:   light-dark(hsl(0, 0%, 100%), hsl(0, 0%, 22%));
+  --infoboxBg:     light-dark(hsl(0, 0%, 100%), hsl(219, 19%, 30%));
+  --disabledBg:    light-dark(hsla(0,0%,100%,0.6), hsla(217.5,19%,24.7%,0.75));
+
+  /* --- Хүрээ / сүүдэр --- */
+  --borderColor:        light-dark(hsl(0, 0%, 86%), hsl(0, 0%, 44%));
+  --borderColorHover:   light-dark(hsl(0, 0%, 70%), hsl(210, 100%, 60%));
+  --borderColorFocus:   light-dark(hsl(150, 50%, 47%), hsl(210, 100%, 60%));
+  --wellBorderColor:    light-dark(hsl(0, 0%, 86%), hsl(0, 0%, 44%));
+  --separatorBg:        light-dark(hsl(0, 0%, 83%), hsl(0, 0%, 44%));
+  --boxShadowCommonColor: light-dark(hsla(0,0%,0%,0.15), hsla(0,0%,100%,0.2));
+
+  /* --- Текст --- */
+  --textColor:      light-dark(hsl(0, 0%, 47%), hsl(0, 100%, 98%));
+  --textColorHover: light-dark(hsl(225, 57%, 59%), hsl(42, 56%, 51%));
+  --editedColor:    light-dark(hsl(59, 85%, 82%), hsl(45, 63%, 43%));
+
+  /* --- Толгой (header) --- */
+  --headerBg:            light-dark(hsl(0, 0%, 100%), hsl(217, 19%, 27%));
+  --headerButtonBg:      light-dark(hsl(204, 83%, 65%), hsl(218, 19%, 25%));
+  --headerButtonHover:   light-dark(hsl(204, 83%, 55%), hsl(218, 19%, 55%));
+
+  /* --- Хажуугийн цэс (sidebar) --- */
+  --menuBg:        hsl(240, 6%, 17%);
+  --menuTextColor: hsl(0, 0%, 100%);
+
+  /* --- Товчлуурын палитр (Bg / Hover / Active / Disabled) --- */
+  --btnDefaultBg:  light-dark(hsl(204,83%,65%), hsl(213,79%,57%));
+  --btnDefaultBgHover: light-dark(hsl(204,83%,55%), hsl(213,79%,47%));
+  --btnDefaultBgActive:light-dark(hsl(204,83%,45%), hsl(213,79%,37%));
+  --btnDefaultDisabledBg: light-dark(hsl(204,84%,83%), hsla(0,0%,100%,0.08));
+
+  --btnGreenBg:    light-dark(hsl(150,50%,47%), hsl(150,50%,45%));
+  --btnGreenBgHover:light-dark(hsl(150,50%,37%), hsl(150,50%,35%));
+  --btnGreenBgActive:light-dark(hsl(150,50%,27%), hsl(150,50%,25%));
+  --btnGreenDisabledBg: light-dark(hsl(150,45%,74%), hsl(150,35%,37%));
+
+  --btnBlueBg:     light-dark(hsl(225,57%,59%), hsl(220,22%,40%));
+  --btnBlueBgHover:light-dark(hsl(225,57%,49%), hsl(220,22%,35%));
+  --btnBlueBgActive:light-dark(hsl(225,57%,39%), hsl(220,22%,30%));
+  --btnBlueDisabledBg: light-dark(hsl(225,58%,80%), hsla(220,22%,40%,0.5));
+
+  --btnLightblueBg:light-dark(hsl(204,83%,65%), hsl(204,83%,56%));
+  --btnLightblueBgHover:light-dark(hsl(204,83%,55%), hsl(204,83%,46%));
+  --btnLightblueBgActive:light-dark(hsl(204,83%,45%), hsl(204,83%,36%));
+  --btnLightblueDisabledBg: light-dark(hsl(225,58%,80%), hsl(204,43%,43%));
+
+  --btnRedBg:      light-dark(hsl(0,82%,67%), hsl(0,83%,39%));
+  --btnRedBgHover: light-dark(hsl(0,82%,57%), hsl(0,83%,29%));
+  --btnRedBgActive:light-dark(hsl(0,82%,47%), hsl(0,83%,19%));
+  --btnRedDisabledBg: light-dark(hsl(0,83%,84%), hsl(0,35%,40%));
+
+  --btnOrangeBg:   light-dark(hsl(27,100%,66%), hsl(30,80%,37%));
+  --btnOrangeBgHover:light-dark(hsl(27,100%,56%), hsl(30,80%,27%));
+  --btnOrangeBgActive:light-dark(hsl(27,100%,46%), hsl(30,80%,22%));
+  --btnOrangeDisabledBg: light-dark(hsl(28,100%,83%), hsl(30,38%,43%));
+
+  --btnYellowBg:   light-dark(hsl(46,100%,70%), hsl(46,78%,47%));
+  --btnYellowBgHover:light-dark(hsl(46,100%,60%), hsl(46,78%,37%));
+  --btnYellowBgActive:light-dark(hsl(46,100%,50%), hsl(46,78%,27%));
+  --btnYellowDisabledBg: light-dark(hsl(47,100%,85%), hsl(47,42%,43%));
+
+  --btnPurpleBg:   light-dark(hsl(261,59%,57%), hsl(261,59%,48%));
+  --btnPurpleBgHover:light-dark(hsl(261,59%,47%), hsl(261,59%,38%));
+  --btnPurpleBgActive:light-dark(hsl(261,59%,37%), hsl(261,59%,28%));
+  --btnPurpleDisabledBg: light-dark(hsl(225,58%,80%), hsl(261,38%,40%));
+
+  --btnCrimsonPurpleBg: light-dark(hsl(318,40%,51%), hsl(318,40%,45%));
+  --btnCrimsonPurpleBgHover:light-dark(hsl(318,40%,41%), hsl(318,40%,35%));
+  --btnCrimsonPurpleBgActive:light-dark(hsl(318,40%,31%), hsl(318,40%,25%));
+  --btnCrimsonPurpleDisabledBg: light-dark(hsl(225,58%,80%), hsl(318,30%,40%));
+
+  --btnEmeraldBg:  light-dark(hsl(180,75%,31%), hsl(180,75%,30%));
+  --btnEmeraldBgHover:light-dark(hsl(180,75%,21%), hsl(180,75%,20%));
+  --btnEmeraldBgActive:light-dark(hsl(180,75%,11%), hsl(180,75%,15%));
+  --btnEmeraldDisabledBg: light-dark(hsl(180,37%,67%), hsl(180,38%,42%));
+
+  --btnDisabledColor: light-dark(hsl(0,0%,100%), hsla(0,0%,100%,0.25));
+
+  /* --- Оролт (input) --- */
+  --inputBg:            light-dark(hsl(0, 0%, 100%), hsl(220, 15%, 24%));
+  --inputColor:         light-dark(hsl(0, 0%, 47%), hsl(0, 0%, 100%));
+  --inputDisabledBg:    light-dark(hsl(0, 0%, 96%), hsl(217,12%,34%));
+  --inputDisabledColor: light-dark(#787878, rgba(255,255,255,0.5));
+  --inputPlaceholderColor: light-dark(hsl(0, 0%, 75%), hsl(0, 0%, 81%));
+
+  /* --- Checkbox / Radio --- */
+  --checkboxBg:            light-dark(hsl(0,0%,100%), hsl(220,15%,24%));
+  --checkboxColor:         light-dark(hsl(0,0%,47%), hsl(220,20%,97%));
+  --checkboxCheckedColor:  light-dark(hsl(150,50%,47%), hsl(207,90%,77%));
+  --checkboxCheckedColorHover: light-dark(hsl(150,50%,27%), hsl(207,90%,57%));
+  --radioCheckedColor:     light-dark(hsl(150,50%,47%), hsl(207,90%,77%));
+  --radioHoverColor:       light-dark(hsl(150,50%,47%), hsl(207,90%,77%));
+  --radioBgFocus:          light-dark(hsl(150,50%,27%), hsl(207,90%,57%));
+
+  /* --- Select box --- */
+  --selectboxHover:        light-dark(hsl(216,100%,94%), hsl(216,11%,55%));
+  --selectboxIndicators:   light-dark(hsl(0,0%,47%), hsl(0,0%,100%));
+  --selectboxOptionHighlightable: light-dark(hsl(0,0%,12%), hsl(54,100%,50%));
+
+  /* --- Grid / Хүснэгт --- */
+  --gridBg:          light-dark(hsl(0,0%,100%), hsl(218,19%,23%));
+  --gridBorderColor: light-dark(hsl(0,0%,87%), hsl(0,0%,44%));
+  --gridFilterRowBg: light-dark(hsl(0,0%,98%), hsl(200,8%,22%));
+  --gridHeaderRowBg: light-dark(hsl(0,0%,100%), hsl(200,8%,15%));
+  --gridSeparatorColor: light-dark(hsl(0,0%,86%), hsl(0,0%,44%));
+  --gridTextColor:   light-dark(hsl(0,0%,24%), hsl(0,0%,100%));
+  --rowOddBg:        light-dark(hsl(0,0%,100%), hsl(200,8%,15%));
+  --rowEvenBg:       light-dark(hsl(203,100%,97%), hsl(197,13%,11%));
+  --rowHoverBg:      light-dark(hsl(189,45%,65%), hsla(207,90%,54%,0.1));
+  --rowSelectedBg:   light-dark(hsl(150,50%,47%), hsl(150,45%,35%));
+  --rowPaleYellow:   light-dark(hsl(54,100%,89%), hsla(53.9,59.3%,42.4%,0.6));
+
+  /* --- Popup / Window --- */
+  --popupBg:       light-dark(hsl(0,0%,100%), hsl(0,0%,15%));
+  --popupHeadBg:   light-dark(hsl(225,57%,59%), hsl(218,14%,45%));
+  --popupActiveHoxShadow: 0 0 4px 1px hsla(211,71%,50%,0.5);
+  --windowHeader:  light-dark(hsl(225,57%,59%), hsl(218,14%,45%));
+  --loginFormBg:   light-dark(hsl(0,0%,100%), hsl(218,19%,25%));
+  --loginPopupBg:  light-dark(hsla(0,0%,97%,0.9), hsla(218,19%,25%,0.9));
+
+  /* --- Tab --- */
+  --tabBg:        light-dark(hsl(204,83%,65%), hsl(204,25%,40%));
+  --tabHoverBg:   light-dark(hsl(204,83%,55%), hsl(204,25%,50%));
+  --tabActiveBg:  light-dark(hsl(204,83%,45%), hsl(204,25%,60%));
+  --tabControlsBg:light-dark(hsl(225,57%,59%), hsl(219,8%,57%));
+
+  /* --- Panel accordion --- */
+  --panelHeadBg:              light-dark(hsl(204,83%,65%), hsl(217,19%,43%));
+  --panelAccordionHeadBg:     light-dark(hsl(0,0%,59%), hsl(204,83%,31%));
+  --panelAccordionHeadActiveBg:light-dark(hsl(204,83%,65%), hsl(217,19%,43%));
+
+  /* --- Tree (цэгийн мод) --- */
+  --treeBg:        light-dark(hsl(0,0%,100%), hsl(218,19%,23%));
+  --treeActiveBg:  light-dark(hsl(204,83%,65%), hsl(0,0%,52%));
+  --treeEmptyColor:light-dark(hsl(0,0%,84%), hsl(0,0%,69%));
+
+  /* --- Calendar / огноо сонгогч --- */
+  --calendarDayBg:            light-dark(hsl(0,0%,90%), hsl(223,18%,24%));
+  --calendarDayDisabledBg:    light-dark(hsl(180,7%,94%), hsl(223,8%,18%));
+  --calendarDayOutsideBg:     light-dark(hsl(0,0%,100%), hsl(222,8%,25%));
+  --calendarDaySelectedBgHover:light-dark(hsl(150,50%,27%), hsl(150,50%,25%));
+
+  /* --- Loader / spinner --- */
+  --loaderBorder:  light-dark(hsl(0,0%,80%), hsl(0,0%,100%));
+  --dotLoaderBg:   light-dark(hsl(0,0%,20%), hsl(0,0%,100%));
+  --spinnerControlsColor: light-dark(hsl(0,0%,86%), hsl(0,0%,100%));
+
+  /* --- Хэмжээ / хэлбэр (metrics) --- */
+  --toshi-font:        'Roboto', -apple-system, 'Segoe UI', Arial, sans-serif;
+  --toshi-font-size:   12px;
+  --toshi-radius:      4px;
+  --toshi-header-h:    70px;
+  --toshi-menu-w:      220px;
+  --toshi-btn-h:       30px;
+  --toshi-btn-pad:     5px 10px;
+  --toshi-shadow:      0 0 4px 1px var(--boxShadowCommonColor);
+}
+
+/* Гар аргаар сэлгэх (color-scheme-ийг албадана) */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+/* =============================================================================
+   2) СУУРЬ (base)
+   ============================================================================= */
+html, body, #root { margin: 0; padding: 0; height: 100%; }
+.toshi, body.toshi {
+  margin: 0;
+  font-family: var(--toshi-font);
+  font-size: var(--toshi-font-size);
+  color: var(--textColor);
+  background: var(--bodyBg);
+}
+.toshi a { color: var(--textColorHover); text-decoration: none; }
+.toshi a:hover { text-decoration: underline; }
+
+/* =============================================================================
+   3) ТОВЧЛУУР (button) — 11 өнгийн хувилбар
+   .toshi-btn + .toshi-btn--{default|green|blue|lightblue|red|orange|yellow|
+                              purple|crimson|emerald}
+   ============================================================================= */
+.toshi-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: var(--toshi-btn-h); padding: var(--toshi-btn-pad);
+  border: 0; border-radius: var(--toshi-radius);
+  font-family: var(--toshi-font); font-size: var(--toshi-font-size); font-weight: 400;
+  color: #fff; cursor: pointer; transition: background-color .12s ease;
+  background: var(--btnDefaultBg);
+}
+.toshi-btn:hover  { background: var(--btnDefaultBgHover); }
+.toshi-btn:active { background: var(--btnDefaultBgActive); }
+.toshi-btn:disabled { background: var(--btnDefaultDisabledBg); color: var(--btnDisabledColor); cursor: default; }
+
+.toshi-btn--green   { background: var(--btnGreenBg); }
+.toshi-btn--green:hover{background:var(--btnGreenBgHover)} .toshi-btn--green:active{background:var(--btnGreenBgActive)} .toshi-btn--green:disabled{background:var(--btnGreenDisabledBg)}
+.toshi-btn--blue    { background: var(--btnBlueBg); }
+.toshi-btn--blue:hover{background:var(--btnBlueBgHover)} .toshi-btn--blue:active{background:var(--btnBlueBgActive)} .toshi-btn--blue:disabled{background:var(--btnBlueDisabledBg)}
+.toshi-btn--lightblue{ background: var(--btnLightblueBg); }
+.toshi-btn--lightblue:hover{background:var(--btnLightblueBgHover)} .toshi-btn--lightblue:active{background:var(--btnLightblueBgActive)} .toshi-btn--lightblue:disabled{background:var(--btnLightblueDisabledBg)}
+.toshi-btn--red     { background: var(--btnRedBg); }
+.toshi-btn--red:hover{background:var(--btnRedBgHover)} .toshi-btn--red:active{background:var(--btnRedBgActive)} .toshi-btn--red:disabled{background:var(--btnRedDisabledBg)}
+.toshi-btn--orange  { background: var(--btnOrangeBg); }
+.toshi-btn--orange:hover{background:var(--btnOrangeBgHover)} .toshi-btn--orange:active{background:var(--btnOrangeBgActive)} .toshi-btn--orange:disabled{background:var(--btnOrangeDisabledBg)}
+.toshi-btn--yellow  { background: var(--btnYellowBg); color:#333; }
+.toshi-btn--yellow:hover{background:var(--btnYellowBgHover)} .toshi-btn--yellow:active{background:var(--btnYellowBgActive)} .toshi-btn--yellow:disabled{background:var(--btnYellowDisabledBg)}
+.toshi-btn--purple  { background: var(--btnPurpleBg); }
+.toshi-btn--purple:hover{background:var(--btnPurpleBgHover)} .toshi-btn--purple:active{background:var(--btnPurpleBgActive)} .toshi-btn--purple:disabled{background:var(--btnPurpleDisabledBg)}
+.toshi-btn--crimson { background: var(--btnCrimsonPurpleBg); }
+.toshi-btn--crimson:hover{background:var(--btnCrimsonPurpleBgHover)} .toshi-btn--crimson:active{background:var(--btnCrimsonPurpleBgActive)} .toshi-btn--crimson:disabled{background:var(--btnCrimsonPurpleDisabledBg)}
+.toshi-btn--emerald { background: var(--btnEmeraldBg); }
+.toshi-btn--emerald:hover{background:var(--btnEmeraldBgHover)} .toshi-btn--emerald:active{background:var(--btnEmeraldBgActive)} .toshi-btn--emerald:disabled{background:var(--btnEmeraldDisabledBg)}
+
+/* =============================================================================
+   4) БҮТЭЦ — Header / Sidebar / Content
+   ============================================================================= */
+.toshi-header {
+  height: var(--toshi-header-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; background: var(--headerBg); box-shadow: var(--toshi-shadow);
+}
+.toshi-header__btn {
+  border: 0; border-radius: var(--toshi-radius); height: 34px; min-width: 34px;
+  background: var(--headerButtonBg); color: #fff; cursor: pointer;
+}
+.toshi-header__btn:hover { background: var(--headerButtonHover); }
+
+.toshi-menu {
+  width: var(--toshi-menu-w); background: var(--menuBg); color: var(--menuTextColor);
+  height: 100%; overflow-y: auto;
+}
+.toshi-menu__item {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  color: var(--menuTextColor); cursor: pointer;
+}
+.toshi-menu__item:hover, .toshi-menu__item.is-active { background: rgba(255,255,255,.08); }
+
+.toshi-content { background: var(--contentBg); color: var(--textColor); }
+
+/* =============================================================================
+   5) КАРТ / WELL / INFOBOX (dashboard модулийн карт)
+   ============================================================================= */
+.toshi-card {
+  background: var(--wellWhiteBg); border: 1px solid var(--wellBorderColor);
+  border-radius: var(--toshi-radius); box-shadow: var(--toshi-shadow);
+  padding: 16px; color: var(--textColor);
+}
+.toshi-card__title { color: var(--textColorHover); font-weight: 500; margin-bottom: 8px; }
+.toshi-well   { background: var(--wellBg); border: 1px solid var(--wellBorderColor); border-radius: var(--toshi-radius); padding: 12px; }
+.toshi-infobox{ background: var(--infoboxBg); border-radius: var(--toshi-radius); padding: 12px; }
+
+/* KPI stat tile (dashboard дээрх ногоон том тоо) */
+.toshi-stat {
+  border-radius: var(--toshi-radius); padding: 18px 20px; color: #fff;
+  background: var(--btnGreenBg);
+  min-height: 190px;
+  display: flex; flex-direction: column;
+}
+.toshi-stat > div:first-child { font-size: 18px; font-weight: 500; }
+.toshi-stat__value { font-size: 34px; font-weight: 500; text-align: right; margin-top: auto; }
+
+/* =============================================================================
+   6) ФОРМ — input / select / checkbox / radio
+   ============================================================================= */
+.toshi-input {
+  height: var(--toshi-btn-h); padding: 5px 8px;
+  background: var(--inputBg); color: var(--inputColor);
+  border: 1px solid var(--borderColor); border-radius: var(--toshi-radius);
+  font-family: var(--toshi-font); font-size: var(--toshi-font-size);
+}
+.toshi-input::placeholder { color: var(--inputPlaceholderColor); }
+.toshi-input:hover  { border-color: var(--borderColorHover); }
+.toshi-input:focus  { border-color: var(--borderColorFocus); outline: none; }
+.toshi-input:disabled { background: var(--inputDisabledBg); color: var(--inputDisabledColor); }
+
+.toshi-select { /* мөн адил */ background: var(--inputBg); color: var(--inputColor);
+  border: 1px solid var(--borderColor); border-radius: var(--toshi-radius); height: var(--toshi-btn-h); }
+.toshi-checkbox { accent-color: var(--checkboxCheckedColor); }
+.toshi-radio    { accent-color: var(--radioCheckedColor); }
+
+/* =============================================================================
+   7) ХҮСНЭГТ (grid)
+   ============================================================================= */
+.toshi-grid { width: 100%; border-collapse: collapse; background: var(--gridBg); color: var(--gridTextColor); }
+.toshi-grid th {
+  background: var(--gridHeaderRowBg); border-bottom: 1px solid var(--gridSeparatorColor);
+  padding: 6px 10px; text-align: left; font-weight: 500;
+}
+.toshi-grid td { border-bottom: 1px solid var(--gridBorderColor); padding: 6px 10px; }
+.toshi-grid tbody tr:nth-child(odd)  { background: var(--rowOddBg); }
+.toshi-grid tbody tr:nth-child(even) { background: var(--rowEvenBg); }
+.toshi-grid tbody tr:hover           { background: var(--rowHoverBg); }
+.toshi-grid tbody tr.is-selected     { background: var(--rowSelectedBg); color: #fff; }
+.toshi-grid__filter-row td { background: var(--gridFilterRowBg); }
+
+/* =============================================================================
+   8) POPUP / WINDOW / TAB / PANEL / TREE
+   ============================================================================= */
+.toshi-popup { background: var(--popupBg); border-radius: var(--toshi-radius); box-shadow: var(--toshi-shadow); overflow: hidden; }
+.toshi-popup__head { background: var(--popupHeadBg); color: #fff; padding: 8px 12px; font-weight: 500; }
+.toshi-window { background: var(--windowBg); border: 1px solid var(--borderColor); border-radius: var(--toshi-radius); }
+.toshi-window__head { background: var(--windowHeader); color: #fff; padding: 8px 12px; }
+
+.toshi-tabs { display: flex; gap: 2px; }
+.toshi-tab  { background: var(--tabBg); color: #fff; padding: 6px 14px; border-radius: var(--toshi-radius) var(--toshi-radius) 0 0; cursor: pointer; }
+.toshi-tab:hover { background: var(--tabHoverBg); }
+.toshi-tab.is-active { background: var(--tabActiveBg); }
+
+.toshi-panel__head { background: var(--panelHeadBg); color: #fff; padding: 6px 12px; }
+.toshi-accordion__head { background: var(--panelAccordionHeadBg); color: #fff; padding: 6px 12px; }
+.toshi-accordion__head.is-active { background: var(--panelAccordionHeadActiveBg); }
+
+.toshi-tree { background: var(--treeBg); border: 1px solid var(--borderColor); border-radius: var(--toshi-radius); }
+.toshi-tree__item.is-active { background: var(--treeActiveBg); color: #fff; }
+.toshi-tree__empty { color: var(--treeEmptyColor); }
+
+/* =============================================================================
+   9) LOADER (spinner)
+   ============================================================================= */
+.toshi-loader { width: 30px; height: 30px; border: 2px solid var(--loaderBorder);
+  border-top-color: var(--textColorHover); border-radius: 50%; animation: toshi-spin .6s linear infinite; }
+@keyframes toshi-spin { to { transform: rotate(360deg); } }
+
+/* Dashboard module cards (1:1 with real TEAMI) */
+.mod-card {
+  display: flex; flex-direction: column;
+  min-height: 190px;
+  border: 1px solid var(--borderColor);
+  border-radius: 6px;
+  background: var(--contentBg);
+  padding: 16px;
+  box-shadow: 0 1px 3px var(--boxShadowCommonColor);
+}
+.mod-card__head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mod-card__ico {
+  width: 40px; height: 40px; flex: 0 0 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--btnLightblueBg) 15%, transparent);
+  border-radius: 8px;
+}
+.mod-card__title { color: var(--btnLightblueBg); font-size: 15px; font-weight: 600; }
+.mod-card__desc { flex: 1; font-size: 12.5px; line-height: 1.5; color: var(--textColor); opacity: .9; }
+.mod-card__foot { display: flex; justify-content: flex-end; margin-top: 12px; }

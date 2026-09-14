@@ -1,0 +1,1010 @@
+# TEAMI / EMCOS EC3 — Endpoint параметрийн бүтэц (982)
+#
+# Эх сурвалж: браузерын webpack model config-уудаас (route + request_label + structure)
+#   бүх 852 chunk ачаалж олборлов (2026-08-28). Зам бүр ec3api/v1/ суурьтай харьцангуй.
+#
+# Формат:  <path> [METHODS] :: PARAM(flags), PARAM2(flags), ...
+#   METHODS — request_label-аас (GET/POST/PUT/DELETE). "[-]" = label тодорхойгүй
+#             (ерөнхийдөө GET унших / POST бичих; action-оор шийдэгдэнэ).
+#   Туг (flags):
+#     get=req  — GET query параметр, ЗААВАЛ
+#     get=opt  — GET query параметр, сонголтоор
+#     add=req  — POST/PUT body талбар, ЗААВАЛ
+#     add=opt  — POST/PUT body талбар, сонголтоор
+#     nonNull=req — null байж болохгүй (заавал утгатай)
+#     query    — query string-д (POST үед)
+#   Туггүй параметр = ихэвчлэн хариунд буцдаг/дотоод талбар (жишээ ID).
+#   Нэг параметр олон туг агуулж болно (GET ба POST-д өөр өөр үүрэгтэй).
+#
+# ЖИШЭЭ бичих хүсэлт (POST):
+#   POST ec3api/v1/points
+#   header: st-token: <JWT>
+#   body: { "POINT_NAME":"...", "POINT_CODE":"...", ... }  // add=* талбарууд
+# ЖИШЭЭ унших (GET):
+#   GET ec3api/v1/measuringdevices?offset=0&limit=100      // get=* параметрүүд
+#
+# Grid query (жагсаалт): POST <path> body { limit, offset, filters:[{c,p,v}], ... } -> { data, totalCount }
+# ============================================================================
+
+/ [-]
+/gr_name [-]
+/id_by_code [-]
+/id_by_name [-]
+/mlset [-]
+/pl_mlset [-]
+/rpq [-]
+/rpqc [-]
+/rpqf [-]
+/tp_id_by_name [-]
+/user_id_by_name [-]
+/with_data [-]
+/wiz_rel [-]
+/{bga_id} [-]
+/{bga_type_id} [-]
+/{cont_id} [-]
+/{ds_code} [-]
+/{gr_id} [-]
+/{id}/{role_name} [-]
+/{mou_id} [-]
+/{se_id} [-]
+accesslevelsgroups [GET] :: UG_ID(get=req,add=req), GR_ID(add=req), ALGR_ID(add=req)
+actdata [GET,POST] :: ACT_ID(get=req,add=req), PL_ID(add=req), PL_T(add=req), ACT_VALUE(add=req)
+actdata/point_mls [GET] :: ACT_ID(get=req), POINT_ID(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+acts [DELETE,GET,POST] :: POINT_ID(add=req,get=req,add=opt), ACT_TYPE_ID(add=req), IGNORE_READ_DATA(add=opt,add=req), ACT_NUMBER(add=opt,add=req), ACT_MONTH(add=req,add=opt), ACT_DESC(add=opt,add=req), PL_ID(add=req,add=opt), PL_T(add=req,add=opt), ACT_VALUE(add=req,add=opt), ACT_ENABLED(add=opt,add=req), ACT_ID
+acts/point_ml [GET,POST] :: POINT_ID(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+acttypes [GET] :: ACT_ID(get=req,add=req), PL_ID(add=req), PL_T(add=req), ACT_VALUE(add=req), ACT_TYPE_ID, ACT_TYPE_NAME(add=req), POINT_ID(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+add_new_lines_for_generation [POST] :: BGA_ID(add=opt), POINT_ID(add=opt)
+admin_testmode [POST] :: SP_ID(add=req)
+aggfunctions/tff [GET]
+aggfunctions/verification [-]
+aggregationsegments/fill [-]
+aggregationsegmenttypes/verification [-]
+aggs_type/fib_data [GET] :: FIB_ID(add=opt), METER_NUMBER(add=opt), POINT_ID(add=opt), AGGS_TYPE_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), FROM_DA(add=opt), TO_DA(add=opt), MOVE(add=req), FORCED(add=opt)
+ai/generate_by_id [POST] :: QUERY_ID(add=req), DATA(add=opt)
+alertdas [-]
+algr [GET]
+allbalance [GET]
+appcontrol/compare [-]
+appcontrol/create [-] :: IP(add=opt), PORT(add=opt)
+appcontrol/get [-] :: WADR(add=req), OID(add=req), IP(add=opt), PORT(add=opt), INDEX(add=req), PROGRAM(add=req)
+appcontrol/get_info [-] :: WADR(add=req), OID(add=req), IP(add=opt), PORT(add=opt), INDEX(add=req), PROGRAM(add=req)
+appcontrol/kill [-] :: WADR(add=req), OID(add=req), IP(add=opt), PORT(add=opt)
+appcontrol/set [-] :: WADR(add=req), OID(add=req), IP(add=opt), PORT(add=opt), INDEX(add=req), PROGRAM(add=req), VALUE(add=req)
+appcontrol/sleep [-] :: WADR(add=req), OID(add=req), IP(add=opt), PORT(add=opt), INDEX(add=req), PROGRAM(add=req)
+appcontrol/start [-] :: WADR(add=req), OID(add=req), IP(add=opt), PORT(add=opt), INDEX(add=req), PROGRAM(add=req)
+appinfo/app_version [GET]
+appinfo/das_modules [GET]
+appinfo/das_version [GET]
+appinfo/db_time [-]
+appinfo/db_version [GET]
+appinfo/dst [GET] :: POBJ_ID(get=req), WW(get=req), IS15MIN(get=opt), DP_ID(get=req)
+appinfo/license [GET]
+ar_ds [GET] :: DS_ID(get=req,add=req), FROM(get=req), TO(get=req), DS_T(add=req), DS_V(add=req), DS_DATA_DESC(add=opt)
+ar_ds_plain [GET] :: DS_ID(add=req,get=opt), DS_T(add=req), DS_V(add=req), DS_DATA_DESC(add=opt), FROM(get=opt), TO(get=opt)
+ar_dw_plain [GET]
+ar_pw_plain [GET] :: FF1(get=opt), FF2(get=opt), FF3(get=opt), FF4(get=opt), FF5(get=opt)
+archives/act_from_archives [GET] :: POINT_ID(get=req), MULTIPLIER(get=req), TERM(get=req), USE_AVG_DATA(get=req), PL_BT(get=req), PL_ET(get=req), ML_ID(get=req), ROUND(get=opt)
+archives/actual_pl [POST] :: POINT_ID(add=opt), ML_ID(add=opt), FROM(add=opt), TO(add=opt)
+archives/ar_act_data [GET] :: ML_ID(get=req), BT(get=req), POINT_ID(get=opt), AGGS_ID(get=req), MD_ID(get=req), GR_ID(get=opt)
+archives/ar_src_ph [GET] :: AGGS_ID(get=req), POINT_ID(get=req), ML_ID(get=req), MD_ID(get=req), BT(get=req)
+archives/dls_day [POST] :: POINT_ID(get=req), ML_ID(get=req), DAY(get=req)
+archives/extra_fields [POST] :: POINT_ID(add=opt), GR_ID(add=opt), FFP_FIELDS_POINT(add=opt), FFP_FIELDS_GR(add=opt)
+archives/grexp [GET] :: ML_ID(get=req), BT(get=req), GR_ID(get=req)
+archives/group [POST] :: FROM(add=req), TO(add=req), GR_ID(add=req), ML_ID(add=req), GR_VALUE(add=opt), GR_GMOD(add=opt), GL_EC(add=opt), BILLING_HOUR(add=opt), BILLING_HOUR_FOR_PREV_DAY(add=opt), SHOW_MAP_DATA(add=opt), FREEZED(add=opt), MD_ID(add=req)
+archives/mou [POST] :: POINT_ID(add=req), FROM(add=req), TO(add=req)
+archives/mt [GET] :: MT_ID(get=req)
+archives/point [POST] :: FROM(add=req), TO(add=req), POINT_ID(add=req), ML_ID(add=req), MD_ID(add=req), AGGS_ID(add=req), WO_BYP(add=opt), WO_ACTS(add=opt), BILLING_HOUR(add=opt), BILLING_HOUR_FOR_PREV_DAY(add=opt), SHOW_MAP_DATA(add=opt), FREEZED(add=opt), MOU_SPLIT(add=opt), SPLIT_BT(add=opt), SPLIT_ET(add=opt)
+archives/point_act [POST] :: FROM(add=req), TO(add=req), POINT_ID(add=req), ML_ID(add=req), ACT_ID(add=req)
+archives/points_with_acts [POST] :: POINT_ID(add=req), ML_ID(add=req), FROM(add=req), TO(add=req)
+archives/points_with_mou [POST] :: POINT_ID(add=req), FROM(add=req), TO(add=req)
+archives/raw_point_data [GET] :: POINT_ID(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+archives/read_rq_info [-] :: POINT_ID(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+archives/set_rread [POST] :: POINT_ID(add=req), ML_ID(add=req), FROM(add=req), TO(add=req)
+archives/signal [POST] :: DS_ID(add=req), FROM(add=req), TO(add=req), BILLING_HOUR(add=opt), BILLING_HOUR_FOR_PREV_DAY(add=opt)
+archives/verge [POST] :: TARGET_MT_ID(get=req), FROM(get=req), TO(get=req), MD_ID(get=req), ML_ID(get=req), ID(get=req), TYPE(get=req)
+archives/withe [POST] :: FROM(add=req), TO(add=req), POINT_ID(add=opt), DP_ID(add=opt), TYPE(add=req), DATA_CODE(add=req)
+archives/withe_compare [POST] :: FROM(add=req), TO(add=req), POINT_ID(add=opt), DP_ID(add=opt), TYPE(add=req), DATA_CODE(add=req)
+archives/xfau [POST] :: XFAU_ID(add=req), FROM(add=req), TO(add=req), ML_ID(add=req)
+archives/xfau_det [GET] :: ML_ID(get=req), BT(get=req), XFAU_ID(get=opt)
+archives/xfau_info [GET] :: XFAU_ID(get=req)
+audit [GET] :: DB_TIME(get=opt), AU_NR(get=opt), TAB_ID(get=opt), OPERATION_ID(get=opt)
+audit/details [GET] :: DB_TIME(get=opt), AU_NR(get=opt), TAB_ID(get=opt), OPERATION_ID(get=opt)
+auf [GET]
+balance [GET] :: GR_ID, GR_NAME(add=req), GR_CODE(add=opt), IS_PUBLIC(add=opt), GR_TYPE_ID
+balances [GET] :: POINT_ID(get=opt,add=opt), GR_ID(get=req,add=req), FROM(get=req,add=req), TO(get=req,add=req), TIME_SCROLLING(get=req,add=req), ROUNDING(get=req,add=req), DISCR(get=req,add=req), CUSTOMER_SPECIFIC(get=req,add=req)
+balances/balance_all_emcos [POST]
+balances/balance_consumer [POST]
+balances/balance_nt [POST]
+balances/balances_config_export [GET] :: GR_ID(get=opt)
+balances/balances_view_export [-] :: POINT_ID(add=opt), GR_ID(add=req), FROM(add=req), TO(add=req), TYPE(add=req), TIME_SCROLLING(add=req), ROUNDING(add=req), SCOPE(add=req), H_DEPTH(add=req), BALANCE_KIND(add=req), DISCR(add=req), CUSTOMER_SPECIFIC(add=req)
+balances/group [GET] :: POINT_ID(get=opt,add=opt), GR_ID(get=req,add=req), FROM(get=req,add=req), TO(get=req,add=req), TIME_SCROLLING(get=req,add=req), ROUNDING(get=req,add=req), DISCR(get=req,add=req), CUSTOMER_SPECIFIC(get=req,add=req)
+balances/io_gr [GET] :: C_ID(add=req), GR_ID(get=opt,add=req), GR_NAME(add=req), VALID(get=opt), BT(add=req), _BT, ET(add=opt), PPB_F(add=opt), PMB_F(add=opt), PB_F(add=opt), QPB_F(add=opt), QMB_F(add=opt), QB_F(add=opt)
+balances/io_point [GET] :: C_ID(add=req), GR_ID(get=opt,add=req), GR_NAME(add=req), VALID(get=opt), BT(add=req), _BT, ET(add=opt), WITH_COEF(get=req,add=req), PPB_F(add=opt), PMB_F(add=opt), PB_F(add=opt), QPB_F(add=opt), QMB_F(add=opt), QB_F(add=opt)
+bga [GET,PUT] :: BGA_TYPE_ID(get=opt,add=req), BGA_ID(get=opt), BGA_NAME(add=req), BGA_ENABLED(add=opt), SCH_ID(add=opt), GR_ID(add=opt), BGAQ_ID(add=opt), BGA_PRIORITY(add=opt)
+bga/execute [POST] :: BGA_ID(add=opt,add=req)
+bga/execute_serv [POST] :: BGA_ID(add=opt)
+bga/gr_query [GET]
+bga/sch_bga_det [GET]
+bga/se [GET] :: BGA_NAME(get=opt), DP_CODE(get=opt)
+bga_class [GET,POST] :: BGA_ID(get=req), APPEND_TYPE(get=opt), BGA_CLASS_ID(get=req), BGA_CLASS_CODE(add=req), BGA_CLASS_NAME(add=req)
+bga_param [GET] :: BGA_ID(add=req,get=opt), BGA_PARAM_NR(add=req), BGA_PARAM_VALUE(add=req), BGA_PARAM_VALUE_DESC(add=opt)
+bga_param/loss [GET] :: BGA_ID(get=req)
+bga_statistics [GET] :: BGA_ID(get=opt), BGA_NAME(get=opt)
+bga_type [GET,POST] :: BGA_CLASS_ID(get=req,add=req), BGA_TYPE_ID, BGA_TYPE_CODE(add=req), BGA_TYPE_NAME(add=req), BGA_TYPE_DESC(add=req), BGA_TYPE_DECLARE(add=req), BGA_TYPE_PRE_ACTION(add=req), BGA_TYPE_SELECT(add=req), BGA_TYPE_REC_ACTION(add=req), BGA_TYPE_POST_ACTION(add=req)
+bga_type_param [GET] :: BGA_TYPE_ID(add=req,get=opt), BGA_TYPE_PARAM_NR(add=req), BGA_TYPE_PARAM_DESC(add=opt), BGA_TYPE_PARAM_REGULAR(add=opt), BGA_TYPE_PARAM_KEY(add=opt), ENUM_ID(add=opt), BGA_PARAM_DEFAULT_VALUE(add=opt)
+bga_type_ug [GET] :: BGA_TYPE_ID(add=req,get=opt), UG_ID(add=req)
+bgaoprogress [GET] :: FILTERS(get=opt), ORDER(get=opt), ORDERDIRECTIONS(get=opt), ORDERNULLS(get=opt), LIMIT(get=opt), OFFSET(get=opt)
+bgaoprogress/status [GET] :: INTERVAL(get=opt)
+bgaq [GET] :: BGA_ID(get=req), APPEND_TYPE(get=opt), BGAQ_ID, BGAQ_CODE(add=req), BGAQ_NAME(add=req)
+bgatree/bga [GET] :: BGA_TYPE_ID(get=req), SEARCH_STRING(get=opt), SEARCH_BEHAVIOUR_BGA(get=opt), FILTERS(get=req), ACTION(get=req)
+bgatree/bga_class [GET] :: ACTION(get=opt), EXACT_SEARCH(get=opt), SEARCH_STRING(get=opt), FILTERS(get=opt)
+bgatree/bga_path [-] :: BGA_ID(get=req), APPEND_TYPE(get=opt)
+bgatree/bga_struct [-] :: BGA_ID(get=req)
+bgatree/bga_type [GET] :: BGA_CLASS_ID(get=req), SEARCH_STRING(get=opt), SEARCH_BEHAVIOUR_BGA(get=opt)
+bridgetevis [GET]
+bridgetevis/disable [POST]
+bridgetevis/transmit [POST]
+bridgetevis/transmitall [POST]
+bridgetevisfail [POST] :: GPP_OBJ_NR_I(add=opt), GPP_APTK_NR_I(add=opt), GPP_REGISTRAVIMO_DATA_I(add=opt), GPP_PRANESIMO_APRASYMAS_I(add=opt), GPT_PAVADINIMAS_I(add=opt), GPP_PRANESEJAS_I(add=opt), GPP_GEDIMO_PRIEZASTIS_I(add=opt), GPP_PASALINIMO_DATA_IKI_I(add=opt)
+bridgetevisoperations/bridgetevisoperations [GET]
+bypasspoints [-]
+caption [GET] :: FILTERS(get=opt), ORDERDIRECTIONS(get=opt), ORDER(get=opt), ORDERNULLS(get=opt), LIMIT(get=opt), OFFSET(get=opt), CAP_ID, CAP_TEXT
+caption/default [PUT] :: CAP_ID
+caption/param [GET] :: CAP_ID(get=req)
+channelaprops [GET,PUT] :: PH_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req)
+channels [GET,PUT] :: PH_ID(add=req), DP_ID(add=req,get=opt), PH_TYPE_ID(add=req), PH_NAME(add=req), PH_ENABLED(add=opt), PH_DELETED(add=opt), PH_SAVE_STATISTICS(add=opt), PH_FAILURE_COUNT(add=opt), COSTA_G_PER_ID(add=opt), COSTA_G_EXP_VALUE(add=opt), COSTA_B_PER_ID(add=opt), COSTA_B_EXP_VALUE(add=opt), SRC_ID(add=req), SP_ID(add=opt)
+channels/by_ip_port [-]
+channeltypelpty [GET] :: PH_TYPE_ID(get=opt)
+channeltypes [GET,POST] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt,get=opt), SRC_ID(add=opt), PH_ID(add=opt,add=req), POINT_ID(add=opt,get=opt), GR_ID(add=opt,get=opt), DS_ID(add=opt), PH_TYPE_ID(get=req,add=req), PH_NAME, PH_ENABLED, COSTA_G_PER_ID, COSTA_B_PER_ID, PH_FAILURE_COUNT, COSTA_G_EXP_VALUE, COSTA_B_EXP_VALUE, PH_SAVE_STATISTICS, LPTY_ID(add=req), LPTY_VALUE(add=req), SP_ID(add=req), RC_ID(get=opt), SCH_ID(get=opt), SCH_TIME(get=opt), RODO_ID(get=opt), DAS_ID(get=opt), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt), ACTION(get=opt), EXACT_SEARCH(get=opt), FILTERS(get=opt), SCOPE(get=opt), SEARCH_STRING(get=opt), SHOW_DELETED(get=opt), SHOW_SYSTEM_DP(get=opt), SRC_TYPE_ID(get=opt), WITH_ADD_LABEL(get=opt), PH_LAYER_ID(add=req), PH_TYPE_NAME(add=req)
+chromo/ch [GET]
+chromo/chr_to_dev [POST] :: POINT_ID(add=req), VAL(add=req)
+chromo/data [GET]
+chromo/groups [GET]
+chromo/grs [GET]
+chromo/umg [GET]
+chromo/w_chr_to_dev [POST] :: GR_ID(add=req), VAL(add=req)
+cpty [POST] :: CPTY_ID, CPTY_CODE(add=req,nonNull=req), CPTY_NAME(add=req,nonNull=req), ENUM_ID(add=opt), CPTY_NR(add=opt), FMT_ID(add=opt)
+databranchsets [GET] :: POINT_ID(get=req,add=req), PL_ID, PL_ENABLED(add=opt), ML_ID(add=req), SRC_RULE_ID, RULE_ENABLED(add=opt), SRC_TMPL_ID(add=req), METER_TYPE_ID(add=opt), ECP_ID(add=opt), POINT_TYPE_ID(add=opt), DEV_TYPE_ID(add=opt), DP_TYPE_ID(add=opt), MOU_TYPE_ID(add=opt), PPTY_ID(add=opt), PPTY_VALUE(add=opt), WITHESET_ID, WITHESET_CODE(add=req), WITHESET_NAME(add=req), SRC_TYPE_ID(add=opt), WITHESET_JOURNAL(add=opt)
+databranchsets/duplicate [POST] :: WITHESET_ID(add=req), WITHESET_NAME(add=opt), WITHESET_CODE(add=opt)
+dataitems [GET,POST,PUT] :: DI_ID, DI_ENABLED(add=req,add=opt), PL_ID(add=opt), DS_ID(add=opt,add=req), LP_ID(add=req), SHEAF_ID(add=opt), POINT_ID(add=opt,get=opt), DP_ID(add=opt,get=opt), WITHESET_ID(add=opt)
+dataitems/combo [POST] :: DI_ID(add=opt)
+dataitems/dp [POST]
+dataitems/ids [POST] :: POINT_ID(add=opt), ML_ID(add=opt), SHEAF_ID(add=opt), WITHESET_ID(add=opt)
+dataitems/multi [POST] :: POINT_ID(add=req,add=opt)
+dataitems/pl_mlset [POST] :: POINT_ID(add=req), MLSET_ID(add=req), LP_ID(add=req), EXTEND(add=opt)
+dataitemsperiods [POST] :: DI_ID(add=req), DI_BT(add=opt), DI_ET(add=opt)
+dataitemsperiods/dip [POST] :: DI_ID(add=req)
+dataloctypes [GET,POST] :: SRC_NAME(add=req), SRC_NUMBER(add=req), DP_ID(add=req), SRC_TYPE_ID(add=req), DL_TYPE_ID(add=req), SRC_BT(add=req), SRC_ET(add=req), SRC_ENABLED(add=opt), TZ_ID(add=req), SRC_TZ_DST_USED(add=opt), SRC_SAVE_STATISTICS(add=opt), POINT_ID(add=req), SRC_DIR_INV(add=opt), SRC_TMPL_ID(add=opt,add=req), ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt), SRC_TMPL_CODE(add=opt), SRC_TMPL_NAME(add=opt)
+datapointmenu/dp_info [-] :: DP_ID(get=req)
+datapointmenu/dp_struct [GET] :: DP_ID(get=opt), POINT_ID(get=opt), DS_ID(get=opt)
+datapointprops [GET,PUT] :: DP_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req)
+datapoints [GET,POST,PUT] :: DP_ID, DP_CODE(add=opt), DP_NAME(add=req), DP_TYPE_ID(add=req), DP_ENABLED(add=opt), DP_DELETED(add=opt), DP_INTERNAL(add=opt)
+datapointstypes [GET,POST] :: PH_TYPE_ID(get=req,add=req), POINT_ID(get=opt), GR_ID(get=opt), DP_ID(add=req), DAS_ID(add=req), DP_CODE, DP_NAME, DP_TYPE_ID, DP_ENABLED, SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt), SEARCH(get=req)
+dataservers [GET] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt,add=req,get=opt), SRC_ID(add=opt), PH_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), DS_ID(add=opt), DAS_ID(add=req,get=opt), RC_ID(get=opt), SCH_ID(get=opt), SCH_TIME(get=opt), RODO_ID(get=opt), DAS_ENABLED, ACTION(get=opt), EXACT_SEARCH(get=opt), FILTERS(get=opt), SCOPE(get=opt), SEARCH_STRING(get=opt), SHOW_DELETED(get=opt), SHOW_SYSTEM_DP(get=opt), SRC_TYPE_ID(get=opt), WITH_ADD_LABEL(get=opt)
+dataservers/das_lbd [-]
+datasheafs [GET] :: DP_ID(get=opt,add=opt), WITHESET_ID(get=opt), WITHESET_JOURNAL(get=opt), ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), SRC_ID(add=opt), PH_ID(add=opt), POINT_ID(add=opt,get=req), GR_ID(add=opt), DS_ID(add=opt), ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+datasheafs/ids [POST] :: POINT_ID(add=opt), SHEAF_ID(add=opt), WITHESET_ID(add=opt), WITHESET_JOURNAL(add=opt)
+datasheafs/not_di_multi [POST] :: POINT_ID(add=req), WITHESET_ID(add=opt), WITHESET_JOURNAL(add=opt)
+datasourcetemplates [GET,POST] :: DP_ID(add=opt), SRC_TMPL_ID(add=opt,get=req,add=req,get=opt), POINT_ID(add=req), DELAYED(add=opt), IGNORE_EXISTING(add=opt), SE_TMPL_DP_SHEAF_ID, SHEAF_ID(add=req), LP_ID(add=req), SE_H(add=req), SE_H_PER_ID(add=opt), SE_H_DEPTH(add=opt), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), WITHESET_ID(add=opt), SRC_TMPL_CODE(add=req), SRC_TMPL_NAME(add=req), SRC_TMPL_MULTIPOINT(add=opt), SRC_TYPE_ID(add=req), DL_TYPE_ID(add=req), TZ_ID(add=req), SRC_TZ_DST_USED(add=opt), SRC_SAVE_STATISTICS(add=opt), IGNORE_SE_AB(add=opt), SRC_DIR_INV(add=opt), INHERIT_SRC_NUMBER(add=opt), SRC_ID
+datasourcetemplates/duplicate [POST] :: SRC_TMPL_ID(add=req), SRC_TMPL_CODE(add=opt), SRC_TMPL_NAME(add=opt)
+datasourcetemplates/tmpl_from_src [POST] :: SRC_ID(add=req), SRC_TMPL_CODE(add=opt), SRC_TMPL_NAME(add=opt), SRC_TMPL_MULTIPOINT(add=opt), IGNORE_SE_AB(add=opt)
+datasourcetypes [GET,POST] :: SRC_NAME(add=req), SRC_NUMBER(add=req), DP_ID(add=req,get=req), SRC_TYPE_ID(add=req), DL_TYPE_ID(add=req), SRC_BT(add=req), SRC_ET(add=req), SRC_ENABLED(add=opt), TZ_ID(add=req), SRC_TZ_DST_USED(add=opt), SRC_SAVE_STATISTICS(add=opt), POINT_ID(add=req), SRC_DIR_INV(add=opt), SRC_TMPL_ID(add=opt,add=req), SRC_ID, SP_ID(add=req), LPTY_ID(add=req), LPTY_VALUE(add=req), SRC_TMPL_CODE(add=opt), SRC_TMPL_NAME(add=opt), PH_ID(get=req), DELAYED
+datasourcetypes/src_type_from_src [GET] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt,get=req), SRC_ID(add=opt), PH_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), DS_ID(add=opt), FILTERS(get=opt), ORDERDIRECTIONS(get=opt), ORDER(get=opt), ORDERNULLS(get=opt), LIMIT(get=req), OFFSET(get=req)
+datastatusflags [POST] :: FROM(add=req), TO(add=req), POINT_ID(add=opt), DP_ID(add=opt), TYPE(add=req), DATA_CODE(add=req), SCOPE(get=req)
+datastatusflags/fp_sf [GET] :: FP_ID(get=opt,add=req), SF_ID(get=opt,add=req), SF_AUTO_NULL_ACT(get=opt,add=opt), IN_FP_SF(get=opt,add=opt), SF_NAME(get=opt,add=opt)
+datastatusflags/fp_sf_count [GET] :: FP_ID(get=req)
+datawitheclasses [GET]
+datawithes [GET] :: PW_BT(get=opt), POINT_ID(get=opt), USER_ID(get=opt), DP_ID(get=opt)
+datawithetypes [GET] :: WITHESET_ID(get=req), SRC_TYPE_ID(get=opt), WITHE_TYPE_ID(get=opt), WITHESET_JOURNAL(get=opt)
+dayprogramsdata [-]
+debug/date [-]
+debug/sql [-]
+debug/sql_log [-]
+devdp [-]
+deviceconfig/dp [POST] :: DP_ID(add=req), DW_T(add=opt), WITHE_ID(add=req), IND1(add=opt), IND2(add=opt), IND3(add=opt), EMU(add=opt)
+deviceconfig/dp_src_type [GET] :: DP_ID(get=req)
+deviceconfig/dp_src_type_list [GET] :: DP_ID(get=req)
+deviceconfig/point [POST] :: POINT_ID(add=req), SRC_ID(add=req), WITHE_ID(add=req), PW_T(add=opt), IND1(add=opt), IND2(add=opt), IND3(add=opt), EMU(add=opt)
+deviceconfig/point_src_type [GET] :: POINT_ID(get=req)
+deviceconfig/point_src_type_list [GET] :: POINT_ID(get=req)
+deviceconfig/src_type_mod_withe [GET] :: IS_POINT(get=req), SRC_TYPE_MOD_NR(get=req), SRC_TYPE_ID(get=req), POINT_ID(get=opt), DP_ID(get=opt)
+devices [GET] :: DEV_ID, DEV_TYPE_ID(add=req), DEV_NUMBER(add=req), IMEI(add=req)
+devices/dev_not_dp [POST]
+devicespropslists [POST] :: DP_ID(get=req), DPTY_ID, DPTY_CODE(add=req,nonNull=req), DPTY_NAME(add=req,nonNull=req), ENUM_ID(add=opt), DPTY_TYPE_ID(add=opt), DPTY_NR(add=opt), FMT_ID(add=opt)
+devicespropslists/available_dpty [GET]
+devicespropstypes [-]
+devicestypes [GET,POST] :: PH_TYPE_ID(get=req,add=req), POINT_ID(get=opt), GR_ID(get=opt), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt), DP_ID(get=req,add=req), DEV_ID, MOD_DEV_NUMBER, SRC_ID(add=opt), DEVDP_ID(add=opt), OLD_DEV_DP_ET(add=opt), NEW_DEV_TYPE_ID(add=req), NEW_DEV_NUMBER(add=req), NEW_DEV_DP_BT(add=req), CREATE_SRC(add=req), DEV_TYPE_ID, DEV_TYPE_NAME(add=req)
+devicestypesdpty [GET] :: DEV_TYPE_ID(add=req,get=opt), DPTY_ID(add=req)
+devmou [-] :: DP_ID(get=req,add=req), DEV_ID, MOD_DEV_NUMBER, SRC_ID(add=opt), DEVDP_ID(add=opt), OLD_DEV_DP_ET(add=opt), NEW_DEV_TYPE_ID(add=req), NEW_DEV_NUMBER(add=req), NEW_DEV_DP_BT(add=req), CREATE_SRC(add=req)
+dewwithe [GET]
+dewwithetype [GET]
+di_dp [GET] :: DI_ID(get=req)
+di_ds [GET] :: DI_ID(get=req)
+di_point [GET] :: DI_ID(get=req)
+directions [-] :: CONT_ID(add=req), COMP_ID(add=req), COMP_MS_ID(add=req), COMP_DIR_ID(add=req), COMP_EC_ID(add=req), GRC_BT(add=opt), CONT_MS_ID(add=req), CONT_DIR_ID(add=req), CONT_EC_ID(add=req), COEF(add=opt), GR_ID(add=req), POINT_ID(add=req), POINT_MS_ID(add=req), POINT_DIR_ID(add=req), GRP_BT(add=opt), GR_MS_ID(add=req), GR_DIR_ID(add=req), GR_EC_ID(add=req)
+directions/grc_rule [GET]
+directions/verification [-]
+directory/file [GET] :: PATH(get=req), FILE(get=req), BASE(get=req), FILE_TYPE_ID(get=opt)
+directory/pty_file [GET] :: FMT_CODE(get=req), OBJ_ID(get=req), PTY_ID(get=req), TYPE(get=req), FILE(get=req), EXT(get=req)
+directory/pty_write_file [POST]
+directory/read [GET] :: PATH(get=req), FILE(get=req), BASE(get=req), FILE_TYPE_ID(get=opt), FULLNAME(get=req)
+directread [POST]
+directread/con_settings_by_point [GET] :: POINT_ID(get=req)
+directread/dp_con_settings_by_point [GET] :: DP_ID(get=req)
+directread/dp_src_type_params [GET] :: POINT_ID(get=req)
+directread/point_by_con_settings [GET] :: METER_NUMBER(get=req)
+directread/set [POST]
+directread/sp_check [GET] :: DP_ID(get=req), PH_ID(get=req)
+directread/sp_param [-] :: SRC_TYPE_ID(get=req)
+directread/src_type_dp [GET] :: POINT_ID(get=req)
+directread/src_type_meter [GET] :: POINT_ID(get=req)
+dirp [GET] :: DI_ID(get=req)
+disconnector [GET] :: POINT_ID(get=opt), GR_ID(get=opt), CASE(get=opt)
+disconnector/rights [GET] :: POINT_ID(get=opt), GR_ID(get=opt), CASE(get=opt)
+discretesignaldata [POST] :: DS_ID(add=req), DS_T(add=opt,add=req), DS_V(add=opt,add=req), DS_DATA_DESC(add=opt)
+discretesignaldata/validation [POST] :: DS_ID(add=req), DS_IGNORED(add=opt), TARGET(add=opt), BT(add=opt), ET(add=opt)
+discretesignals [DELETE,GET,PUT] :: DS_ID, DS_NAME, DS_CODE, DS_TYPE_ID, ENUM_ID, POINT_ID, DS_ENABLED, DS_EVENT_LOG, DS_RT_ENABLED, DS_BINARY
+discretesignals/di [POST] :: SRC_ID(add=req), DI_ID(add=req), SE_AB(add=opt), SE_A(add=req), SE_B(add=req), SE_ENABLED(add=opt), SE_FORCED(add=opt), SE_H(add=req), SE_H_PER_ID(add=req), SE_H_DEPTH(add=req), SE_H_BOUND(add=req), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), ADD_SEP(add=opt)
+discretesignaltypes [GET] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt), SRC_ID(add=opt), PH_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), DS_ID(add=opt), DS_TYPE_ID, DS_TYPE_NAME(add=req), DS_TYPE_CODE(add=req), ENUM_ID(add=opt), DS_EVENT_LOG(add=opt), DS_RT_ENABLED(add=opt), DS_BINARY(add=opt), ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+discretesignaltypes/no_mlset [GET] :: MLSET_ID(get=req)
+dl_type_show [POST] :: DS_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), MS_TYPE_ID(add=opt), AGGS_TYPE_ID(add=opt), MD_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), ML_ID(add=opt), SHEAF_ID(add=opt), COUNT(add=opt)
+dp_das [-] :: DP_ID(add=req), DAS_ID(add=req)
+dp_das_frc [-] :: DP_ID(add=req), DAS_ID(add=req)
+dp_das_log [-] :: DP_ID(add=req), DAS_ID(add=req)
+dp_type_show [POST] :: DS_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), MS_TYPE_ID(add=opt), AGGS_TYPE_ID(add=opt), MD_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), ML_ID(add=opt), SHEAF_ID(add=opt), COUNT(add=opt)
+dpmenu/dp [-] :: ACTION(get=opt), DP_ID(get=opt), EXACT_SEARCH(get=opt), FILTERS(get=opt), SCOPE(get=opt), SEARCH_STRING(get=opt), SHOW_DELETED(get=opt), SHOW_SYSTEM_DP(get=opt), SRC_TYPE_ID(get=opt), WITH_ADD_LABEL(get=opt)
+dpmenu/ph [-] :: DP_ID(get=req)
+dpmenu/se [-] :: SCOPE(get=opt), MD_ID(get=opt), AGGS_TYPE_ID(get=opt), AGGS_ID(get=opt), SE_ID(get=opt), DS_ID(get=opt), SRC_ID(get=req), POINT_ID(get=opt)
+dpmenu/se_md_aggs [-] :: SCOPE(get=opt), MD_ID(get=opt), AGGS_TYPE_ID(get=opt), SE_ID(get=opt), DS_ID(get=opt), SRC_ID(get=req), POINT_ID(get=opt)
+dpmenu/src [-] :: DP_ID(get=req), SCOPE(get=opt), SEARCH_STRING(get=opt), SHOW_EXPIRED_SRC(get=opt), SEARCH_BEHAVIOUR_DP(get=opt)
+dpmenu/src_ds [-] :: SRC_ID(get=req), SEARCH_STRING(get=opt), SEARCH_BEHAVIOUR_DP(get=opt), SCOPE(get=opt)
+dpmenu/src_point [-] :: SRC_ID(get=req), SEARCH_STRING(get=opt), SEARCH_BEHAVIOUR_DP(get=opt), SCOPE(get=opt)
+dpmenu/src_se [-] :: SRC_ID(get=req), SCOPE(get=opt)
+ds_auto_write_plan [GET] :: SCH_ID_ON(get=opt), SCH_ID_OFF(get=opt)
+ds_auto_write_sch [GET] :: DS_ID(get=opt)
+ds_gr [GET,PUT] :: DS_ID(add=req), GR_ID(add=req), DS_NR(add=opt), ID
+ds_type_gr [GET] :: DS_TYPE_ID(add=opt), GR_ID(add=opt), WITHE_ID(add=opt), SAM_ID(add=opt), ML_ID(add=opt), VERGE_ID(add=opt), GMOD_ID(add=opt), EC_ID(add=opt), EC_IN(add=opt), GPRC(add=opt), DS_TYPE_GR_PRIORITY
+dsperiods [-] :: FROM(get=req), TO(get=req)
+dwsettinghistory [GET] :: DW_BT(get=opt), USER_ID(get=opt), DP_ID(get=opt)
+eapp [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt)
+eapp_edev_status [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt)
+eapp_ee_status [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt)
+eapp_log [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt)
+eapp_status [GET] :: EAPP_ID(get=opt)
+ecocategories [GET,POST] :: ML_ID(get=req,add=req,get=opt), POINT_ID(get=opt,add=req), GR_ID(get=opt,add=req), GMOD_ID(get=opt,add=req), GPRC(get=opt,add=req), EC_ID(get=opt,add=req), EC_IN(get=opt,add=req), SAM_ID(add=req,get=opt), PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req), FROM(add=req), TO(add=req), MD_ID(add=req), AGGS_ID(add=req), WO_BYP(add=opt), WO_ACTS(add=opt), BILLING_HOUR(add=opt), BILLING_HOUR_FOR_PREV_DAY(add=opt), SHOW_MAP_DATA(add=opt), FREEZED(add=opt), MOU_SPLIT(add=opt), SPLIT_BT(add=opt), SPLIT_ET(add=opt), CONT_ID(add=req), COMP_ID(add=req), COMP_MS_ID(add=req), COMP_DIR_ID(add=req), COMP_EC_ID(add=req), GRC_BT(add=opt), CONT_MS_ID(add=req), CONT_DIR_ID(add=req), CONT_EC_ID(add=req), COEF(add=opt), POINT_MS_ID(add=req), POINT_DIR_ID(add=req), GRP_BT(add=opt), GR_MS_ID(add=req), GR_DIR_ID(add=req), GR_EC_ID(add=req), MT_ID(get=opt)
+ecoprofiles [GET,POST] :: POINT_ID(get=req,add=req), PL_ID, PL_ENABLED(add=opt), ML_ID(add=req), PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+ecp_data [-]
+edev [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt)
+edev_ee [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt), EDEV_ID(get=opt)
+edev_log [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt), EDEV_ID(get=opt)
+edevprq [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt), EDEV_ID(get=opt)
+edevprq_log [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt), EDEV_ID(get=opt), EDEVPRQ_ID(get=opt)
+ee [GET] :: EAPP_ID(get=opt), EAPP_TIME(get=opt)
+engineeringunits [PUT]
+enumerations [GET,POST] :: ENUM_ID, ENUM_CODE(add=req), ENUM_NAME(add=req), ENUM_TYPE_ID(add=opt,get=req), SCOPE(get=opt)
+enumerations?scope=DS [GET]
+enumerationsdata [GET,POST] :: SCOPE(get=opt,get=req), DP_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req), ENUM_ID(add=req,get=opt), ENUM_VALUE(add=req,nonNull=req), ENUM_VALUE_DESC(add=req), ENUM_DATA_NR(add=opt), ENUM_VALUE_NEW
+enumerationsdata/add_grcp_by [GET]
+enumerationsdata/grc_typ [GET]
+enumerationsdata?scope=DS [GET] :: DS_ID(add=req), DS_T(add=req), DS_V(add=req), DS_DATA_DESC(add=opt)
+enumerationsdata?scope=SPTY [-]
+enumerationtypes [POST]
+ev [POST]
+ev_ack [GET] :: EVC_ID(get=opt), EVT_ID(get=opt), DS_ID(get=opt), DP_ID(get=opt), PH_ID(get=opt), POINT_ID(get=opt), SRC_ID(get=opt), GR_ID(get=opt)
+ev_ack/ack_ev_ack [POST] :: EV_TIME(add=req), EV_ID(add=req), ACK_COMMENT(add=req,add=opt)
+ev_ack/ack_ev_ack_sum [POST] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt), SRC_ID(add=opt), PH_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), DS_ID(add=opt)
+ev_fields [GET] :: EVA_ID(get=req,add=req), RP_ID(get=req), RPQF_ID(add=req), RPQF_VALUE(add=req)
+eva_ack_ug [GET] :: EVA_ID(get=req,add=req), UG_ID(add=req), AL_ID(add=req)
+eva_ack_user [GET] :: EVA_ID(get=req,add=req), USER_ID(add=req), AL_ID(add=req)
+evabgaqf [POST] :: EVA_ID(get=req,add=req), BGA_ID(get=req), BGA_PARAM_NR(add=req), BGA_PARAM_VALUE(add=req)
+evac_type [GET]
+evaqf [POST] :: EVA_ID(get=req,add=req), RP_ID(get=req), RPQF_ID(add=req), RPQF_VALUE(add=req)
+eventaccidents [POST] :: EVA_ID, EVA_NAME(add=req), EVA_CODE(add=req), EVA_TYPE_ID(get=req,add=opt), RPA_ID(add=opt), BGAO_STATUS(add=opt), BGA_ID(add=opt), EVA_ENABLED(add=opt), EVA_BLOCK(add=opt), EVA_BLOCK_TYPE_ID(add=opt), EVA_BLOCK_DURATION(add=opt), EVA_IMMEDIATE(add=opt), CH_CNT(add=opt), SI_CNT(add=opt), OC_CNT(add=opt), DU_CNT(add=opt), CH_PNT(add=opt), SI_PNT(add=opt), OC_PNT(add=opt), DU_PNT(add=opt), CH_DSC(add=opt), SI_DSC(add=opt), OC_DSC(add=opt), DU_DSC(add=opt), CH_DPT(add=opt), SI_DPT(add=opt), OC_DPT(add=opt), DU_DPT(add=opt), CH_GRP(add=opt), SI_GRP(add=opt), OC_GRP(add=opt), DU_GRP(add=opt), CH_STEADY(add=opt), STEADY_TYPE_ID(add=opt), IGNORE_STEADY_VAL_RESTORE(add=opt), DU_STEADY(add=opt)
+eventaccidentsconditions [GET] :: EVA_ID(get=req)
+eventaccidentstypes [GET] :: EVA_TYPE_ID, EVA_TYPE_NAME(add=req)
+events_mcc [GET] :: POINT_ID(add=req), MCC_T(add=req), MD_CNT(add=opt), COEF_U_NUMERATOR(add=opt), COEF_U_DENOMINATOR(add=opt), COEF_I_NUMERATOR(add=opt), COEF_I_DENOMINATOR(add=opt), PL_DL(add=opt)
+eventsdevlog/dew [GET] :: DEW_ID, DEW_NAME(add=req), DEW_ENABLED(add=req), WITHE_TYPE_ID(add=req), WITHE_ID(add=opt), DP_ID(add=opt), DEW_DEPTH(add=req,nonNull=req)
+eventsdevlog/gew [GET] :: GEW_ID, GEW_NAME(add=req), GEW_ENABLED(add=opt), WITHE_TYPE_ID(add=opt), WITHE_ID(add=opt), GR_ID(add=opt), GEW_DEPTH(add=req,nonNull=req), WITHE_TYPE_NAME(add=opt), ON_VALUE_CHANGE(add=opt)
+evt [GET]
+exc_src_tmpl_gr [PUT] :: SRC_TMPL_ID(add=req,get=opt), GR_ID(add=req), SBST_SRC_TMPL_ID(add=req), SBST_SRC_TMPL_PRIORITY(add=opt)
+exchangeaddresses [GET,POST] :: POINT_ID(get=req,add=req), PL_ID, PL_ENABLED(add=opt), ML_ID(add=req), XA_ID, XA_NAME(add=req), XA_ENABLED(add=req), PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+exchangeaddresses/quality [POST] :: ML_ID(add=req), POINT_ID(add=req), GR_ID(add=req), MLSET_ID(add=req), FILTERS(add=req), DATE_FROM(add=req), DATE_TO(add=req)
+exchangeaddresses/xqTree [-]
+exchangeelements [PUT] :: XFE_ID, SCH_ID
+exchangeoperations [GET]
+exchangequality [POST] :: ML_ID(add=opt), SHOW_NON_DISCRETE(add=opt), MLSET_ID(add=opt), SHOW_POINT_ANYWAY(add=opt), Q_VIEW(add=opt), XA_ID(add=opt), XF_ID(add=opt), XFAU_ID(add=opt), XF_TYPE_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), Q_TYPE(add=opt), OWN(add=opt), NOT_OWN(add=opt), COMERCIAL(add=opt), TECH(add=opt), AUTOMATED(add=opt), NOT_AUTOMATED(add=opt)
+exchangequality/aggs_type_details [POST]
+exchangequality/details [POST]
+exchangequality/point_details [POST]
+exportform/file [GET] :: PATH(get=req), RELATIVE_TO(get=req)
+exportform/last_sent_doc_nr [GET] :: FROM(get=req), TO(get=req), XF_ID(get=req)
+exportform/send_after_view [POST] :: XML_NAME(add=req), XA_ID(add=req), REPORT_SENDING(add=opt)
+exportform/view_and_send [POST] :: XF_ID(add=req), FROM(add=req), TO(add=req), DOC_NR(add=req), XA_ID(add=req), XF_TYPE_ID(add=req)
+fib [POST] :: FIB_ID(add=opt), METER_NUMBER(add=opt), POINT_ID(add=opt), AGGS_TYPE_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), FROM_DA(add=opt), TO_DA(add=opt), MOVE(add=req), FORCED(add=opt)
+fib_msf_dir [GET] :: FIB_ID(add=opt), METER_NUMBER(add=opt), POINT_ID(add=opt), AGGS_TYPE_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), FROM_DA(add=opt), TO_DA(add=opt), MOVE(add=req), FORCED(add=opt)
+fib_msf_dir/details [GET] :: FIB_ID(add=opt), METER_NUMBER(add=opt), POINT_ID(add=opt), AGGS_TYPE_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), FROM_DA(add=opt), TO_DA(add=opt), MOVE(add=req), FORCED(add=opt)
+file_type [GET]
+fillingprofiledata [GET] :: FP_ID(get=req,add=req), ORDER(get=opt), ORDERDIRECTIONS(get=opt), FP_NR(add=req), AGGS_TYPE_ID(add=req), MS_ID(add=req), DIR_ID(add=req), AGGS_ID(add=req), AGGF_ID(add=req), TFF_ID(add=req), MD_ID(add=req)
+fillingprofiles [GET] :: FP_ID(get=opt,add=req), FP_NAME(get=opt,add=req), FP_CODE(get=opt,add=req), POINT_ID(get=req)
+fillingprofiles/fp_report [POST] :: FP_NAME(get=opt), FP_CODE(get=opt), POINT_COUNT(get=opt)
+formula [GET]
+gewwithe [GET]
+gewwithetype [GET]
+gis/events [-] :: OBJ_ID(get=req), TYPE(get=req), EVA_CODE(get=opt), EV_LIMIT(get=opt), EV_DEPTH(get=opt)
+gis/events_ack [-] :: OBJ_ID(get=req), TYPE(get=req), EV_LIMIT(get=opt), EV_DEPTH(get=opt)
+gis/map_info [-] :: OBJ_ID(get=req)
+gis/map_visibility [-] :: OBJ_ID(get=req)
+gis/obj_data [-] :: OBJ_ID(get=req), TYPE(get=req), GR_ML_IDS(get=opt), POINT_ML_IDS(get=opt), WITHE_IDS(get=opt)
+gis/obj_fields [-] :: OBJ_ID(get=req), TYPE(get=req)
+gis/obj_info [-] :: OBJ_ID(get=req)
+gis/obj_info_det [-] :: OBJ_ID(get=req), TYPE(get=req)
+gis/objects_gr [-] :: OBJ_ID(get=req)
+gis/objects_point [-] :: OBJ_ID(get=req)
+gis/ph_state [-] :: OBJ_ID(get=req), TYPE(get=req)
+gis/sp_state [-] :: OBJ_ID(get=req)
+gis/status_arch_data_gr [-] :: OBJ_ID(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+gis/status_arch_data_point [-] :: OBJ_ID(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+gis/status_ev_ack [-] :: OBJ_ID(get=req), STATUS_EV_DEPTH(get=opt)
+gis/status_ev_ack_point [-] :: OBJ_ID(get=req), STATUS_EV_POINT_DEPTH(get=opt)
+gis/status_ffp [-] :: OBJ_ID(get=req), FFP_VAL_ROW_NUM(get=req), FFP_ID(get=opt), CODE(get=opt)
+gis/status_ph [-] :: OBJ_ID(get=req)
+gis/status_point [-] :: OBJ_ID(get=req), FFP_VAL_ROW_NUM(get=req), FFP_ID(get=opt)
+gis/status_pty [-] :: OBJ_ID(get=req), CODE(get=opt)
+gis/status_rt [-] :: OBJ_ID(get=req), GR_ML_IDS(get=opt), POINT_ML_IDS(get=opt)
+gis/status_rt_data_gr [-] :: OBJ_ID(get=req), ML_ID(get=req)
+gis/status_rt_data_point [-] :: OBJ_ID(get=req), ML_ID(get=req)
+gis/status_sp [-] :: OBJ_ID(get=req)
+gmod [GET,POST] :: ML_ID(get=req,add=req,get=opt), POINT_ID(get=opt,add=req), GR_ID(get=opt,add=req), GMOD_ID(get=opt,add=req), GPRC(get=opt,add=req), EC_ID(get=opt,add=req), EC_IN(get=opt,add=req), SAM_ID(add=req,get=opt), PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req), MT_ID(get=opt), GMOD_CODE(add=req), GMOD_NAME(add=req), IGNORE_GROUP_VALUE(add=opt), GMOD_EU_CODE(add=opt), GMOD_EU_CODE_USAGE(add=opt)
+gmod_data [GET] :: GMOD_ID(add=req), GMOD_DATA_NR(add=opt), GPTY_ID(add=req), LTC_ID(add=req), GMOD_CONST(add=opt), MS_ID(add=opt), TFF_ID(add=opt), EC_ID(add=opt)
+grc [GET,PUT] :: CONT_ID(add=req), COMP_ID(add=req), GRC_BT_ORIGINAL, GRC_BT(add=opt), GRC_ET(add=opt), GRC_NR(add=opt), GRC_DESC(add=opt), GRC_TYP(add=opt), ID
+grc_data [GET] :: CONT_ID(add=req), COMP_ID(add=req), COMP_MS_ID(add=req), COMP_DIR_ID(add=req), COMP_EC_ID(add=req), GRC_BT(add=opt), CONT_MS_ID(add=req), CONT_DIR_ID(add=req), CONT_EC_ID(add=req), COEF(add=opt)
+grc_rule [GET] :: CONT_TYPE_ID(add=req), CONT_MS_ID(add=req), CONT_DIR_ID(add=req), CONT_EC_ID(add=req), COMP_TYPE_ID(add=req), COMP_MS_ID(add=req), COMP_DIR_ID(add=req), COMP_EC_ID(add=req), RULE_ENABLED(add=req), COEF(add=req)
+groupmodifications [POST] :: FROM(add=req), TO(add=req), POINT_ID(add=req), ML_ID(add=req), MD_ID(add=req), AGGS_ID(add=req), WO_BYP(add=opt), WO_ACTS(add=opt), BILLING_HOUR(add=opt), BILLING_HOUR_FOR_PREV_DAY(add=opt), SHOW_MAP_DATA(add=opt), FREEZED(add=opt), MOU_SPLIT(add=opt), SPLIT_BT(add=opt), SPLIT_ET(add=opt)
+groupmstree/export [GET] :: GR_ID(get=req)
+groupmstree/gr_ec [GET] :: GR_ID(get=req), MS_ID(get=req), DIR_ID(get=req), MS_TYPE_ID(get=req)
+groupmstree/gr_grc_data [GET] :: GR_ID(get=req), MS_ID(get=req), DIR_ID(get=req), EC_ID(get=req)
+groupmstree/gr_grp_data [GET] :: GR_ID(get=req), MS_ID(get=req), DIR_ID(get=req), MS_TYPE_ID(get=req), EC_ID(get=req)
+groupmstree/gr_ms [GET] :: GR_ID(get=req), MS_TYPE_ID(get=req)
+groupmstree/gr_ms_type [GET] :: GR_ID(get=req)
+grouppropsgpty [GET] :: GR_TYPE_ID(add=req,get=opt), GPTY_ID(add=req)
+grouppropslists [GET,POST] :: GPTY_ID, GPTY_CODE(add=req,nonNull=req), GPTY_NAME(add=req,nonNull=req), ENUM_ID(add=opt), GPTY_NUMERIC(add=opt), GPTY_TYPE_ID(add=opt), GPTY_NR(add=opt), FMT_ID(add=opt)
+grouppropslists/available_gpty [GET]
+grouppropslists/numeric [GET] :: PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req)
+grouppropslists?gpty_numeric=1 [-]
+grouppropstypes [-]
+groups [GET] :: GR_ID, GR_TYPE_ID, GR_CODE, IS_PUBLIC, GR_NAME, USER_ID
+groups/duplicate [-]
+groups/individual_ud_containers [POST]
+groups/parent [POST] :: GR_TYPE_ID(get=opt), SEARCH_STRING(get=opt)
+grouptypes [GET,POST] :: GR_ID(add=opt), POINT_ID(add=opt,add=req), DS_ID(add=opt), GRP_BT(add=req), GRP_ET(add=req)
+grouptypes/parent [GET] :: GR_TYPE_ID(get=opt), SEARCH_STRING(get=opt)
+grp [GET,POST,PUT] :: POINT_ID(add=req), GRP_BT(add=req,add=opt), GRP_ET(add=req,add=opt), GR_ID(add=req), GRP_BT_ORIGINAL, GRP_NR(add=opt), GRP_DESC(add=opt), ID
+grp/by_code [POST] :: GR_ID(add=req), TYPE(add=req), CODES(add=opt), FFP_VAL_ROW_NUM(add=opt)
+grp_data [GET] :: GR_ID(add=req), POINT_ID(add=req), POINT_MS_ID(add=req), POINT_DIR_ID(add=req), GRP_BT(add=opt), GR_MS_ID(add=req), GR_DIR_ID(add=req), GR_EC_ID(add=req), COEF(add=opt)
+grq_data [GET] :: GRQ_TIME(get=opt), GRQ_NR(get=opt), DAS_ID(get=opt)
+grq_det [GET] :: RC_ID(get=opt), SCH_ID(get=opt), SCH_TIME(get=opt), RODO_ID(get=opt), DAS_ID(get=opt)
+grq_prq [GET] :: GRQ_TIME(get=opt), GRQ_NR(get=opt), DAS_ID(get=opt)
+grq_src_data [GET] :: GRQ_TIME(get=req), GRQ_NR(get=req), DAS_ID(get=opt)
+grq_src_data_det [GET] :: GRQ_TIME(get=opt), GRQ_NR(get=opt), DAS_ID(get=opt)
+gtp [GET] :: GTP_ID, GR_ID(add=req), MS_ID(add=req), TP_ID(add=req), GTP_BT(add=req), GTP_ET(add=req), AGGF_ID(add=req)
+holidays [GET] :: ML_ID(get=req,add=req), POINT_ID(get=opt,add=req), GR_ID(get=opt,add=req), GMOD_ID(get=opt,add=req), GPRC(get=opt,add=req), EC_ID(get=opt,add=req), EC_IN(get=opt,add=req), SAM_ID(add=req)
+holidaysdata [-]
+homedashboard/data [POST] :: RPQ_SLC(add=req)
+homedashboard/query [GET] :: RPQ_SLC(add=req)
+import_data_file [-]
+import_export_db_config [-]
+import_export_db_config/bga_array [GET]
+import_export_db_config/dp_array [GET]
+import_export_db_config/gp_array [GET]
+import_export_db_config/src_tmpl_array [GET]
+important_withe_all [POST] :: SRC_TYPE_ID(get=req), IS_POINT(get=req)
+importantwithe [POST] :: SRC_TYPE_ID(get=req,add=req), IS_POINT(get=req,add=req), WITHE_ID(add=opt)
+importdevmeter [POST] :: PH_TYPE_ID(add=req), DEV_TYPE_ID(add=req), DP_TYPE_ID(add=req), PH_PORT(add=req), IP(add=req), DEV_NUMBER(add=req), METERS(add=req), DP_NAME(add=opt), DP_NAME_ENDING(add=opt), PH_PORT2(add=opt), PH_TYPE_ID2(add=opt)
+importdevmeter/check [GET] :: PH_TYPE_ID(get=req), DEV_TYPE_ID(get=req), DP_TYPE_ID(get=req), PH_PORT(get=req), IP(get=req), DEV_NUMBER(get=req), DP_NAME_ENDING(get=req), DP_NAME(get=req), METERS(get=req)
+importdevmeter/controller_info [GET] :: DEV_TYPE_ID(get=req)
+importdevmeter/fill [GET] :: PH_TYPE_ID(get=req), POINT_ID(get=opt), GR_ID(get=opt)
+importdevmeter/meter_info [GET] :: METERS(get=req)
+importgpdp [-]
+importgpdp/templates [GET]
+importkesc [-]
+init_gen_point [POST] :: POINT_ID(add=req), ML_ID(add=req), FROM_DA(add=req), TO_DA(add=req), FORCED(add=req), BGAO_STATUS(add=opt)
+init_gen_point/bgao [GET] :: BGAO_MIN(get=req), BGAO_MAX(get=req)
+init_gen_point/bgao_bga [GET] :: BGAO_MIN(get=req), BGAO_MAX(get=req), BGA_TYPE_ID(get=req)
+init_gen_point/bgao_bga_type [GET] :: BGAO_MIN(get=req), BGAO_MAX(get=req)
+kms/controllers [-] :: FILTERS(get=opt), ORDERDIRECTIONS(get=opt), ORDER(get=opt), ORDERNULLS(get=opt), LIMIT(get=req), OFFSET(get=req)
+kms/meters [-] :: FILTERS(get=opt), ORDERDIRECTIONS(get=opt), ORDER(get=opt), ORDERNULLS(get=opt), LIMIT(get=req), OFFSET(get=req)
+kms/pwd [-] :: SRC_ID(get=req)
+lim [GET] :: MA_ID(get=opt), MT_TIME(get=opt)
+limiter [GET] :: POINT_ID(get=opt), GR_ID(get=opt), CASE(get=opt)
+limiter/rights [GET] :: POINT_ID(get=opt), GR_ID(get=opt), CASE(get=opt)
+linkconfiggrid/dp [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/dp_lpty [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/lpty_flt [GET] :: SCOPE
+linkconfiggrid/ph [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/ph_lpty [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/se [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/se_lpty [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/sep_rc [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/sp_lpty [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/src [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkconfiggrid/src_lpty [GET] :: ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt)
+linkprofiles [GET,POST,PUT] :: SRC_TMPL_ID(add=req), ML_ID(add=req), LP_ID(add=req), SE_AB(add=opt), SE_A(add=opt), SE_B(add=opt), SE_H(add=req), SE_H_PER_ID(add=opt,add=req), SE_H_DEPTH(add=opt,add=req), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), SE_TMPL_EXTEND_PL(add=opt), IGNORE_SE_AB(add=opt), POINT_ID(get=req,add=req), PL_ID, PL_ENABLED(add=opt), MLSET_ID(add=req), DI_ID, DI_ENABLED
+linkprofilesdata [-]
+lossconfig [POST]
+lossconfig/check_rel [GET] :: POINT_ID(get=req), REL_TYPE_ID(get=req)
+lossparams [GET] :: GR_ID(get=req,add=req), BT(add=req), _BT, ET(add=opt), PPB_SN_KOEF(add=opt), PPB_SN_KONST(add=opt), PMB_SN_KOEF(add=opt), PMB_SN_KONST(add=opt), QPB_SN_KOEF(add=opt), QPB_SN_KONST(add=opt), QMB_SN_KOEF(add=opt), QMB_SN_KONST(add=opt), PB_SN_KOEF1(add=opt), PB_SN_KONST(add=opt), QB_SN_KOEF1(add=opt), QB_SN_KONST(add=opt)
+ltc [GET] :: PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req)
+manageperiods/act_detailed [GET] :: POINT_ID(get=req), ACT_ID(get=opt), FROM(get=opt), TO(get=opt), MD_CNT(get=opt)
+manageperiods/act_detailed_day [GET] :: POINT_ID(get=req), ACT_ID(get=opt), DA(get=opt)
+manageperiods/act_detailed_day_det [GET] :: POINT_ID(get=req), ACT_ID(get=opt)
+manageperiods/act_detailed_month [GET] :: POINT_ID(get=req), ACT_ID(get=opt), DA(get=opt)
+manageperiods/act_detailed_param [GET] :: POINT_ID(get=req), ACT_ID(get=opt), DA(get=opt)
+manageperiods/close_all [POST]
+manageperiods/day_closure [GET] :: FROM(get=req), TO(get=req), POINT_ID(get=opt), GR_ID(get=opt), TECH(get=opt), COMMERCIAL(get=opt), ONLY_OPEN_DAYS(get=opt), ONLY_OPEN_MONTHS(get=opt)
+manageperiods/day_compare [GET] :: DA(get=req), POINT_ID(get=req), COMPARE_TYPE(get=opt)
+manageperiods/day_detail_sum [GET] :: POINT_ID(get=req), DA(get=req), SCOPE(get=opt), SUM_TYPE(get=opt)
+manageperiods/gen_days [POST] :: POINT_ID(add=req), MONTH(add=req)
+manageperiods/meter_day_detailed [GET] :: POINT_ID(get=req), DA(get=req)
+manageperiods/meter_day_detailed_t0 [GET] :: POINT_ID(get=req), DA(get=req)
+manageperiods/meter_day_detailed_t0_sum [GET] :: POINT_ID(get=req), DA(get=req)
+manageperiods/meter_detailed [GET] :: POINT_ID(get=req), DA(get=opt), SCOPE(get=opt), FROM(get=opt), TO(get=opt), MD_CNT(get=opt)
+manageperiods/meter_month_detailed [GET] :: POINT_ID(get=req), DA(get=req)
+manageperiods/meter_month_detailed_t0 [GET] :: POINT_ID(get=req), DA(get=req)
+manageperiods/month_closure [GET] :: FROM(get=req), TO(get=req), POINT_ID(get=opt), GR_ID(get=opt), TECH(get=opt), COMMERCIAL(get=opt), ONLY_OPEN_DAYS(get=opt), ONLY_OPEN_MONTHS(get=opt)
+manageperiods/month_compare [GET] :: DA(get=req), POINT_ID(get=req), COMPARE_TYPE(get=opt)
+manageperiods/month_days [GET] :: DA(get=req), POINT_ID(get=req), SHOW_CLOSED(get=opt)
+manageperiods/month_detail_sum [GET] :: POINT_ID(get=req), DA(get=req), SCOPE(get=opt), SUM_TYPE(get=opt)
+manageperiods/period_closure [GET] :: FROM(get=req), TO(get=req), POINT_ID(get=opt), GR_ID(get=opt), TECH(get=opt), COMMERCIAL(get=opt), ONLY_OPEN_DAYS(get=opt), ONLY_OPEN_MONTHS(get=opt)
+manageperiods/period_days [GET] :: FROM(get=req), TO(get=req), POINT_ID(get=req), SHOW_CLOSED(get=opt)
+manageperiods/pl_ids [GET] :: POINT_ID(get=req)
+manageperiods/point_acts [GET] :: POINT_ID(get=req), SCOPE(get=opt), FROM(get=opt), TO(get=opt), DA(get=opt)
+map [-]
+map/force [-] :: FORCE_RECHECK
+mcc/last [-]
+measuredensity/fill [-]
+measuredensity/md [GET,POST] :: SCOPE(get=opt,get=req), FROM(add=req), TO(add=req), POINT_ID(add=opt), DP_ID(add=opt), TYPE(add=req), DATA_CODE(add=req)
+measurelines [GET,PUT] :: ACT_WIZ(get=req), POINT_ID(get=req), ML_ID, ML_CUSTOM_CODE, ML_NAME, STOBIS, EU_ID, ENUM_ID
+measurelines/check_ml_custom [-]
+measurelines/eu_map [POST] :: ML_ID(add=req)
+measurelines/indicator_ml [PUT]
+measurelines/ml_convert [POST] :: ML_ID(add=req)
+measurelines/ml_custom [-]
+measurelinessets [GET,POST] :: MLSET_ID(get=req,add=req), POINT_ID(get=req,add=req), PL_ID, PL_ENABLED(add=opt), ML_ID(add=req), GR_ID(add=req), FILTERS(add=req), DATE_FROM(add=req), DATE_TO(add=req), SRC_TMPL_ID(add=req), LP_ID(add=req), SE_AB(add=opt), SE_A(add=opt), SE_B(add=opt), SE_H(add=req), SE_H_PER_ID(add=req), SE_H_DEPTH(add=req), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), SE_TMPL_EXTEND_PL(add=opt), IGNORE_SE_AB(add=opt), MLSET_NAME(add=req), MLSET_CODE(add=req), XFA_ID(add=req), XFAU_CODE(add=req), XFAU_TYPE_ID(add=opt), XFAU_ENABLED(add=opt), INHERIT_CN(add=opt), IGNORE_PL(add=opt)
+measurelinessets/duplicate [POST] :: MLSET_ID(add=req), MLSET_NAME(add=opt), MLSET_CODE(add=opt)
+measurements [PUT] :: MS_ID, MS_NAME, MS_TYPE_ID
+measurements/grc_rule [GET]
+measurements/gtp [GET]
+measurements/indicator_ms [GET]
+measurements/ms [-]
+measurements/verification [-]
+measurementsaggfuncs [GET] :: MSF_ID, MSF_NAME
+measurementsarchives [GET] :: POINT_ID(get=opt), ML_ID(get=opt), AGGS_ID(get=opt), MD_ID(get=opt)
+measurementtypes [PUT] :: MS_TYPE_ID, VISIBLE
+measurementtypes/grc_rule [GET]
+measurementtypes/pobj [GET]
+measurementtypes/system [GET,PUT]
+measurementtypes/verification [-]
+measuringdevices [-] :: METER_ID, METER_TYPE_ID(add=req), METER_NUMBER(add=req), MADE(add=req), EXPL_START(add=req), METER_CLASS(add=req)
+measuringdevices/meter_not_mou [POST]
+measuringdevices/meter_type_report [-]
+measuringdevicespropslists [GET,POST,PUT] :: MPTY_ID, MPTY_CODE(add=req,nonNull=req), MPTY_NAME(add=req,nonNull=req), ENUM_ID(add=opt), MPTY_TYPE_ID(add=opt), MPTY_NR(add=opt), FMT_ID(add=opt)
+measuringdevicespropslists/available_mpty [GET]
+measuringdevicespropstypes [-]
+measuringdevicetypes [GET,POST] :: METER_TYPE_ID, METER_TYPE_PRODUCER(add=req), METER_TYPE_NAME(add=req), MOU_ID, MOU_BT(add=req), MOU_ET(add=req), METER_ID(add=req), POINT_ID(add=req), MOU_TYPE_ID(add=req), MOU_BT_DB_TIME(add=opt), MOU_ET_DB_TIME(add=opt), MOU_BT_NUMBER(add=opt), MOU_ET_NUMBER(add=opt)
+metertypempty [GET] :: METER_TYPE_ID(add=req,get=opt), MPTY_ID(add=req)
+mlsetdata [GET] :: MLSET_ID(get=req,add=req), ML_ID(add=req), ORDER(get=opt), ORDERDIRECTIONS(get=opt), ORDERNULLS(get=opt)
+mlsetdata/ds [GET] :: MLSET_ID(get=req,add=req), DS_TYPE_ID(add=req)
+modwithe [POST] :: SRC_TYPE_ID(get=req), IS_POINT(get=req)
+monitoring [GET] :: ML_ID(get=req,add=req,get=opt), POINT_ID(get=opt,add=req), GR_ID(get=opt,add=req), GMOD_ID(get=opt,add=req), GPRC(get=opt,add=req), EC_ID(get=opt,add=req), EC_IN(get=opt,add=req), SAM_ID(add=req,get=opt), MT_ID(get=opt)
+monitoring/ma [-]
+monitoringtemplates/gma [POST] :: GMA_TMPL_ID, GMA_TMPL_NAME(add=req), GMA_TMPL_CODE(add=req)
+monitoringtemplates/gma/dup [GET] :: GMA_TMPL_ID(add=req), GMA_TMPL_NAME(add=opt), GMA_TMPL_CODE(add=opt)
+monitoringtemplates/gma_ma_tmpl [GET,POST] :: GMA_MA_TMPL_ID, GMA_TMPL_ID(get=req)
+monitoringtemplates/gr_gma [POST] :: GR_ID(add=req), GMA_TMPL_ID(add=req)
+monitoringtemplates/gr_gma_tmpl_det [GET] :: GMA_TMPL_ID(get=opt)
+monitoringtemplates/gr_gma_tmpl_sum [GET] :: PMA_TMPL_ID(get=opt)
+monitoringtemplates/ma_tmpl_type [-]
+monitoringtemplates/pma [GET] :: PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req), POINT_ID(get=req)
+monitoringtemplates/pma/dup [POST] :: PMA_TMPL_ID(add=req), PMA_TMPL_NAME(add=opt), PMA_TMPL_CODE(add=opt)
+monitoringtemplates/pma_ma_tmpl [GET,POST] :: PMA_MA_TMPL_ID, PMA_TMPL_ID(get=req,add=req), VERGE_ID(add=req), MA_AB(add=req), MA_A_NOM(add=opt), MA_A_DENOM(add=opt), MA_B(add=opt), PPTY_MA_A_NOM(add=req), PPTY_MA_A_DENOM(add=req), PPTY_MA_B(add=req), IGNORE_MA_AB(add=req), MA_SHOW(add=req), MA_AUTO_CHECK(add=req), MA_AUTO_NULL_ACT(add=req), MA_AUTO_CCS(add=req), MA_REPORT_EXCEEDING(add=opt), MA_LAG(add=opt), MA_LAG_PER_ID(add=opt), PPTY_ID(add=opt), LTC_ID(add=opt), TARGET_ML_ID(add=opt), SOURCE_MT_ID(add=opt), SOURCE_SAM_TMPL_ID(add=opt), SOURCE_ML_ID(add=opt), REL_TYPE_ID(add=opt), POS_NR(add=opt), PMA_MA_TMPL_NAME
+monitoringtemplates/point_pma [GET,POST] :: POINT_ID(add=req,get=req), PMA_TMPL_ID(add=req)
+monitoringtemplates/point_pma_tmpl_det [GET] :: PMA_TMPL_ID(get=opt)
+monitoringtemplates/point_pma_tmpl_sum [GET] :: PMA_TMPL_ID(get=opt)
+mou_type_upty [GET] :: MOU_TYPE_ID(add=req,get=opt), UPTY_ID(add=req)
+mountings [GET] :: MOU_ID, MOU_BT(add=req), MOU_ET(add=req), METER_ID(add=req), POINT_ID(add=req), MOU_TYPE_ID(add=req), MOU_BT_DB_TIME(add=opt), MOU_ET_DB_TIME(add=opt), MOU_BT_NUMBER(add=opt), MOU_ET_NUMBER(add=opt)
+mountings/last [-]
+mountings/point_by_nr [-]
+mountingtypes [GET,POST] :: MOU_ID, MOU_BT(add=req), MOU_ET(add=req), METER_ID(add=req), POINT_ID(add=req), MOU_TYPE_ID(add=req), MOU_BT_DB_TIME(add=opt), MOU_ET_DB_TIME(add=opt), MOU_BT_NUMBER(add=opt), MOU_ET_NUMBER(add=opt), MOU_TYPE_NAME(add=req)
+ms_type_ug [POST] :: MS_TYPE_ID(add=req), UG_ID(add=req), VISIBLE(add=opt)
+my_ug [GET] :: SES_ID(get=req)
+my_ug/not_rp [GET] :: RP_ID(get=req)
+ollama/generate [GET] :: PROMPT(add=req), SYSTEM_MESSAGE(add=opt)
+op [-] :: OP_ID, OS_ID, ERR_TEXT
+op_errors [GET] :: OP_TIME(get=req), OP_ID(get=req)
+op_log [GET]
+op_log/det [GET] :: OP_TIME(get=req), OP_ID(get=req)
+op_param_log [GET] :: OP_TIME(get=req), OP_ID(get=req)
+op_param_type [GET] :: PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+op_type [GET] :: PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+opc/alert_cfg [POST]
+opc/prefix [GET] :: SERVER(get=req), RUNON(get=opt), PATH(get=opt)
+opc/se [GET] :: SRC_ID(get=req)
+opc/server [GET] :: RUNON(get=opt)
+orn [POST]
+orn/multi_das [-] :: ACTION(get=opt), DP_ID(get=opt), EXACT_SEARCH(get=opt), FILTERS(get=opt), SCOPE(get=opt), SEARCH_STRING(get=opt), SHOW_DELETED(get=opt), SHOW_SYSTEM_DP(get=opt), SRC_TYPE_ID(get=opt), WITH_ADD_LABEL(get=opt)
+orn/sep [-] :: SEP_ID(get=req)
+orn/withe [GET] :: POINT_ID(add=opt), GR_ID(add=opt), DS_ID(add=opt), MS_TYPE_ID(add=opt), AGGS_TYPE_ID(add=opt), MD_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), ML_ID(add=opt), SHEAF_ID(add=opt), COUNT(add=opt)
+os [GET] :: PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+parammenuv2/aggs_type [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), MS_TYPE_ID(add=opt)
+parammenuv2/aggs_type_md [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), MS_TYPE_ID(add=opt)
+parammenuv2/all_aggs [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), MSF_ID(add=opt), MD_ID(add=opt)
+parammenuv2/all_md [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), AGGS_ID(add=opt), MSF_ID(add=opt)
+parammenuv2/all_ml [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), AGGS_ID(add=opt), MSF_ID(add=opt), MD_ID(add=opt)
+parammenuv2/all_msf [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), AGGS_ID(add=opt), MD_ID(add=opt)
+parammenuv2/extract [POST] :: BRANCHES(add=req), SCOPE(add=opt), Q_VIEW(add=opt), EXTRACTBRANCHDATA(add=opt), POINT_ID(add=opt), GR_ID(add=opt), ADD_TECH_INFO(add=opt)
+parammenuv2/extract_tech [POST] :: BRANCHES(add=req), SCOPE(add=opt), Q_VIEW(add=opt), EXTRACTBRANCHDATA(add=opt), POINT_ID(add=opt), GR_ID(add=opt)
+parammenuv2/ml [GET,POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), AGGS_TYPE_ID(add=opt), MSF_ID(add=req), MD_ID(add=opt)
+parammenuv2/ml_from_t0 [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), AGGS_TYPE_ID(add=opt), MSF_ID(add=req), AGGS_ID(add=opt), AGGF_ID(add=opt), DIR_ID(add=req), MD_ID(add=opt)
+parammenuv2/mls_by_id [-] :: ML_ID(get=req)
+parammenuv2/ms_type [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt)
+parammenuv2/msf [POST] :: GR_ID(add=opt), POINT_ID(add=opt), EXTRACTBRANCHDATA(add=opt), Q_VIEW(add=opt), SCOPE(add=opt), AGGS_TYPE_ID(add=opt), MS_TYPE_ID(add=opt), MD_ID(add=opt)
+parammenuv2/path [GET] :: TYPE(get=req), AGGS_TYPE_ID(get=opt), MS_TYPE_ID(get=opt), AGGS_ID(get=opt), DIR_ID(get=opt), MD_ID(get=opt), MSF_ID(get=opt), APPEND_TYPE(get=opt), ML_ID(get=opt), GR_ID(get=opt), POINT_ID(get=opt)
+parammenuv2/withe_class_sheaf [POST] :: GR_ID(add=opt), POINT_ID(add=opt), SCOPE(add=opt)
+parammenuv2/withe_type [POST] :: WITHE_CLASS_ID(add=req), POINT_ID(add=opt), GR_ID(add=opt), SCOPE(add=req)
+ph_layer [GET]
+ph_props [GET] :: PH_ID(get=req)
+ph_type_show [POST] :: DS_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), MS_TYPE_ID(add=opt), AGGS_TYPE_ID(add=opt), MD_ID(add=opt), MSF_ID(add=opt), DIR_ID(add=opt), ML_ID(add=opt), SHEAF_ID(add=opt), COUNT(add=opt)
+pobj [POST] :: POBJ_ID, POBJ_NAME(add=req), POBJ_CODE(add=opt), POBJ_TYPE_ID(add=opt), PARENT_POBJ_ID(add=opt), SIGN(add=opt), RECOM_ENABLE(add=opt), MS_TYPE_ID(add=opt)
+pobj/gas_plan [GET] :: POBJ_ID(get=req), POBJ_CODE(get=req), ML_ID(get=req), FROM(get=req), TO(get=req), ORDER(get=opt), ACR(get=opt), GAS_TOTAL(get=opt)
+pobj/limit_value [GET] :: POBJ_ID(get=req), LIMIT_TIME(get=req)
+pobj/limit_value_15 [GET] :: POBJ_ID(get=req), LIMIT_TIME(get=req)
+pobj/plan_to_import [GET]
+pobj/plan_to_import_15 [GET]
+pobj/pobj [GET] :: EV_TIME(add=req), EV_ID(add=req), PP_ID(get=opt)
+pobj/pobj4rs [GET] :: PP_ID(get=req), ORDER(get=opt)
+pobj/power_plant [GET] :: PP_ID(get=opt)
+pobj/power_plant_extended [GET] :: POBJ_ID(get=req), POBJ_CODE(get=req), ML_ID(get=req), FROM(get=req), TO(get=req), ORDER(get=opt), ACR(get=opt), AGG(get=opt)
+pobj/power_plant_plan [GET] :: POBJ_ID(get=req), POBJ_CODE(get=req), ML_ID(get=req), FROM(get=req), TO(get=req), ORDER(get=opt), ACR(get=opt)
+pobj/power_plant_plan_15 [GET] :: POBJ_ID(get=req), POBJ_CODE(get=req), ML_ID(get=req), FROM(get=req), TO(get=req), ORDER(get=opt), ACR(get=opt)
+pobj/power_plant_simple [GET] :: POBJ_ID(get=req), POBJ_CODE(get=req), ML_ID(get=req), FROM(get=req), TO(get=req)
+pobj/region [GET] :: PP_ID(get=opt)
+pobj/rgb_power_plant [GET] :: POBJ_ID(add=req), REG_BT(add=req), REG_SV1(add=opt), REG_SV2(add=opt), REG_SV3(add=opt), REG_BV1(add=opt), REG_BV2(add=opt), REG_BV3(add=opt), REG_SV1_COST(add=opt), REG_SV2_COST(add=opt), REG_SV3_COST(add=opt), REG_BV1_COST(add=opt), REG_BV2_COST(add=opt), REG_BV3_COST(add=opt)
+pobj/rgb_power_plant_extended [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+pobj_data [POST] :: POBJ_ID(add=req), POINT_ID(add=req), ML_ID(add=req), SIGN(add=req), MEAS_TYPE(add=req)
+pobj_limits/reg [POST] :: POBJ_ID(add=req), LIMIT_TIME(add=req), REGULATION(add=opt), LIMIT_COMMENT(add=req), REG_END(add=opt), DELTA(add=req), REG_TYPE_ID(add=opt), REEF(add=opt)
+pobj_limits/rgb_grid [POST] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+pobj_limits_15/reg [POST] :: POBJ_ID(add=req), LIMIT_TIME(add=req), REGULATION(add=opt), LIMIT_COMMENT(add=req), REG_END(add=opt), DELTA(add=req), REG_TYPE_ID(add=opt), REEF(add=opt)
+pobj_limits_15/rgb_grid [POST] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+pobj_limits_offer/rgb_grid [POST,PUT] :: POBJ_ID(add=req), PLO_T(add=req), PLO_V(add=req), USE_OFFER(add=opt)
+pobj_point_data [GET] :: POBJ_ID(add=req,get=opt), POINT_ID(add=req), POBJ_POINT_NAME(add=req), POBJ_POINT_HIDE(add=opt), POBJ_POINT_NR(add=opt), ORDER(get=opt)
+pobj_point_data/available [GET]
+pobj_point_data/ds [GET]
+pobj_point_ds [GET,POST] :: POBJ_ID(add=req), POINT_ID(add=req), DS_ID(add=req), DS_V(add=opt), FORMULA_ID(add=opt)
+pobj_recom [GET] :: AGG(get=opt), POBJ_ID(get=req), FROM(get=req), TO(get=req), ORDER(get=opt), ACR(get=opt)
+pobj_recom_15 [GET] :: AGG(get=opt), POBJ_ID(get=req), FROM(get=req), TO(get=req), ORDER(get=opt), ACR(get=opt)
+pobj_reg [GET] :: POBJ_ID(add=req), REG_BT(add=req), REG_SV1(add=opt), REG_SV2(add=opt), REG_SV3(add=opt), REG_BV1(add=opt), REG_BV2(add=opt), REG_BV3(add=opt), REG_SV1_COST(add=opt), REG_SV2_COST(add=opt), REG_SV3_COST(add=opt), REG_BV1_COST(add=opt), REG_BV2_COST(add=opt), REG_BV3_COST(add=opt)
+pobj_res [GET] :: POBJ_ID(add=req), RES_BT(add=req), RES_V1(add=opt), RES_V2(add=opt), RES_V3(add=opt)
+pobj_rs [GET,POST,PUT] :: POBJ_ID(add=req,get=req), RS_BT(add=req), RS_ET(add=req), RS_V(add=req), FROM(get=req), MS_TYPE_ID(get=req), ORDER(get=opt)
+pobj_rs/import_check [-]
+pobj_rs/last [GET]
+pobj_rs_15 [GET,POST,PUT] :: POBJ_ID(add=req,get=req), RS_BT(add=req), RS_ET(add=req), RS_V(add=req), FROM(get=req), MS_TYPE_ID(get=req), ORDER(get=opt)
+pobj_rs_15/import_check [-]
+pobj_rs_15/last [GET]
+pobj_tpty [GET] :: POBJ_ID(add=req,get=opt), TPTY_ID(add=req), TPTY_VALUE(add=req), OFFSET(add=opt), POBJ_NAME(get=opt), ORDER(get=opt)
+pobj_type [GET]
+pointmenu/curr_root [GET,POST]
+pointmenu/group_path [POST] :: GR_ID(query=opt)
+pointmenuv2/curr_root [GET] :: GR_ID(add=opt), POINT_ID(add=req), GRP_BT(add=req), GRP_ET(add=req)
+pointmenuv2/extract_points [POST] :: GR_ID(add=opt), POINT_ID(add=opt,add=req)
+pointmenuv2/group [GET]
+pointmenuv2/group_ffp [GET] :: GR_ID(add=opt), POINT_ID(add=opt), DS_ID(add=opt)
+pointmenuv2/group_info [GET] :: GR_ID(get=req), WITH_FIXED_FIELDS(get=opt)
+pointmenuv2/group_path [GET] :: GR_ID(get=req), HISTORY_DATE_START(get=opt), HISTORY_DATE_END(get=opt), APPEND_TYPE(get=opt)
+pointmenuv2/groups [GET] :: GR_ID(get=opt), SRC_TYPE_ID(get=opt), SEARCH_BY(get=opt), SEARCH_PHRASE(get=opt), FFP_DATA_ID(get=opt), FFP_VAL_ROW_NUM(get=opt), ACTION(get=opt), FILTERS(get=opt), SCOPE(get=opt), VALID(get=opt), HISTORY_DATE_START(get=opt), HISTORY_DATE_END(get=opt), CP_BT(get=opt), CP_ET(get=opt), OWN(get=opt), TECH(get=opt), COMMERCIAL(get=opt), ONLY_OPEN_DAYS(get=opt), ONLY_OPEN_MONTHS(get=opt), CHECK_GR_CHILDREN(get=opt)
+pointmenuv2/my_root [POST] :: GR_ID(add=opt)
+pointmenuv2/obj_count [POST] :: GR_ID(add=opt), POINT_ID(add=opt), DS_ID(add=opt)
+pointmenuv2/point [GET]
+pointmenuv2/point_ffp [GET] :: GR_ID(add=opt), POINT_ID(add=opt), DS_ID(add=opt)
+pointmenuv2/point_info [GET] :: POINT_ID(get=req), WITH_FIXED_FIELDS(get=opt), MOU_SPLIT(get=opt), SPLIT_BT(get=opt), SPLIT_ET(get=opt)
+pointmenuv2/point_path [GET] :: POINT_ID(get=req), HISTORY_DATE_START(get=opt), HISTORY_DATE_END(get=opt), APPEND_TYPE(get=opt)
+pointmenuv2/points [GET] :: GR_ID(get=opt), SRC_TYPE_ID(get=opt), SEARCH_BY(get=opt), SEARCH_PHRASE(get=opt), FFP_DATA_ID(get=opt), FFP_VAL_ROW_NUM(get=opt), ACTION(get=opt), FILTERS(get=opt), SCOPE(get=opt), VALID(get=opt), HISTORY_DATE_START(get=opt), HISTORY_DATE_END(get=opt), CP_BT(get=opt), CP_ET(get=opt), TECH(get=opt), COMMERCIAL(get=opt), ONLY_OPEN_DAYS(get=opt), ONLY_OPEN_MONTHS(get=opt), POINT_COMMERCIAL(get=opt), SEARCH_UNMOUNTED(get=opt)
+pointmenuv2/signal [GET]
+pointmenuv2/signal_path [GET] :: DS_ID(get=req), HISTORY_DATE_START(get=opt), HISTORY_DATE_END(get=opt), APPEND_TYPE(get=opt)
+pointmenuv2/signals [GET] :: GR_ID(get=opt), SRC_TYPE_ID(get=opt), SEARCH_BY(get=opt), SEARCH_PHRASE(get=opt), FFP_DATA_ID(get=opt), FFP_VAL_ROW_NUM(get=opt), ACTION(get=opt), FILTERS(get=opt), SCOPE(get=opt)
+pointmenuv2/top_gr [GET] :: GR_ID(add=opt)
+pointprops [GET] :: POINT_ID(get=req)
+pointpropstypes [-]
+pointrules [GET] :: POINT_RULE_ID, RULE_ENABLED(add=opt), POINT_TYPE_ID(add=opt), ECP_ID(add=opt), POINT_COMMERCIAL(add=opt), POINT_INTERNAL(add=opt), POINT_AUTO_READ_ENABLED(add=opt), POINT_LICENSED(add=opt), XA_ID(add=opt), IS_XA(add=opt), FP_ID(add=opt), VP_ID(add=opt), PMA_TMPL_ID(add=opt), RTP_ID(add=opt), TP_ID(add=opt), AGGF_ID(add=opt), SBST_TMPL_ID(add=opt)
+points [GET,PUT] :: POINT_ID(get=req), POINT_CODE(get=req), POINT_TYPE_ID, ECP_ID, POINT_NAME, POINT_ENABLED, POINT_COMMERCIAL, POINT_INTERNAL, POINT_AUTO_READ_ENABLED, XA_ID, POINT_LICENSED
+points/next_point_code [POST]
+points_sbst_tmpl [GET] :: POINT_ID(get=req)
+points_sbst_tmpl/save [POST] :: POINT_ID(add=req), SBST_TMPL_ID(add=req)
+pointsfp [GET] :: POINT_ID(get=req)
+pointsfp/fp [POST] :: POINT_ID(get=opt), FP_ID(get=opt)
+pointsfp/save [POST] :: POINT_ID(add=req), FP_ID(add=req)
+pointsmeasurelines [GET,PUT] :: POINT_ID(get=req,get=opt,add=req), MD_ID(get=opt), ML_ID(get=opt,add=req), SCOPE(get=opt), PL_ID, PL_ENABLED(add=opt)
+pointsmeasurelines/formula_preview [POST] :: BGA_FORMULA(add=req), FROM(add=req), TO(add=req), POINT_ID(add=req), ML_ID(add=req), GRID_DATA(add=req)
+pointsmeasurelines/ids [POST] :: POINT_ID(add=req,add=opt), ML_ID(add=req,add=opt), CURRENT_ACTION(add=opt)
+pointsmeasurelines/mcc [-]
+pointsmeasurelines/mlset [POST] :: POINT_ID(add=req), MLSET_ID(add=req), EXTEND(add=opt)
+pointsmeasurelines/month_to_day [-] :: PL_ID(get=req)
+pointsmeasurelines/multi [POST] :: POINT_ID(add=req)
+pointsmeasurelines/not_di [GET] :: POINT_ID(get=req)
+pointsmeasurelines/not_di_multi [POST] :: POINT_ID(add=req)
+pointsrtp [GET] :: POINT_ID(get=req)
+pointsrtp/save [POST] :: POINT_ID(add=req), RTP_ID(add=req)
+pointsvp [GET] :: POINT_ID(get=req)
+pointsvp/save [POST] :: POINT_ID(add=req), VP_ID(add=req)
+pointsvp/vp [POST] :: POINT_ID(get=opt), VP_ID(get=opt)
+pointtypeppty [GET] :: POINT_TYPE_ID(add=req,get=opt), PPTY_ID(add=req)
+pointtypes [GET,POST] :: GR_ID(add=opt), POINT_ID(add=opt,get=req,add=req), DS_ID(add=opt), PL_ID, PL_ENABLED(add=opt), ML_ID(add=req), PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+possiblepointprops [GET,POST,PUT] :: POINT_ID(get=req), PPTY_ID, PPTY_CODE(add=req,nonNull=req), PPTY_NAME(add=req,nonNull=req), ENUM_ID(add=opt), PPTY_TYPE_ID(add=opt), PPTY_NUMERIC(add=opt), PPTY_NR(add=opt), FMT_ID(add=opt)
+possiblepointprops/available_ppty [GET]
+possiblepointprops/numeric [GET] :: PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req)
+possiblesolutions [GET]
+powerrecomm/c_plan [GET] :: POBJ_ID(get=req), IS15MIN(get=opt)
+powerrecomm/ds [GET] :: POBJ_ID(get=req)
+powerrecomm/e_nom [GET] :: POBJ_ID(get=req), IS15MIN(get=opt)
+powerrecomm/limit_graph [GET] :: POBJ_ID(get=req), MS_TYPE_ID(get=req), H_DATE(get=req), HOUR(get=opt), LIMIT_FOR_AVG(get=opt), RECOM_Q_TYPE(get=opt)
+powerrecomm/limit_graph_15 [GET] :: POBJ_ID(get=req), MS_TYPE_ID(get=req), DATE_FROM(get=req), DATE_TO(get=req), HOUR(get=opt), LIMIT_FOR_AVG(get=opt), RECOM_Q_TYPE(get=opt)
+powerrecomm/ml [GET] :: POBJ_ID(get=req)
+powerrecomm/plan_change [GET] :: EVD_ID(get=req)
+powerrecomm/plan_time [GET] :: IS15MIN(get=opt)
+powerrecomm/point [GET] :: POBJ_ID(get=req)
+powerrecomm/recomm_graph [GET] :: POBJ_ID(get=req), MS_TYPE_ID(get=req), H_DATE(get=req), HOUR(get=req), RECOM_Q_TYPE(get=opt), BIT_AND_VAL(get=opt)
+powerrecomm/recomm_graph_15 [GET] :: POBJ_ID(get=req), MS_TYPE_ID(get=req), DATE_FROM(get=req), DATE_TO(get=req), HOUR(get=req), RECOM_Q_TYPE(get=opt), BIT_AND_VAL(get=opt)
+powerrecomm/rs_info [GET] :: POBJ_ID(get=req), IS15MIN(get=opt)
+powerrecommdata [GET] :: POINT_ID(get=req), POBJ_ID(get=req), IS15MIN(get=opt)
+powerrecommds/switch [POST] :: DS_ID(add=req), DS_T(add=req,nonNull=req), DS_V(add=req)
+profiles [GET] :: FFP_ID, FFP_CODE(add=req), FFP_NAME(add=req), FFP_TYPE(add=req)
+profiles/duplicate [POST] :: FFP_ID(add=req), FFP_CODE(add=req), FFP_NAME(add=req)
+profilesdata [GET,POST] :: FFP_DATA_ID, FFP_ID(add=req), FFP_VAL_ROW_NUM(add=opt), FFP_VT_ID(add=req), FFP_VAL_KEY_1(add=req), FFP_VAL_KEY_2(add=req), FFP_VAL_KEY_3(add=req), FFP_DATA_NAME(add=req), FFP_VAL_SORT_NUM(add=opt), ORDER_VAL(add=opt)
+profilesdata/filter_data [GET] :: SEARCH(get=req)
+profilesdata/filter_data?search=POINT [-]
+profilesdata/rm_ffp_data [GET] :: PW_BT(get=opt), POINT_ID(get=opt), USER_ID(get=opt), DP_ID(get=opt)
+prq_det [GET] :: RC_ID(get=opt), SCH_ID(get=opt), SCH_TIME(get=opt), RODO_ID(get=opt), DAS_ID(get=opt)
+prq_sum [GET] :: RC_ID(get=opt), SCH_ID(get=opt), SCH_TIME(get=opt), RODO_ID(get=opt), DAS_ID(get=opt)
+ptp [GET] :: PTP_ID(add=opt), POINT_ID(add=req,get=opt), AGGF_ID(add=opt), TP_ID(add=req), PTP_BT(add=opt), PTP_ET(add=opt), ORDER(get=opt)
+ptyformats [-]
+pwsettinghistory [GET] :: FF1(get=opt), FF2(get=opt), FF3(get=opt), FF4(get=opt), FF5(get=opt), PW_BT(get=opt), POINT_ID(get=opt), USER_ID(get=opt), DP_ID(get=opt)
+qualityreports/aggs_type_details [-]
+qualityreports/cnt [-]
+qualityreports/details [-]
+qualityreports/extra_fields [-]
+qualityreports/holes [-]
+qualityreports/ml_t0_details [-]
+qualityreports/period_close [POST] :: CP_BT(add=req), CP_ET(add=req), POINT_ID(add=opt,add=req), PER_ID(add=opt), USE_FORCED_PERIOD_CLOSE(add=opt), MONTH_OR_DAY(add=opt,add=req)
+qualityreports/period_open [POST] :: CP_BT(add=req), CP_ET(add=req), POINT_ID(add=opt), OPEN_DAYS(add=opt), MONTH_OR_DAY(add=opt,add=req)
+qualityreports/point_details [-]
+qualityreports/rodo_ml [GET]
+rc [GET] :: RC_ID(get=opt), SCH_ID(get=opt), SCH_TIME(get=opt), RODO_ID(get=opt), DAS_ID(get=opt)
+realtimedata [POST] :: TYPES(add=req), POINTS(add=req), MLS(add=req), SCHEME_CHANGED(add=opt), CURRENT_DB_TIME(add=opt), H_DATE(add=opt)
+realtimedata/sql [POST] :: SQL(add=req), GET_HEADERS(add=req), ONLY_FIRST(add=req), H_DATE(add=opt)
+realtimeprofiles [GET] :: POINT_ID(get=req), RTP_ID(add=req,get=req), ML_ID(add=req), RTP_ML_ENABLED(add=req), PER_ID(add=req), RTP_INT_VALUE(add=req)
+realtimeprofilesdata [-] :: RTP_ID(add=req,get=req), ML_ID(add=req), RTP_ML_ENABLED(add=req), PER_ID(add=req), RTP_INT_VALUE(add=req)
+regulations/add [POST] :: POBJ_ID(add=req), LIMIT_TIME(add=req,nonNull=req), LIMIT_COMMENT(add=req), REG_END(add=req), DELTA(add=req,nonNull=req), REG_TYPE_ID(add=req), IS15MIN(add=opt)
+regulations/end [PUT] :: POBJ_ID, REG_TYPE_ID, REG_END(nonNull=req), IS15MIN
+regulations/latest [GET] :: POBJ_ID(get=req), WW(get=req), IS15MIN(get=opt)
+rel_type_epty [GET,POST] :: REL_TYPE_ID(add=req,get=opt,get=req), EPTY_ID(add=req), ENUM_ID(add=req), EPTY_NR(add=req), REL_ID(add=req), EPTY_VALUE(add=req)
+relationpropertylists [POST] :: EPTY_ID, EPTY_CODE(add=req), EPTY_NAME(add=req), ENUM_ID(add=opt), EPTY_TYPE_ID(add=opt), EPTY_NUMERIC(add=opt), FMT_ID(add=opt)
+relationpropertylists/available_epty [GET]
+relationpropertytypes [-]
+relationshippos [POST] :: REL_ID(add=req), EPTY_ID(add=req), EPTY_VALUE(add=req), POS_NR(add=req), POINT_ID(add=req)
+relationshipprops [POST] :: REL_ID(add=req), EPTY_ID(add=req), EPTY_VALUE(add=req)
+relationships [POST] :: REL_ID(add=req), EPTY_ID(add=req), EPTY_VALUE(add=req)
+relationshiptypepos [DELETE,GET,POST] :: REL_ID(add=req), EPTY_ID(add=req), EPTY_VALUE(add=req), PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req), REL_TYPE_ID(add=req,get=req), POS_NR(add=req), POS_CODE(add=req), POS_DESC(add=req)
+relationshiptypes [GET,POST] :: REL_TYPE_ID, REL_TYPE_CODE(add=req), REL_TYPE_NAME(add=req), PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req)
+reportexecutor/available_rp [GET] :: RP_ID(get=req)
+reportexecutor/data [GET] :: RP_ID(get=req)
+reportexecutor/data_p [POST] :: RP_ID(add=req), PARAMS(add=req)
+reportexecutor/uv_data [GET] :: UV_ID, UV_NAME(add=req), UV_PUBLIC(add=opt), UV_MODULE(add=req), UV_TYPE(add=req), UV_TECH_INFO(add=opt,get=req), UV_SUBTYPE(add=opt), UV_DATA(add=opt)
+reports [GET,POST] :: RP_TYPE_ID(get=req,add=req), RP_PUBLIC(get=req,add=opt), SEARCH_STRING(get=opt), UG_ID(get=opt), RP_ID, USER_ID, RP_NAME(add=req), RP_DESCRIPTION(add=opt), RPF_ID(add=opt), RP_LOG_ENABLED(add=opt), RP_FORMULA(add=opt)
+reports/columns [GET] :: RPQ_NAME(get=opt), TABLE_NAME(get=req)
+reports/delayed_rp [GET] :: RP_ID(add=req), XML_NAME(add=req), FROM_DAS(add=opt), QUERIES(add=opt)
+reports/duplicate [POST] :: RP_ID(add=req), RP_NAME(add=req)
+reports/file [GET] :: PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+reports/parameters [GET] :: RP_ID(get=req)
+reports/rp_fpty [GET] :: RP_ID(add=req,get=opt), FPTY_ID(add=req), FPTY_VALUE(add=req)
+reports/rp_fpty_server [GET] :: FPTY_CODE(get=req)
+reports/rp_path [-] :: RP_ID(get=req), APPEND_TYPE(get=opt)
+reports/rp_struct [-] :: RP_ID(get=req)
+reports/rp_tree_main [GET] :: SEARCH_STRING(get=opt), SCOPE(get=opt)
+reports/rpa [POST] :: RPA_ID, RP_ID(add=req), RPP_ID(add=req), SCH_ID(add=req), RPA_NAME(add=req), FOLDER(add=req), FORM_IF_EMPTY(add=opt), RPA_ENABLED(add=opt), RPA_LOG_ENABLED(add=opt), RPA_DELAY_DELIVERY(add=opt)
+reports/rpa_dublicate [POST] :: RPA_ID(add=req), NAME(add=opt), RPP_ID(add=opt), RPA_ENABLED(add=opt), RECIPIENTS(add=opt), RPTY_ID(add=opt), RPTY_VALUE(add=opt)
+reports/rpa_param [GET] :: RPA_ID(get=req), RP_ID(get=req)
+reports/rpa_path [-] :: RPA_ID(get=req), APPEND_TYPE(get=opt)
+reports/rpa_rpty [GET] :: RPA_ID(add=req,get=opt), RPTY_ID(add=req), RPTY_VALUE(add=req)
+reports/rpa_ug [POST] :: RPA_ID(add=req), UG_ID(add=req), ID
+reports/rpa_user [POST] :: RPA_ID(add=req), USER_ID(add=req), ID
+reports/rpa_user_ug [GET] :: RPA_ID(get=req)
+reports/rpapv [POST] :: RPAPV_ID, RPA_ID(add=req), RPQF_ID(add=req), RPQF_VALUE(add=req), RPQF_DESC(add=req)
+reports/rpf [GET] :: RP_ID(get=req)
+reports/rpind [GET] :: RPA_ID, RP_ID(add=req,get=req), RPP_ID(add=req), SCH_ID(add=req), RPA_NAME(add=req), FOLDER(add=req), FORM_IF_EMPTY(add=opt), RPA_ENABLED(add=opt), RPA_LOG_ENABLED(add=opt), RPA_DELAY_DELIVERY(add=opt)
+reports/rpqc [GET] :: RPQC_ID, RPQ_ID(get=req,add=req), RPQC_NR(add=req), RPQU_ID(add=req), COLUMN_NAME(add=req), RPQC_ASC(add=req)
+reports/rpqf [GET] :: RPQF_ID, RPQ_ID(get=req,add=req), RPQO_ID(add=req), COLUMN_NAME(add=req), RPQF_VALUE(add=req), RPQF_ESSENTIAL(add=opt), RPQF_INV(add=opt), RPQF_DESC(add=opt), RPQF_NR(add=opt), RPQF_ALLOW_EMPTY_VALUES(add=opt), DATA_TYPE, ENUM_ID(add=opt), RPIND_ID(add=opt)
+reports/rpqo [GET] :: SCOPE(get=opt)
+reports/rpqu [GET] :: SCOPE(get=opt)
+reports/send_after_view_mrpa [POST] :: RP_ID(add=req), XML_NAME(add=req), FROM_DAS(add=opt), QUERIES(add=opt)
+reports/send_mrpa [POST] :: RP_ID(add=req), RPA_ID(add=req), REPORT_CHECK(add=req), QUERIES(add=opt)
+reports/tables [GET] :: RP_ID(get=req)
+reports/template_on_server [GET] :: FULLNAME(get=req)
+reports/view_and_send_mrpa [POST] :: RP_ID(add=req), RPA_ID(add=req), REPORT_CHECK(add=req), REPORT_SENDING(add=req), QUERIES(add=opt)
+reportslog [POST] :: VIEW_ONLY_LOG_ENABLED(add=req), LIMIT(add=req), OFFSET(add=req), SORT(add=opt), DB_TIME(add=req), RP_PUBLIC(add=opt), RP_MANUAL(add=opt), RP_TYPE_ID(add=opt), RP_ID(add=opt), RP_NAME(add=opt), RPA_ID(add=opt), RPA_NAME(add=opt), FILL(add=opt), FORM(add=opt), SEND(add=opt), LOG_COMMENT(add=opt), FILL_DUR(add=opt), FORM_DUR(add=opt), SEND_DUR(add=opt), TOTAL_DUR(add=opt), RP_REPEAT(add=opt), SCH_ID(add=opt), USER_ID(add=opt), DAS_ID(add=opt)
+reportsusergroups/rp_ug [GET] :: RP_ID(add=req), UG_ID(get=req,add=req), AL_ID(add=req)
+reporttypes [GET,POST] :: RP_PUBLIC(get=req,add=opt), SEARCH_STRING(get=opt), UG_ID(get=opt), VIEW_ONLY_LOG_ENABLED(add=req), LIMIT(add=req), OFFSET(add=req), SORT(add=opt), DB_TIME(add=req), RP_MANUAL(add=opt), RP_TYPE_ID(add=opt), RP_ID(add=opt), RP_NAME(add=opt), RPA_ID(add=opt), RPA_NAME(add=opt), FILL(add=opt), FORM(add=opt), SEND(add=opt), LOG_COMMENT(add=opt), FILL_DUR(add=opt), FORM_DUR(add=opt), SEND_DUR(add=opt), TOTAL_DUR(add=opt), RP_REPEAT(add=opt), SCH_ID(add=opt), USER_ID(add=opt), DAS_ID(add=opt), RP_TYPE_NAME(add=req)
+reporttypes/rp_types_rpa [GET] :: RP_PUBLIC(get=req), SEARCH_STRING(get=opt)
+reporttypes/rpa [GET] :: RP_PUBLIC(get=req), RP_TYPE_ID(get=req), RP_ID(get=req), SEARCH_STRING(get=opt)
+reporttypes/rpa_rp_group [GET] :: RP_PUBLIC(get=req), RP_TYPE_ID(get=req), SEARCH_STRING(get=opt)
+reporttypes/rpa_struct [-] :: RPA_ID(get=req)
+reporttypes/rpapv [GET] :: RPA_ID(get=req), RP_ID(get=req)
+reporttypes/rpq [GET,POST] :: RP_ID(get=req,add=req), RPQ_ID, RPQ_NAME(add=req), TABLE_NAME(add=req), RPQ_DISTINCT(add=opt), RPQ_MAXROWS(add=opt), RPQ_SLC(add=opt), RPQ_ADVANCED(add=opt)
+reporttypes/tree_cf [GET] :: TABLE_NAME(get=req), RPQ_NAME(get=req), RP_ID(get=req), RPQ_ID(get=req)
+rgb_plan/b7 [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan/b8 [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan/dpp_khe [-] :: LIMIT_TIME(add=req), NL(add=opt), DPP(add=opt)
+rgb_plan/khae [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan/khe [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan/le [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan/le9 [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan/lel_start_ds [GET] :: DS_ID(add=req), DS_T(add=req), DS_V(add=req), DS_DATA_DESC(add=opt)
+rgb_plan/pobj_ag [GET] :: POBJ_ID(add=req), BT(add=req), ET(add=opt), DS_TYPE_PICK(add=opt), POBJ_STATE_DESC(add=opt), DS_V(add=opt)
+rgb_plan/pobj_ag_ta [GET] :: POBJ_ID(add=req), BT(add=req), ET(add=opt), DS_TYPE_PICK(add=opt), POBJ_STATE_DESC(add=opt)
+rgb_plan/pobj_compensation [GET] :: DA(add=req), POBJ_ID(add=req)
+rgb_plan/pobj_limits_reg [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), REGULATION(add=opt), LIMIT_COMMENT(add=req), REG_END(add=opt), DELTA(add=req), REG_TYPE_ID(add=opt), REEF(add=opt)
+rgb_plan/pobj_plan_ds [GET] :: DS_ID(add=req), DS_T(add=req), DS_V(add=req), DS_DATA_DESC(add=opt)
+rgb_plan/pobj_power_plant [GET]
+rgb_plan/pobj_power_plant_reg [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), REGULATION(add=opt), LIMIT_COMMENT(add=req), REG_END(add=opt), DELTA(add=req), REG_TYPE_ID(add=opt), REEF(add=opt)
+rgb_plan/pobj_remont [GET] :: POBJ_ID(add=req), BT(add=req), ET(add=opt), DS_TYPE_PICK(add=opt), POBJ_STATE_DESC(add=opt), DS_V(add=opt)
+rgb_plan/pobj_remont_plan [GET] :: POBJ_ID(add=req), BT(add=req), ET(add=opt), DS_TYPE_PICK(add=opt), POBJ_STATE_DESC(add=opt)
+rgb_plan/pobj_rs [PUT] :: POBJ_ID(add=req), RS_BT(add=req), RS_ET(add=req), RS_V(add=req)
+rgb_plan/pobj_state [POST] :: POBJ_ID(add=req), BT(add=req), ET(add=opt), DS_TYPE_PICK(add=opt), POBJ_STATE_DESC(add=opt), DS_V(add=opt)
+rgb_plan/pobj_ta [GET] :: POBJ_ID(add=req), BT(add=req), ET(add=opt), DS_TYPE_PICK(add=opt), POBJ_STATE_DESC(add=opt)
+rgb_plan/pobj_tpty_h [PUT] :: POBJ_ID(add=req), PLO_T(add=req), PLO_V(add=req), USE_OFFER(add=opt)
+rgb_plan/reg_type [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), REGULATION(add=opt), LIMIT_COMMENT(add=req), REG_END(add=opt), DELTA(add=req), REG_TYPE_ID(add=opt), REEF(add=opt)
+rgb_plan/region [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan_15/b7 [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan_15/b8 [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan_15/dpp_khe [-] :: LIMIT_TIME(add=req), NL(add=opt), DPP(add=opt)
+rgb_plan_15/khae [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan_15/khe [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan_15/le [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan_15/le9 [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rgb_plan_15/pobj_limits_reg [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), REGULATION(add=opt), LIMIT_COMMENT(add=req), REG_END(add=opt), DELTA(add=req), REG_TYPE_ID(add=opt), REEF(add=opt)
+rgb_plan_15/pobj_rs [PUT] :: POBJ_ID(add=req), RS_BT(add=req), RS_ET(add=req), RS_V(add=req)
+rgb_plan_15/region [GET] :: POBJ_ID(add=req), LIMIT_TIME(add=req), LIMIT_VALUE(add=req), LIMIT_COMMENT(add=opt), REGULATION(add=opt)
+rodo [GET] :: RODO_ID(get=opt), RC_ID(get=opt)
+roles [POST] :: UG_ID(get=req,add=req), GR_ID(add=req), ROLE(add=req)
+roles/ug [GET] :: UG_ID(add=req), ROLE(add=req)
+roles/user [-]
+rp_das [-] :: RP_ID(add=req), DAS_ID(add=req)
+rp_das/rp [-]
+rp_das_frc [-] :: RP_ID(add=req), DAS_ID(add=req)
+rp_das_log [-] :: RP_ID(add=req), DAS_ID(add=req)
+rpa [GET,PUT] :: RPA_ID, SCH_ID
+rpa/sch_rpa_det [GET]
+rpp [GET] :: XA_ID(add=req), RPTY_ID(add=req), RPTY_VALUE(add=req), RPA_ID, RP_ID(add=req), RPP_ID(add=req), SCH_ID(add=req), RPA_NAME(add=req), FOLDER(add=req), FORM_IF_EMPTY(add=opt), RPA_ENABLED(add=opt), RPA_LOG_ENABLED(add=opt), RPA_DELAY_DELIVERY(add=opt)
+sampledaydata [GET,POST] :: SAMD_ID(get=req,add=req), NR(add=req), SAM_V(add=req)
+sampledayprograms [POST] :: SAMD_ID, SAMW_ID(get=opt), SAMP_ID(get=opt), SAMD_NAME(add=req), SAMD_COMMON(add=opt), MD_ID(add=req), GET_ALL(get=opt)
+sampledayprograms/id_by_name [GET] :: SAMD_NAME(get=req)
+sampledayprograms/w [GET] :: SAMW_ID(get=req), MD_ID(get=req)
+sampleperiods [GET] :: SAMP_ID, SAM_ID(get=req,add=req), MD_ID(get=opt), SAMW_ID(add=req), BMM(add=opt), BDD(add=opt), EMM(add=opt), EDD(add=opt), BT(add=opt), ET(add=opt)
+samples [GET,POST] :: SAM_ID, SAM_TYPE_ID(get=req,add=req), SAM_CODE(add=req), SAM_NAME(add=req), MD_ID(add=req), HLD_ID(add=opt), USE_CONST_VAL(add=opt), CONST_VAL(add=opt), SAM_CYCLIC(add=opt), PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req)
+samples/sam_from_avg [POST] :: SAM_ID(add=req), MT_ID(add=req), BT(add=req), ET(add=req)
+sampletypes [POST] :: SAM_TYPE_ID, SAM_TYPE_NAME(add=req)
+sampleweekprograms [POST] :: SAMW_ID, MD_ID(add=req), SAMW_NAME(add=req), SAMW_COMMON(add=opt), SAMD1(add=opt), SAMD2(add=opt), SAMD3(add=opt), SAMD4(add=opt), SAMD5(add=opt), SAMD6(add=opt), SAMD7(add=opt), SAMD8(add=opt), GET_ALL(get=opt)
+sampleweekprograms/p [POST] :: MD_ID(get=req), SAM_ID(get=req)
+sbst [-]
+schedules [GET,PUT] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt), SRC_ID(add=opt,get=opt), PH_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), DS_ID(add=opt), BGA_ID(get=req,get=opt), APPEND_TYPE(get=opt), XFAU_ID, XFAU_ENABLED, INHERIT_CN, XFAU_CODE, XFAU_NAME, XFAU_CODE2, XFAU_NAME2, XF_ID(add=req), BGA_TYPE_ID(add=req), BGA_NAME(add=req), BGA_ENABLED(add=opt), SCH_ID(add=opt,add=req), BGAQ_ID(add=opt), BGA_PRIORITY(add=opt), PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt), SEP_ID, SEP_ENABLED, SEP_S_LAG, SEP_S_DEPTH, SEP_S_PER_ID, SEP_S_SCH_ID, RPA_ID, RP_ID(add=req), RPP_ID(add=req), RPA_NAME(add=req), FOLDER(add=req), FORM_IF_EMPTY(add=opt), RPA_ENABLED(add=opt), RPA_LOG_ENABLED(add=opt), RPA_DELAY_DELIVERY(add=opt)
+schedules/bga_class_filter [GET]
+schedules/bga_type_filter [GET]
+schedules/rp_type_filter [GET]
+schedules/sch_task [-] :: SCH_ID(get=req)
+schedules/sch_task_sum [-]
+schedules/sep_rc_md_filter [GET]
+schedules/sep_rc_ph_type_filter [GET]
+schedules/sep_rc_sheaf_filter [GET]
+schedules/sep_rc_sum_filter_rc [GET]
+schedules/sep_tmpl_rc_src_filter [GET]
+schedules/sep_tmpl_rc_sum_filter_rc [GET]
+schedules/xf_rc_filter_rc [GET]
+schedules/xf_type_filter [GET]
+scheme [GET] :: SCHEME_ID, SCHEME_CODE(add=req,nonNull=req), SCHEME_NAME(add=req,nonNull=req), SCHEME_DTYPE_ID(add=req), SCHEME_TYPE_ID(add=req,get=opt), SCHEME_DATA(add=opt)
+scheme/data [GET] :: SCHEME_ID(get=req)
+scheme/with_params [GET] :: FILTER(get=opt)
+schemedatatype [GET] :: SCHEME_TYPE_ID, SCHEME_TYPE_NAME(add=req)
+schemeds [POST] :: DS_ID(get=req)
+schemelog [GET] :: SCHEME_ID(get=req), WITH_DATA(get=req,get=opt), FILTERS(get=opt), LIMIT(get=opt), OFFSET(get=opt), ORDER(get=opt), ORDERDIRECTIONS(get=opt)
+schemetype [GET] :: SCHEME_TYPE_ID(get=opt), SCHEME_TYPE_NAME(add=req)
+schemeusergroup [GET] :: SCHEME_ID(add=req,get=opt), UG_ID(add=req), AL_ID(add=opt)
+se_tmpl [GET] :: SRC_TMPL_ID(add=req,get=opt), ML_ID(add=req), LP_ID(add=req), SE_AB(add=opt), SE_A(add=opt), SE_B(add=opt), SE_H(add=req), SE_H_PER_ID(add=opt), SE_H_DEPTH(add=opt), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), SE_TMPL_EXTEND_PL(add=opt), IGNORE_SE_AB(add=opt), MD_ID(get=opt), AGGS_ID(get=opt), SE_TMPL_ID
+se_tmpl/mlset [-] :: SRC_TMPL_ID(add=req), MLSET_ID(add=req), LP_ID(add=req), SE_AB(add=opt), SE_A(add=opt), SE_B(add=opt), SE_H(add=req), SE_H_PER_ID(add=req), SE_H_DEPTH(add=req), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), SE_TMPL_EXTEND_PL(add=opt), IGNORE_SE_AB(add=opt)
+se_tmpl_dp_sheaf [GET] :: SRC_TMPL_ID(get=req,add=req,get=opt), SE_TMPL_DP_SHEAF_ID, SHEAF_ID(add=req), LP_ID(add=req), SE_H(add=req), SE_H_PER_ID(add=opt), SE_H_DEPTH(add=opt), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), WITHESET_ID(add=opt)
+se_tmpl_dp_sheaf_lpty [GET] :: SE_TMPL_DP_SHEAF_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req), PERSISTENT(add=opt)
+se_tmpl_dp_sheaf_ph_type [-] :: PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+se_tmpl_lpty [GET] :: SE_TMPL_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req), PERSISTENT(add=opt)
+se_tmpl_md_aggs [-] :: SRC_RULE_ID, RULE_ENABLED(add=opt), SRC_TMPL_ID(add=req), METER_TYPE_ID(add=opt), ECP_ID(add=opt), POINT_TYPE_ID(add=opt), DEV_TYPE_ID(add=opt), DP_TYPE_ID(add=opt), MOU_TYPE_ID(add=opt), PPTY_ID(add=opt), PPTY_VALUE(add=opt)
+se_tmpl_md_aggs_ph_type [-] :: PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+se_tmpl_ph_type [-] :: PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+se_tmpl_sheaf [GET] :: SRC_TMPL_ID(get=req,add=req,get=opt), SE_TMPL_SHEAF_ID, SHEAF_ID(add=req), LP_ID(add=req), SE_H(add=req), SE_H_PER_ID(add=req), SE_H_DEPTH(add=req), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), WITHESET_ID(add=opt)
+se_tmpl_sheaf_lpty [GET] :: SE_TMPL_SHEAF_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req), PERSISTENT(add=opt)
+se_tmpl_sheaf_ph_type [-] :: PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+sep [GET,PUT] :: SE_ID(get=opt), SP_ID(get=opt), SEP_ID, SEP_ENABLED, SEP_B_LAG, SEP_B_DEPTH, SEP_B_PER_ID, SEP_B_SCH_ID, SEP_H_LAG, SEP_H_DEPTH, SEP_H_PER_ID, SEP_H_SCH_ID, SEP_F_LAG, SEP_F_DEPTH, SEP_F_PER_ID, SEP_F_SCH_ID, SEP_R_LAG, SEP_R_DEPTH, SEP_R_PER_ID, SEP_R_SCH_ID, SEP_S_LAG, SEP_S_DEPTH, SEP_S_PER_ID, SEP_S_SCH_ID
+sep/d2 [DELETE] :: SE_ID, SP_ID
+sep/md_aggs [-] :: SP_ID(get=opt), POINT_ID(get=opt), MD_ID(get=opt), AGGS_ID(get=opt)
+sep/server_time [-]
+sep/ui [PUT] :: SE_ID, SP_ID, SEP_ENABLED, SEP_B_LAG, SEP_B_DEPTH, SEP_B_PER_ID, SEP_B_SCH_ID, SEP_H_LAG, SEP_H_DEPTH, SEP_H_PER_ID, SEP_H_SCH_ID, SEP_F_LAG, SEP_F_DEPTH, SEP_F_PER_ID, SEP_F_SCH_ID, SEP_T_LAG, SEP_T_DEPTH, SEP_T_PER_ID, SEP_T_SCH_ID, SEP_R_LAG, SEP_R_DEPTH, SEP_R_PER_ID, SEP_R_SCH_ID, SEP_S_LAG, SEP_S_DEPTH, SEP_S_PER_ID, SEP_S_SCH_ID
+sep_rc [PUT] :: SEP_ID, RC_ID, SCH_ID, PER_ID, SEP_RC_LAG, SEP_RC_DEPTH
+sep_rc/sch_sep_rc_det [GET]
+sep_rc/sch_sep_rc_sum_det [GET]
+sep_tmpl [-] :: PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+sep_tmpl_dp_sheaf [PUT] :: PH_TYPE_ID(add=req), SE_TMPL_DP_SHEAF_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt), SEP_T_LAG(add=opt), SEP_T_DEPTH(add=opt), SEP_T_PER_ID(add=opt), SEP_T_SCH_ID(add=opt), SEP_S_LAG(add=opt), SEP_S_DEPTH(add=opt), SEP_S_PER_ID(add=opt), SEP_S_SCH_ID(add=opt)
+sep_tmpl_md_aggs [-] :: PH_TYPE_ID(add=req), SE_TMPL_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt)
+sep_tmpl_rc [PUT] :: SE_TMPL_ID, PH_TYPE_ID, RC_ID, SCH_ID
+sep_tmpl_rc/sch_sep_tmpl_rc_det [GET]
+sep_tmpl_rc/sch_sep_tmpl_rc_sum_det [GET]
+sep_tmpl_sheaf [-] :: PH_TYPE_ID(add=req), SE_TMPL_SHEAF_ID(add=req), SEP_B_LAG(add=opt), SEP_B_DEPTH(add=opt), SEP_B_PER_ID(add=opt), SEP_B_SCH_ID(add=opt), SEP_H_LAG(add=opt), SEP_H_DEPTH(add=opt), SEP_H_PER_ID(add=opt), SEP_H_SCH_ID(add=opt), SEP_F_LAG(add=opt), SEP_F_DEPTH(add=opt), SEP_F_PER_ID(add=opt), SEP_F_SCH_ID(add=opt), SEP_R_LAG(add=opt), SEP_R_DEPTH(add=opt), SEP_R_PER_ID(add=opt), SEP_R_SCH_ID(add=opt), SEP_T_LAG(add=opt), SEP_T_DEPTH(add=opt), SEP_T_PER_ID(add=opt), SEP_T_SCH_ID(add=opt), SEP_S_LAG(add=opt), SEP_S_DEPTH(add=opt), SEP_S_PER_ID(add=opt), SEP_S_SCH_ID(add=opt)
+sepdetails [PUT] :: POINT_ID(get=opt), DS_ID(get=opt)
+ses [GET]
+ses/details [GET] :: SES_ID(get=req)
+show/only_actual [POST] :: POINT_ID(add=req), ML_ID(add=req)
+show/sheaf [-] :: DP_ID(get=req)
+show/time_sep [-] :: DL_TYPE_ID(add=req), DP_TYPE_ID(add=req), PH_TYPE_ID(add=req), DP_ID(add=opt), POINT_ID(add=opt)
+simpleschedules [POST] :: SCH_ID(add=req), SCHI_NR(add=req), HLD_ID(add=req), SCH_PER_ID(add=req), SCH_PER_VALUE(add=req), SCH_START_PER_ID(add=req), SCH_REPEAT_PER_ID(add=req), SCH_REPEAT_PER_VALUE(add=req), SCH_START_DAY_PER_VALUE(add=req), SCH_START_PER_VALUE(add=req), WD1(add=opt), WD2(add=opt), WD3(add=opt), WD4(add=opt), WD5(add=opt), WD6(add=opt), WD7(add=opt), WD8(add=opt), WD_SPECIFIC(add=opt)
+sourceelementpropsa [GET,POST,PUT] :: SE_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req)
+sourceelements [GET,POST,PUT] :: SRC_ID(add=req,get=opt), DI_ID(add=req), SE_AB(add=opt), SE_A(add=req), SE_B(add=req), SE_ENABLED(add=opt), SE_FORCED(add=opt), SE_H(add=req), SE_H_PER_ID(add=req), SE_H_DEPTH(add=req), SE_H_BOUND(add=req), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), ADD_SEP(add=opt), POINT_ID(get=opt), MD_ID(get=opt), AGGS_ID(get=opt), SE_ID(get=opt), CHANGE_DATA, SE_SUMMAND, CHANGE_DATA_BT, CHANGE_DATA_ET
+sourceelements/di [POST]
+sourceelements/diff_branch [-] :: SRC_ID(get=opt), POINT_ID(get=opt), MD_ID(get=opt), AGGS_ID(get=opt), PH_TYPE_ID(get=opt)
+sourceelements/mcc [-]
+sourceelements/md_aggs [-] :: SRC_ID(get=opt), POINT_ID(get=opt), MD_ID(get=opt), AGGS_ID(get=opt)
+sourcepropsa [GET,POST,PUT] :: SRC_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req)
+sources [POST,PUT] :: SRC_NAME(add=req), SRC_NUMBER(add=req), DP_ID(add=req), SRC_TYPE_ID(add=req), DL_TYPE_ID(add=req), SRC_BT(add=req), SRC_ET(add=req), SRC_ENABLED(add=opt), TZ_ID(add=req), SRC_TZ_DST_USED(add=opt), SRC_SAVE_STATISTICS(add=opt), POINT_ID(add=req), SRC_DIR_INV(add=opt), SRC_TMPL_ID(add=opt), SRC_ID
+sources/mas [POST] :: SRC_ID(add=req), SRC_NAME(add=opt), SRC_NUMBER(add=opt), OLD(add=opt)
+sources/mcc [-]
+sources/src_from_rule [POST] :: DP_ID(add=opt), SRC_TMPL_ID(add=opt), POINT_ID(add=req), DELAYED(add=opt), IGNORE_EXISTING(add=opt)
+sources/src_from_tmpl [POST,PUT] :: DP_ID(add=req), SRC_TMPL_ID(add=req), POINT_ID(add=req), DELAYED(add=opt), IGNORE_EXISTING(add=opt), SRC_ID
+sourcetemplate [GET]
+sp [GET,POST] :: PH_ID(add=req), SRC_ID(add=req), SP_ID(add=opt)
+sp/mdc_list_from_db [-]
+sp/src_dp [GET] :: PH_ID(add=req), SRC_ID(add=req), SP_ID(add=opt)
+sp_lpty [GET,PUT] :: SP_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req), SRC_ID(get=opt), PH_ID(get=opt)
+sp_src [GET] :: SRC_ID(get=opt)
+specialdays [-]
+specialformspoint/export [GET] :: POINT_ID(add=opt), GR_ID(add=opt), FORM(add=req), FROM(add=req), TO(add=req), EXPORT_ONLY_ACTUAL_PL(add=opt), EXPORT_SHOW_STATUS_DATA(add=opt), EXPORT_COLOR_STATUS_DATA(add=opt), LOCALE(add=opt)
+specialformspoint/forms [GET] :: POINT_ID(add=opt), GR_ID(add=opt), FORM(add=req), FROM(add=req), TO(add=req), EXPORT_ONLY_ACTUAL_PL(add=opt), EXPORT_SHOW_STATUS_DATA(add=opt), EXPORT_COLOR_STATUS_DATA(add=opt), LOCALE(add=opt)
+src_rule [-] :: SRC_RULE_ID, RULE_ENABLED(add=opt), SRC_TMPL_ID(add=req), METER_TYPE_ID(add=opt), ECP_ID(add=opt), POINT_TYPE_ID(add=opt), DEV_TYPE_ID(add=opt), DP_TYPE_ID(add=opt), MOU_TYPE_ID(add=opt), PPTY_ID(add=opt), PPTY_VALUE(add=opt)
+src_tmpl_lpty [GET] :: SRC_TMPL_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req), PERSISTENT(add=opt)
+src_tmpl_ph_type_lpty [GET] :: SRC_TMPL_ID(add=req,get=opt), PH_TYPE_ID(add=req,get=opt), LPTY_ID(add=req), LPTY_VALUE(add=req), PERSISTENT(add=opt)
+src_tmpl_report [GET] :: SRC_ID, SRC_TMPL_ID, DELAYED
+src_tmpl_src [GET] :: SRC_ID, SRC_TMPL_ID, DELAYED
+src_type_important_withe [POST] :: SRC_TYPE_ID(get=req), IS_POINT(get=req)
+src_type_mod_withe/available_witheset_data [GET] :: WITHESET_ID(get=req), SRC_TYPE_ID(get=opt), WITHE_TYPE_ID(get=opt), WITHESET_JOURNAL(get=opt)
+src_type_mod_withe/ffp_dp_withe [GET]
+src_type_mod_withe/ffp_withe [GET]
+src_type_sheaf [-] :: SRC_TYPE_ID(get=req)
+src_type_withe/ffp_dp_state_withe [GET]
+src_type_withe/ffp_state_withe [GET]
+src_type_withe/witheset_src_type [GET] :: WITHESET_ID(get=req), SRC_TYPE_ID(get=opt), WITHE_TYPE_ID(get=opt), WITHESET_JOURNAL(get=opt)
+stats/ph [POST] :: FROM(add=req), TO(add=req), FILTERS(add=opt), LIMIT(add=opt), OFFSET(add=opt)
+stats/src [POST] :: FROM(add=req), TO(add=req), FILTERS(add=opt), LIMIT(add=opt), OFFSET(add=opt)
+steadytypes [GET]
+stgate [POST]
+stgate/destroy [POST]
+stgate/wait [POST]
+stkmsadapter [POST] :: ACTION(add=req), URI(add=req), BODY(add=opt), HEADERS(add=opt), PARAMS(add=opt), ROW(add=opt)
+stkmsadapter/call [POST] :: FUNC(add=req), PARAMS(add=req)
+substitutiontemplates [GET] :: SBST_TMPL_ID, SBST_TMPL_NAME(add=req), SBST_TMPL_CODE(add=req), POINT_ID(get=req)
+substitutiontemplates/ml [GET] :: SBST_TMPL_ID(get=req,add=req,nonNull=req), ML_ID(add=req,nonNull=req), SBST_ML_ID(add=opt), SBST_PL_ID(add=opt), SAM_ID(add=opt), REL_TYPE_ID(add=opt), POS_NR(add=opt), SBST_TMPL_EXTEND_PL(add=opt), SBST_SF(add=opt), SBST_AB(add=opt), SBST_A(add=opt), SBST_B(add=opt), PER_ID(add=opt), SBST_LAG(add=opt), SBST_IMPROVABLE(add=opt), SBST_FLN(add=opt), SBST_RADIUS(add=opt), SBST_RADIUS_PER_ID(add=opt), SBST_OFFSET(add=opt), SBST_OFFSET_PER_ID(add=opt), SBST_ALTER_READ_TIME(add=opt), SBST_EXCLUDE_FLN(add=opt), SBST_DST_ONLY(add=opt), SBST_DST_USED(add=opt)
+switch_off_ph_statistics [POST] :: SP_ID(add=req)
+switch_off_ph_statistics/all [POST]
+switch_off_ph_statistics/selected [POST] :: PH_ID(add=req)
+switch_off_src_statistics [POST] :: SP_ID(add=req)
+switch_off_src_statistics/all [POST]
+switch_off_src_statistics/selected [POST] :: SRC_ID(add=req)
+switch_off_testmode [POST] :: SP_ID(add=req)
+switch_off_testmode/all [POST]
+switch_off_testmode/selected [POST] :: SP_ID(add=req)
+sysdiag/export [POST] :: FROM(add=opt), TO(add=opt), DEPTH(add=opt), BC(add=opt), WORST_BY(add=opt), OUTPUT_XO_TYPE_RNK(add=opt), OUTPUT_CNT(add=opt), OUTPUT_OLDNESS(add=opt), OUTPUT_PRC_NORM(add=opt), OUTPUT_PRC_VALID(add=opt), OUTPUT_PRC_WO_ERR(add=opt), OUTPUT_WORST(add=opt), USE_CACHE(add=opt), FILTERS(add=opt)
+sysdiag/import [POST] :: FROM(add=opt), TO(add=opt), DEPTH(add=opt), BC(add=opt), WORST_BY(add=opt), OUTPUT_XO_TYPE_RNK(add=opt), OUTPUT_CNT(add=opt), OUTPUT_OLDNESS(add=opt), OUTPUT_PRC_NORM(add=opt), OUTPUT_PRC_VALID(add=opt), OUTPUT_PRC_WO_ERR(add=opt), OUTPUT_WORST(add=opt), USE_CACHE(add=opt), FILTERS(add=opt)
+sysdiag/ph [POST] :: FROM(add=opt), TO(add=opt), DEPTH(add=opt), BC(add=opt), USE_CACHE(add=opt), FILTERS(add=opt)
+sysdiag/queue [POST] :: FROM(add=opt), TO(add=opt), DEPTH(add=opt), BC(add=opt), OUTPUT_LINE(add=opt), OUTPUT_LINK(add=opt), USE_CACHE(add=opt), FILTERS(add=opt)
+sysdiag/rp [POST] :: FROM(add=req), TO(add=req), DEPTH(add=opt), BC(add=opt), WORST_BY(add=opt), OUTPUT_FFS_RNK(add=opt), OUTPUT_PRC_WO_ERR(add=opt), OUTPUT_WORST(add=opt), FILTERS(add=opt)
+sysdiag/wait [POST] :: FROM(add=opt), TO(add=opt), DEPTH(add=opt), BC(add=opt), MAX_BY(add=opt), OUTPUT_RC_RNK(add=opt), OUTPUT_PRC_WO_ERR(add=opt), OUTPUT_MAX(add=opt), OUTPUT_BUF(add=opt), OUTPUT_BYTES(add=opt), USE_CACHE(add=opt), FILTERS(add=opt)
+systemeventsclasses [GET]
+systemeventstypes [GET]
+systemmodules [GET] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt), SRC_ID(add=opt), PH_ID(add=opt), POINT_ID(add=opt), GR_ID(add=opt), DS_ID(add=opt)
+systemprops [PUT] :: SPTY_VALUE
+tables [GET] :: SES_ID(get=req)
+tabletypes [GET] :: SES_ID(get=req)
+tarifflists [POST] :: ML_ID(add=req)
+tarifflists/grc_rule [-]
+tarifflists/verification [-]
+tariffplans [GET]
+tariffplansperiods [-]
+tff_system [-]
+timeperiods [GET,POST,PUT] :: SRC_TMPL_ID(add=req), ML_ID(add=req), LP_ID(add=req), SE_AB(add=opt), SE_A(add=opt,add=req), SE_B(add=opt,add=req), SE_H(add=req), SE_H_PER_ID(add=opt,add=req), SE_H_DEPTH(add=opt,add=req), SE_H_RESTORE_DEPTH(add=opt), SE_H_RESTORE_PER_ID(add=opt), SE_TMPL_EXTEND_PL(add=opt), IGNORE_SE_AB(add=opt), SRC_ID(add=req,get=opt), DI_ID(add=req), SE_ENABLED(add=opt), SE_FORCED(add=opt), SE_H_BOUND(add=req), ADD_SEP(add=opt), XF_ID(add=req), PMA_TMPL_ID, PMA_TMPL_NAME(add=req), PMA_TMPL_CODE(add=req), POINT_ID(get=opt), MD_ID(get=opt), AGGS_ID(get=opt), ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt), MLSET_ID(add=req), SEP_ID, SEP_ENABLED, SEP_B_LAG, SEP_B_DEPTH, SEP_B_PER_ID, SEP_B_SCH_ID, SEP_H_LAG, SEP_H_DEPTH, SEP_H_PER_ID, SEP_H_SCH_ID, SEP_F_LAG, SEP_F_DEPTH, SEP_F_PER_ID, SEP_F_SCH_ID, SEP_R_LAG, SEP_R_DEPTH, SEP_R_PER_ID, SEP_R_SCH_ID, SEP_S_LAG, SEP_S_DEPTH, SEP_S_PER_ID, SEP_S_SCH_ID, RTP_ID(add=req,get=req), RTP_ML_ENABLED(add=req), PER_ID(add=req), RTP_INT_VALUE(add=req)
+timezones [GET,POST,PUT] :: SRC_NAME(add=req), SRC_NUMBER(add=req), DP_ID(add=req), SRC_TYPE_ID(add=req), DL_TYPE_ID(add=req), SRC_BT(add=req), SRC_ET(add=req), SRC_ENABLED(add=opt), TZ_ID(add=req), SRC_TZ_DST_USED(add=opt), SRC_SAVE_STATISTICS(add=opt), POINT_ID(add=req), SRC_DIR_INV(add=opt), SRC_TMPL_ID(add=opt,add=req), XF_ID, XA_ID, XF_NAME, XF_ENABLED, RP_ID, ORDER(get=opt), LIMIT(get=opt), OFFSET(get=opt), FILTERS(get=opt), ORDERNULLS(get=opt), ORDERDIRECTIONS(get=opt), SRC_TMPL_CODE(add=opt), SRC_TMPL_NAME(add=opt)
+transaction [POST]
+ug_not_eva [GET] :: EVA_ID(get=req)
+ugr [GET] :: UG_ID(get=req,add=req), GR_ID(add=req), ALGR_ID(add=req)
+ugr/ug_not_gr [GET]
+ugrole [POST] :: UG_ID(get=req,add=req), GR_ID(add=req), ROLE(add=req)
+ugroot [GET] :: UG_ID(get=req,add=req), GR_ID(add=req)
+upty [POST] :: UPTY_ID, UPTY_CODE(add=req,nonNull=req), UPTY_NAME(add=req,nonNull=req), ENUM_ID(add=opt), UPTY_TYPE_ID(add=opt), UPTY_NR(add=opt), FMT_ID(add=opt)
+upty/available_upty [GET]
+upty_type [-]
+user/change_pw [-]
+user/login [POST]
+user/login_az [-]
+user_not_eva [GET] :: EVA_ID(get=req)
+usergroup [GET,POST] :: UG_ID(get=req), UG_NAME(add=req), UG_TYPE_ID(add=opt), RPA_ID, RP_ID(add=req), RPP_ID(add=req), SCH_ID(add=req), RPA_NAME(add=req), FOLDER(add=req), FORM_IF_EMPTY(add=opt), RPA_ENABLED(add=opt), RPA_LOG_ENABLED(add=opt), RPA_DELAY_DELIVERY(add=opt), GR_ID(get=opt,add=req), EC_IN(get=opt,add=req), GPRC(get=opt,add=req), EC_ID(get=opt,add=req), GMOD_ID(get=opt,add=req), POINT_ID(get=opt,add=req), SAM_ID(get=opt,add=req), ML_ID(get=opt,add=req), MT_ID(get=opt)
+usergroup/bga_type [GET] :: BGA_TYPE_ID(get=opt)
+usergroup/by_user [GET] :: USER_ID(get=req)
+usergroup/not_by_user [GET] :: USER_ID(get=req)
+usergroupdata [GET,POST] :: UG_ID(get=req,add=req), USER_ID(add=req)
+usergrouptype [POST] :: UG_TYPE_ID, UG_TYPE_NAME(add=req), UG_TYPE_SINGLE_UG_MODE(add=req)
+users [GET,PUT] :: USER_ID, USER_NAME, USER_EMAIL, USER_PHONE, USER_LOCATION, USER_GSM, USER_COMPANY, USER_DEPARTMENT, USER_ENABLED, USER_DELETED, GRANT_REVOKE, ROLE_NAME, USER_PASSWORD, USER_SMS_LIMIT, INHERIT_UG_ROLE, GR_REMOVE_PUBLIC, GR_REMOVE_PRIVATE, RP_REMOVE_PUBLIC, RP_REMOVE_PRIVATE, SCHEME_REMOVE_PUBLIC, SCHEME_REMOVE_PRIVATE
+users/not_ug [POST] :: UG_ID(get=req)
+users/owned_objects [-] :: USER_ID(get=req)
+users/user_root [POST] :: USER_ID(get=req,add=req), GR_ID(add=req)
+users_fa [GET] :: ACK_COMMENT(add=opt), FROM(add=req), TO(add=req), DP_ID(add=opt,get=opt), SRC_ID(add=opt), PH_ID(add=opt), POINT_ID(add=opt,get=opt), GR_ID(add=opt), DS_ID(add=opt), PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt), PW_BT(get=opt), USER_ID(get=opt), EAPP_ID(get=opt), EAPP_TIME(get=opt), SES_ID(get=req)
+users_fa/actual [GET] :: RPA_ID, RP_ID(add=req), RPP_ID(add=req), SCH_ID(add=req), RPA_NAME(add=req), FOLDER(add=req), FORM_IF_EMPTY(add=opt), RPA_ENABLED(add=opt), RPA_LOG_ENABLED(add=opt), RPA_DELAY_DELIVERY(add=opt)
+usersessions [GET] :: DBU(get=req), SID, SERIAL
+usersettings [GET] :: UV_ID, UV_DATA(add=req,add=opt), UV_NAME(add=req), UV_PUBLIC(add=req,add=opt), UV_TYPE(add=req), UV_MODULE(add=req,get=req), UV_TECH_INFO(add=opt), UV_SUBTYPE(add=opt)
+usersettings/data [GET] :: UV_ID(get=req)
+userviews [PUT] :: UV_ID, UV_NAME, UV_PUBLIC, UV_MODULE(get=req)
+userviews/groups [-] :: UV_GROUP(get=req)
+userviews/modules [-] :: UV_GROUP(get=req)
+verges [GET]
+verificationprofiledata [-] :: VP_ID(get=opt,add=req), VP_NR(add=req), AGGS_TYPE_ID(add=req), MS_ID(add=opt), DIR_ID(add=opt), AGGF_ID(add=opt), TFF_ID(add=opt), ORDER(get=opt), ORDERDIRECTIONS(get=opt)
+verificationprofiles [GET] :: VP_ID(get=opt,add=req), VP_NAME(get=opt,add=req), VP_CODE(get=opt,add=req), VP_BIAS(get=opt,add=req), VP_SEPARATE_TFF(get=opt,add=opt), VP_SMALLEST_INTERVAL(get=opt,add=opt), POINT_ID(get=req)
+verificationprofiles/vp_report [POST] :: VP_NAME(get=opt), VP_CODE(get=opt), POINT_COUNT(get=opt)
+verificationprofilescalar [POST] :: VP_ID(get=opt,add=opt), AGGS_TYPE_ID(get=opt,add=opt), AGGS_TYPE_NAME(get=opt,add=opt), DIR_ID(get=opt,add=opt), DIR_NAME(get=opt,add=opt), MS_ID(get=opt,add=opt), MS_NAME(get=opt,add=opt), UID(get=opt,add=opt), VP_ALLOWED_SCALAR_ERROR(add=opt), VP_MAX_SCALAR_ERROR(add=opt), VP_NAME(add=opt), VP_BIAS(add=opt), VP_CODE(add=opt), VP_SEPARATE_TFF(add=opt), VP_SMALLEST_INTERVAL(add=opt), ORDER(get=opt), ORDERDIRECTIONS(get=opt)
+verificationquality/accept [POST] :: POINT_ID(add=req), FROM(add=req), TO(add=req)
+verificationquality/cnt [POST] :: ML_ID(add=req), POINT_ID(add=req), GR_ID(add=req), MLSET_ID(add=req), FILTERS(add=req), DATE_FROM(add=req), DATE_TO(add=req)
+verificationquality/decline [POST] :: POINT_ID(add=req), FROM(add=req), TO(add=req)
+verificationquality/holes [POST] :: POINT_ID(add=req), SESSION_FILTERS(add=req), POINT_ID_SELECTED(add=opt)
+verificationquality/hour_details [POST] :: POINT_ID(add=req), SESSION_FILTERS(add=req), FROM(add=req), TO(add=req)
+verificationquality/recalc [POST] :: POINT_ID(add=req), MONTH(add=req)
+verificationquality/revoke [POST] :: POINT_ID(add=req), FROM(add=req), TO(add=req)
+vkmignore [POST] :: SRC_TYPE_ID(add=req), WITHE_ID(add=req), IS_POINT(add=req), FILTERS(get=opt), ORDERDIRECTIONS(get=opt), ORDER(get=opt), ORDERNULLS(get=opt)
+vkmignore/src_withe [-] :: FILTERS(get=opt), ORDERDIRECTIONS(get=opt), ORDER(get=opt), ORDERNULLS(get=opt), OFFSET(get=opt), LIMIT(get=opt)
+weeklyprograms [-]
+weeklyprograms/dpr_tree [-]
+withe [POST] :: SCOPE(get=req)
+withesetdata [POST] :: WITHESET_ID(get=req,add=req), SRC_TYPE_ID(get=opt), WITHE_TYPE_ID(get=opt), WITHESET_JOURNAL(get=opt), WITHE_ID(add=req)
+withesetdatalpty [GET] :: WITHESET_ID(get=req,add=req), WITHE_ID(add=req), LPTY_ID(add=req), LPTY_VALUE(add=req)
+writerestrictions [GET] :: PWW_ID, GR_ID(add=opt), WITHESET_ID(add=opt), SRC_TYPE_ID(add=opt), UG_ID(add=opt), PWW_DESC(add=opt)
+xa_das [-] :: XA_ID(add=req), DAS_ID(add=req)
+xa_das_frc [-] :: XA_ID(add=req), DAS_ID(add=req)
+xa_das_log [-] :: XA_ID(add=req), DAS_ID(add=req)
+xa_rpty [GET] :: XA_ID(add=req,get=opt), RPTY_ID(add=req), RPTY_VALUE(add=req), RPP_ID(get=opt)
+xf [GET,POST,PUT] :: XF_TYPE_ID(add=req), XA_ID(add=req), RPP_ID(add=req), XF_NAME(add=req), XF_ENABLED(add=req), XF_IMPORT(add=opt), RP_ID(add=opt), XF_ID, PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+xf/duplicate [POST] :: XF_ID(add=req), XF_IMPORT(add=opt), XA_ID(add=opt), RPP_ID(add=opt), RP_ID(add=opt)
+xf/src [-] :: XF_ID(add=req)
+xf/xqTree [-]
+xf_rc [POST,PUT] :: XF_ID(add=req), RC_ID(add=req), SCH_ID(add=req), PER_ID(add=req), XF_RC_LAG(add=req), XF_RC_DEPTH(add=req)
+xf_rc/sch_xf_rc_det [GET]
+xf_type [GET] :: PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+xf_type/eq_filter [GET]
+xf_type_rpp [-]
+xf_type_xfau_type [POST] :: XFA_ID(add=req), POINT_ID(add=req), XFAU_CODE(add=req), MLSET_ID(add=req), XFAU_TYPE_ID(add=opt), XFAU_ENABLED(add=opt), INHERIT_CN(add=opt), IGNORE_PL(add=opt)
+xf_xpty [GET] :: XF_ID(add=req,get=opt), XPTY_ID(add=req), XPTY_VALUE(add=req)
+xfa [POST] :: XFA_ID, XF_ID(add=req), XFA_CODE(add=req), XFA_NAME(add=req), TZ_ID(add=req), XFA_ENABLED(add=req), XFA_TZ(add=req), XFA_TZ_DST_USED(add=opt)
+xfau [POST,PUT] :: XFAU_ID, XFAU_ENABLED(add=req), INHERIT_CN(add=req), XFAU_CODE(add=req), XFAU_NAME(add=req), XFAU_CODE2(add=req), XFAU_NAME2(add=req), XFAU_TYPE_ID(add=req), POINT_ID(add=req), DS_ID(add=req), GR_ID(add=req), XFA_ID(add=req)
+xfau/gr [POST] :: XFA_ID(add=req), GR_ID(add=req), XFAU_CODE(add=req), MLSET_ID(add=req), XFAU_TYPE_ID(add=opt), XFAU_ENABLED(add=opt), INHERIT_CN(add=opt), IGNORE_PL(add=opt)
+xfau/point [POST] :: XFA_ID(add=req), POINT_ID(add=req), XFAU_CODE(add=req), MLSET_ID(add=req), XFAU_TYPE_ID(add=opt), XFAU_ENABLED(add=opt), INHERIT_CN(add=opt), IGNORE_PL(add=opt)
+xfau/xqTree [-]
+xfau_type [-]
+xfe [POST] :: XFE_ID, XFAU_ID(add=req), ML_ID(add=req), XE_ID(add=req), XFE_ENABLED(add=opt), XFE_INFO(add=opt)
+xfe/export_all [-]
+xfe/export_iec [-]
+xfe/iec [PUT] :: XFE_ID, SCH_ID
+xfe/sch [PUT] :: XFE_ID, SCH_ID
+xfe_ml [GET]
+xftree/xf [GET] :: ACTION(get=req), FILTERS(get=req), SEARCH_BEHAVIOUR_XF(get=opt), XF_TYPE_ID(get=req), SEARCH_STRING(get=opt)
+xftree/xf_type [GET] :: ACTION(get=opt), EXACT_SEARCH(get=opt), SEARCH_STRING(get=opt), FILTERS(get=opt)
+xftree/xfa [GET] :: XF_ID(get=req), SEARCH_STRING(get=opt), SEARCH_BEHAVIOUR_XF(get=opt)
+xftree/xfau [-] :: XFA_ID(get=req), SEARCH_STRING(get=opt), SEARCH_BEHAVIOUR_XF(get=opt)
+xo_type [GET] :: PATH(get=req), RELATIVE_TO(get=req), TYPE(get=opt)
+ypty [POST] :: YPTY_ID, YPTY_CODE(add=req,nonNull=req), YPTY_NAME(add=req,nonNull=req), ENUM_ID(add=opt), YPTY_TYPE_ID(add=opt), YPTY_NR(add=opt), FMT_ID(add=opt)
+ypty_type [-]
