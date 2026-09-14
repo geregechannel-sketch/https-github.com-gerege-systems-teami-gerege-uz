@@ -1,0 +1,15 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {build} from 'vite';
+import react from '@vitejs/plugin-react';
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {MemoryRouter} from 'react-router-dom';
+import {pathToFileURL} from 'node:url';
+import {resolve} from 'node:path';
+await build({configFile:false,plugins:[react()],logLevel:'error',build:{outDir:'.test-windows',lib:{entry:'src/preview/Windows.tsx',formats:['es'],fileName:()=> 'windows.mjs'},rollupOptions:{external:['react','react/jsx-runtime','react-router-dom']}}});
+const {windows,WindowCatalogue,CapturedWindow,EvidenceBrowser}=await import(pathToFileURL(resolve('.test-windows/windows.mjs')));
+const render=(component,route)=>renderToStaticMarkup(createElement(MemoryRouter,{initialEntries:[route]},createElement(component)));
+test('every distinct menu leaf appears in the window catalogue',()=>{const html=render(WindowCatalogue,'/windows');assert.ok(windows.length>40);assert.equal(new Set(windows.map(w=>w.route)).size,windows.length);for(const w of windows)assert.ok(html.includes('href="'+w.route+'"'),w.route);console.log('Menu windows:',windows.length);});
+test('every generic menu window renders with a known title and evidence boundary',()=>{for(const w of windows.filter(w=>w.route.startsWith('/m/')||w.route==='/saved')){const html=render(CapturedWindow,w.route);assert.ok(!html.includes('Цонх олдсонгүй'),w.route);assert.ok(html.includes('Шууд шинэчлэгдэхгүй'),w.route);assert.ok(!html.includes('<form'),w.route);}});
+test('captured reference data and missing results remain distinguishable',()=>{assert.ok(render(CapturedWindow,'/m/measurelinessets').includes('Нийт 30 мөр'));assert.ok(render(CapturedWindow,'/m/audit').includes('үр дүн HAR-д бүртгэгдээгүй'));assert.ok(render(CapturedWindow,'/m/discretesignals').includes('хариу хоосон'));assert.ok(render(EvidenceBrowser,'/evidence?source=measuringdevicetypes').includes('Нийт 21 мөр'));});

@@ -20,7 +20,7 @@ class PreviewHandler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     server = HTTPServer(('127.0.0.1', 0), PreviewHandler)
-    url = f'http://127.0.0.1:{server.server_port}/TOSH_Preview.html#/gis'
+    url = f'http://127.0.0.1:{server.server_port}/TOSH_Preview.html#/windows'
     print('TOSH map preview. Keep this window open. Ctrl+C stops the preview.', flush=True)
     print(url, flush=True)
     webbrowser.open(url)

@@ -60,4 +60,5 @@ jobs:
       - run: node --test tests/preview.test.mjs
       - run: node --test tests/sourceComparison.test.mjs
       - run: node --test tests/gisSnapshot.test.mjs
+      - run: NODE_ENV=production node --test tests/windows.test.mjs
       - run: node scripts/build-preview.mjs
