@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Module from "./pages/Module";
 import Gis from "./pages/Gis";
 import Archives from "./pages/Archives";
+import Quality from "./pages/Quality";
 import Points from "./pages/Points";
 import SavedForms from "./pages/SavedForms";
 
@@ -34,6 +35,7 @@ function App() {
         <Route path="/gis" element={<Protected><Gis /></Protected>} />
         <Route path="/saved" element={<Protected><SavedForms /></Protected>} />
         <Route path="/m/points" element={<Protected><Points /></Protected>} />
+        <Route path="/m/qualityreports" element={<Protected><Quality /></Protected>} />
         <Route path="/m/:model" element={<Protected><Module /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

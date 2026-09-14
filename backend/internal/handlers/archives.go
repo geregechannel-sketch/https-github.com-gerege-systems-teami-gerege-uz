@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Archives serves verified local samples. It does not contact or command meters.
+// Archives serves stored local samples. It does not contact or command meters.
 type Archives struct{ pool *pgxpool.Pool }
 
 func NewArchives(pool *pgxpool.Pool) *Archives { return &Archives{pool: pool} }
@@ -69,12 +69,13 @@ func (h *Archives) Parameters(w http.ResponseWriter, r *http.Request) {
 }
 
 type archiveRequest struct {
-	Point int64  `json:"POINT_ID"`
-	ML    *int64 `json:"ML_ID"`
-	MD    *int64 `json:"MD_ID"`
-	Agg   *int64 `json:"AGGS_ID"`
-	From  string `json:"FROM"`
-	To    string `json:"TO"`
+	Point          int64  `json:"POINT_ID"`
+	ML             *int64 `json:"ML_ID"`
+	MD             *int64 `json:"MD_ID"`
+	Agg            *int64 `json:"AGGS_ID"`
+	From           string `json:"FROM"`
+	To             string `json:"TO"`
+	IncludeOverlap bool   `json:"INCLUDE_OVERLAP"`
 }
 
 func (h *Archives) Point(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +103,7 @@ func (h *Archives) Point(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 	defer cancel()
-	rows, err := h.pool.Query(ctx, `SELECT begin_time,end_time,value::text,unit,source_status,source_ref,received_at FROM archive_samples WHERE point_id=$1 AND ml_id=$2 AND md_id=$3 AND aggs_id=$4 AND begin_time >= $5 AND begin_time < $6 ORDER BY begin_time LIMIT 10001`, q.Point, q.ML, q.MD, q.Agg, from, to)
+	rows, err := h.pool.Query(ctx, `SELECT begin_time,end_time,value::text,unit,source_status,source_ref,received_at FROM archive_samples WHERE point_id=$1 AND ml_id=$2 AND md_id=$3 AND aggs_id=$4 AND (begin_time >= $5 OR ($7 AND end_time > $5)) AND begin_time < $6 ORDER BY begin_time LIMIT 10001`, q.Point, q.ML, q.MD, q.Agg, from, to, q.IncludeOverlap)
 	if err != nil {
 		httpx.Fail(w, http.StatusServiceUnavailable, "Архив недоступен")
 		return

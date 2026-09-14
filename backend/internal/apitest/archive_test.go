@@ -32,6 +32,18 @@ func TestArchiveFiltersAndPreservesValues(t *testing.T) {
 	if rows[0]["VALUE"] != "123456789.123456789" || rows[0]["UNIT"] != "kWh" || rows[0]["SOURCE_STATUS"] != "ORIGINAL" || rows[0]["BT"] != "2026-08-31T16:00:00Z" {
 		t.Fatalf("archive value, unit, status or timezone changed: %v", rows)
 	}
+	request["FROM"] = "2026-09-01T00:15:00+08:00"
+	request["INCLUDE_OVERLAP"] = true
+	code, result = do(t, srv, "POST", "/ec3api/v1/archives/point", tok, request)
+	if code != 200 || result.TotalCount == nil || *result.TotalCount != 1 {
+		t.Fatal("coverage query must include an interval crossing the start boundary")
+	}
+	request["INCLUDE_OVERLAP"] = false
+	code, result = do(t, srv, "POST", "/ec3api/v1/archives/point", tok, request)
+	if code != 200 || result.TotalCount == nil || *result.TotalCount != 0 {
+		t.Fatal("normal query must continue selecting by interval start")
+	}
+	request["FROM"] = "2026-09-01T00:00:00+08:00"
 	request["ML_ID"] = 99
 	code, result = do(t, srv, "POST", "/ec3api/v1/archives/point", tok, request)
 	if code != 200 || !result.Success || result.TotalCount == nil || *result.TotalCount != 0 {

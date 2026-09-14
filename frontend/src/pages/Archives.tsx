@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
 import "../archives.css";
+import { calendarRange, dateInUTC8 } from "../lib/archiveQuality";
 import {
   IcExpand, IcSave, IcSync, IcPlus, IcMinus, IcCollapse, IcGrid,
   IcClock, IcChevron, IcSearch, IcFunnel, IcReset, IcInfo, IcHelp, IcGear,
@@ -24,8 +25,8 @@ export default function Archives() {
   const [sel, setSel] = useState<Row | null>(null);
   const [openSvc, setOpenSvc] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [from, setFrom] = useState(iso(new Date()));
-  const [to, setTo] = useState(iso(new Date()));
+  const [from, setFrom] = useState(dateInUTC8());
+  const [to, setTo] = useState(dateInUTC8());
   const [rows, setRows] = useState<Row[] | null>(null);
   const [tab, setTab] = useState("res");
 
@@ -36,18 +37,19 @@ export default function Archives() {
   }, []);
 
   useEffect(() => {
-    const id = ++requestId.current;
+    ++requestId.current;
+    let active = true;
     setRows(null); setMeasurements([]); setMeasurement(""); setBusy(false);
     if (!sel) { setStatus(""); return; }
     setStatus("Загрузка доступных параметров…");
     api.get("measurementsarchives?POINT_ID=" + encodeURIComponent(sel.POINT_ID)).then(e => {
-      if (id !== requestId.current) return;
+      if (!active) return;
       if (!e.success || !Array.isArray(e.data)) throw new Error();
       const valid = e.data.filter((r: Row) => [r.ML_ID, r.MD_ID, r.AGGS_ID].every(v => v != null && String(v).trim() !== ""));
       setMeasurements(valid);
       setStatus(valid.length ? "Выберите параметр архива" : "Сервер не предоставил параметры архива для этой точки.");
-    }).catch(() => { if (id === requestId.current) setStatus("Не удалось получить параметры архива."); });
-    return () => { ++requestId.current; };
+    }).catch(() => { if (active) setStatus("Не удалось получить параметры архива."); });
+    return () => { active = false; ++requestId.current; };
   }, [sel]);
 
   function clearResult() { ++requestId.current; setRows(null); setBusy(false); setStatus(""); }
@@ -130,20 +132,22 @@ export default function Archives() {
   }
 
   function period(kind: "day" | "week" | "month" | "year") {
-    const now = new Date(), f = new Date();
-    if (kind === "week") f.setDate(now.getDate() - 7);
-    if (kind === "month") f.setMonth(now.getMonth() - 1);
-    if (kind === "year") f.setFullYear(now.getFullYear() - 1);
+    const now = new Date(dateInUTC8() + "T00:00:00Z"), f = new Date(now);
+    if (kind === "week") f.setUTCDate(now.getUTCDate() - 7);
+    if (kind === "month") f.setUTCMonth(now.getUTCMonth() - 1);
+    if (kind === "year") f.setUTCFullYear(now.getUTCFullYear() - 1);
     clearResult(); setFrom(iso(f)); setTo(iso(now));
   }
   async function view() {
     const parameter = measurements[Number(measurement)];
     if (!sel || measurement === "" || !parameter) return;
     if (!from || !to || from > to) { setStatus("Проверьте начало и конец периода."); return; }
+    let range: ReturnType<typeof calendarRange>;
+    try { range = calendarRange(from, to); } catch (e) { setStatus((e as Error).message); return; }
     const id = ++requestId.current;
     setBusy(true); setRows(null); setStatus("Загрузка архива…");
     try {
-      const env = await api.post("archives/point", { POINT_ID: sel.POINT_ID, ML_ID: parameter.ML_ID, MD_ID: parameter.MD_ID, AGGS_ID: parameter.AGGS_ID, FROM: from + "T00:00:00+08:00", TO: iso(new Date(Date.parse(to + "T00:00:00Z") + 86400000)) + "T00:00:00+08:00" });
+      const env = await api.post("archives/point", { POINT_ID: sel.POINT_ID, ML_ID: parameter.ML_ID, MD_ID: parameter.MD_ID, AGGS_ID: parameter.AGGS_ID, FROM: range.begin, TO: range.end });
       if (id !== requestId.current) return;
       if (!env.success || !Array.isArray(env.data)) { setStatus(env.message || "Сервер не вернул данные архива."); return; }
       setRows(env.data);

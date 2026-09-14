@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:quality": "tsc src/lib/archiveQuality.ts --target ES2020 --module ES2020 --moduleResolution bundler --skipLibCheck --outDir .test-build && node --test tests/archiveQuality.test.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
