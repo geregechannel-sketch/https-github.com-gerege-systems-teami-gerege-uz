@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
+import ArchiveTable from "../components/ArchiveTable";
 import "../archives.css";
 import { calendarRange, dateInUTC8 } from "../lib/archiveQuality";
 import {
@@ -234,12 +235,7 @@ export default function Archives() {
             </select>}
             <p role="status" aria-live="polite">{status}</p>
             {rows && rows.length ? (
-              <table className="toshi-grid" style={{ fontSize: 12, width: "100%" }}>
-                <thead><tr>{Object.keys(rows[0]).map((c) => <th key={c}>{c}</th>)}</tr></thead>
-                <tbody>{rows.map((r, i) => (
-                  <tr key={i}>{Object.keys(rows[0]).map((c) => <td key={c}>{String(r[c] ?? "")}</td>)}</tr>
-                ))}</tbody>
-              </table>
+              <ArchiveTable rows={rows} />
             ) : sel ? (
               <div className="ptree">
                 <p>Параметры отображаются только из списка, предоставленного сервером.</p>
