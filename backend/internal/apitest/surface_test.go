@@ -55,13 +55,13 @@ func TestGeneratedEndpointsRespond(t *testing.T) {
 		}
 	}
 
-	// Archive requests must not return a generic grid as successful readings.
+	// Archive requests require explicit timezone offsets instead of a generic grid.
 	code, archive := do(t, srv, "POST", "/ec3api/v1/archives/point", tok, map[string]interface{}{
 		"POINT_ID": 1, "ML_ID": 1, "MD_ID": 1, "AGGS_ID": 1,
 		"FROM": "2026-09-01", "TO": "2026-09-02",
 	})
-	if code != 501 || archive.Success {
-		t.Fatalf("unconnected archive: code=%d success=%v", code, archive.Success)
+	if code != 400 || archive.Success {
+		t.Fatalf("invalid archive dates: code=%d success=%v", code, archive.Success)
 	}
 
 	// auth still enforced on a generated endpoint

@@ -143,7 +143,7 @@ export default function Archives() {
     const id = ++requestId.current;
     setBusy(true); setRows(null); setStatus("Загрузка архива…");
     try {
-      const env = await api.post("archives/point", { POINT_ID: sel.POINT_ID, ML_ID: parameter.ML_ID, MD_ID: parameter.MD_ID, AGGS_ID: parameter.AGGS_ID, FROM: from, TO: to });
+      const env = await api.post("archives/point", { POINT_ID: sel.POINT_ID, ML_ID: parameter.ML_ID, MD_ID: parameter.MD_ID, AGGS_ID: parameter.AGGS_ID, FROM: from + "T00:00:00+08:00", TO: iso(new Date(Date.parse(to + "T00:00:00Z") + 86400000)) + "T00:00:00+08:00" });
       if (id !== requestId.current) return;
       if (!env.success || !Array.isArray(env.data)) { setStatus(env.message || "Сервер не вернул данные архива."); return; }
       setRows(env.data);
@@ -167,7 +167,7 @@ export default function Archives() {
         <button className="ic"><IcCollapse size={15} /></button>
       </div>
 
-      <div className="aw__tools">
+      <div className="aw__tools"><span title="Результаты содержат время UTC; период выбирается в UTC+08:00">UTC+08:00</span>
         <button className="pbtn grid"><IcGrid size={16} /></button>
         <button className="pbtn" onClick={() => period("day")}>Сегодня</button>
         <button className="pbtn" onClick={() => period("week")}>Неделя</button>
