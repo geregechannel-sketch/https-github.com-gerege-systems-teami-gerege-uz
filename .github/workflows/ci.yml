@@ -56,3 +56,5 @@ jobs:
       - run: npx tsc -p tsconfig.json
       - run: npm run test:quality
       - run: npm run build
+      - run: node --test tests/preview.test.mjs
+      - run: node scripts/build-preview.mjs
