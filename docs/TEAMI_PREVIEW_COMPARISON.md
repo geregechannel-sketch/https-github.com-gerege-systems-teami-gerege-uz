@@ -15,3 +15,9 @@ Source BT/ET/READ_TIME are displayed unchanged, without assigning an unverified 
 The shared production archive table now uses understandable column labels, distinguishes zero from no data, and preserves source status columns when supplied by the API. This table does not change production storage or transport behavior. The new source page is preview-only, not a production data source.
 
 Tests reconcile the fixture count and total, check the data-only field allowlist, and server-render the shared table to verify zero/null behavior and HTML escaping. Browser visual verification remains outstanding because the remote browser cannot access the local preview. Production live sync, tariff rules, full audit protection, GIS parity and startup migration preservation remain separate unresolved work.
+
+## OpenStreetMap preview wiring
+
+The preview bundles Leaflet and defaults to OSM tiles over HTTP/HTTPS. The file:// view keeps the offline diagram. CSP allows only OSM image loading plus embedded data; API fetch/connect remains denied. Attribution and strict-origin-when-cross-origin referrer policy are retained. Only visible tiles are requested, with no bulk download. Marker tooltips use textContent.
+
+The Windows launcher locates Python 3 and runs serve_preview.py on a random loopback port, serving only the bundled HTML. Local checks verified HTML 200, traversal 404 and POST 501. Windows execution and browser rendering were unavailable to test; neither is claimed verified. Python 3 and internet are required. Production and live acquisition are unchanged.

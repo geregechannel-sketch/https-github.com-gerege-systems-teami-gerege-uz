@@ -1,5 +1,6 @@
 import { useState } from "react";
 import snapshot from "./teamiGisSnapshot.json";
+import Basemap from "./Basemap";
 
 const located = snapshot.points.filter(p => p.longitude !== null && p.latitude !== null);
 const project = (longitude: number, latitude: number) => [longitude * Math.PI / 180, Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360))];
@@ -14,6 +15,8 @@ export default function GisConnection() {
   const [selected, setSelected] = useState<number | null>(null);
   const [zoom, setZoom] = useState(1);
   const [onlyLocated, setOnlyLocated] = useState(false);
+  const webMode = location.protocol === "http:" || location.protocol === "https:";
+  const [basemap, setBasemap] = useState(webMode);
   const rows = snapshot.points.filter(p => (!onlyLocated || p.longitude !== null) && `${p.name} ${p.id}`.toLowerCase().includes(query.toLowerCase()));
   const point = snapshot.points.find(p => p.id === selected);
   const focus = point?.longitude != null ? xy(point.longitude,point.latitude!) : [500,275];
@@ -31,7 +34,10 @@ export default function GisConnection() {
     <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
       {snapshot.summary.map((r,i) => <div key={i} style={{ padding: 12, background: "#edf2f7", color: "#24344a", borderRadius: 6 }}>{r.label}: <b>{r.value ?? "—"}</b></div>)}
     </div>
-    <p>Суурь газрын зургийн зураг HAR-д хадгалагдаагүй. Доорх нь бодит координатын зураглал; зам, барилга дүрслээгүй. STATUS кодын тайлбар баталгаажаагүй тул бүх цэгийг ижил өнгөөр харуулав.</p>
+    <p>STATUS кодын тайлбар баталгаажаагүй тул цэгүүдийг ижил өнгөөр харуулна. Суурь зураг интернэтээс ачаалагдана; тоолуурын заалт шинэчлэгдэхгүй.</p>
+    <button className="toshi-btn" disabled={!webMode} onClick={()=>setBasemap(v=>!v)}>{basemap ? "Координатын зураглал" : "OpenStreetMap суурь зураг"}</button>
+    {!webMode && <p>Суурь зургийг харахын тулд ZIP-ээ задлаад START_MAP.cmd ажиллуулна. Дотоод вэб хаягаар нээгдэнэ.</p>}
+    {basemap && webMode ? <Basemap points={rows} selected={selected} onSelect={setSelected} /> : <>
     <svg viewBox={`${zoom===1?0:focus[0]-500/zoom} ${zoom===1?0:focus[1]-275/zoom} ${1000/zoom} ${550/zoom}`} role="img" aria-label={`TEAMI-ийн ${located.length} зөв координаттай объектын зураглал`} style={{ width: "100%", height: 480, background: "#eaf0f5", border: "1px solid #bbc9d5" }}>
       {Array.from({length:11},(_,i)=><line key={'v'+i} x1={i*100} y1={0} x2={i*100} y2={550} stroke="#d7e0e8" />)}
       {Array.from({length:6},(_,i)=><line key={'h'+i} x1={0} y1={i*100} x2={1000} y2={i*100} stroke="#d7e0e8" />)}
@@ -39,6 +45,7 @@ export default function GisConnection() {
         <circle cx={x} cy={y} r={(selected===p.id?10:6)/zoom} fill={selected===p.id?'#d57914':'#2375b5'} stroke="white" strokeWidth={2/zoom}/><title>{p.name} · STATUS {p.status}</title>
       </g>;})}
     </svg>
+    </>}
     <p>Хойд зүг ↑ · Хайлт цэгүүдийг шүүнэ. Цэгийг дарахад дэлгэрэнгүй нээгдэнэ; томруулах нь сонгосон цэгт төвлөрнө.</p>
     {point && <aside style={{padding:16,border:'1px solid #8caac4',marginBottom:18}}>
       <h3>{point.name}</h3><p>Объектын ID: {point.id} · Эхийн STATUS: {point.status ?? '—'}</p>

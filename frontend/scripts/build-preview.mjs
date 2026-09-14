@@ -22,7 +22,7 @@ for (const file of await readdir(path.join(dir, 'assets'))) {
     html = html.replace(/<link\b[^>]*rel="stylesheet"[^>]*>/, () => `<style>${css}</style>`);
   } else throw new Error(`Unexpected external asset: ${file}`);
 }
-html = html.replace('<head>', `<head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">`);
+html = html.replace('<head>', `<head><meta name="referrer" content="strict-origin-when-cross-origin"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: https://tile.openstreetmap.org; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">`);
 if (/<script[^>]+src=|<link[^>]+rel="stylesheet"/.test(html)) throw new Error('Preview must be self-contained');
 await writeFile(path.join(dir, 'TOSH_Preview.html'), html);
 console.log('Ready: dist-preview/TOSH_Preview.html (offline, no server connection)');
