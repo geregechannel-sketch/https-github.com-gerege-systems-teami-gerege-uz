@@ -1,14 +1,14 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// Dev proxies the API to the live server so `npm run dev` works without a local backend.
+// Development uses a local backend; production is never the default test target.
 export default defineConfig({
   plugins: [react()],
   base: "/",
   server: {
     proxy: {
-      "/ec3api": { target: "https://toshi.gerege.mn", changeOrigin: true, secure: true },
-      "/health": { target: "https://toshi.gerege.mn", changeOrigin: true, secure: true },
+      "/ec3api": { target: "http://127.0.0.1:8080", changeOrigin: true },
+      "/health": { target: "http://127.0.0.1:8080", changeOrigin: true },
     },
   },
   build: { outDir: "dist", sourcemap: false },

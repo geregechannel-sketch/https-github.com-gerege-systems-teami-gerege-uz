@@ -63,6 +63,11 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 		mux.Handle(pattern, h)
 	}
 
+	// Dedicated archive reads take precedence over generated grid placeholders.
+	archive := handlers.NewArchives(pool)
+	handle("POST "+base+"archives/point", protected(archive.Point))
+	handle("GET "+base+"measurementsarchives", protected(archive.Parameters))
+
 	// Bulk import (admin): POST /ec3api/v1/admin/import/{model}
 	mux.Handle("POST "+base+"admin/import/{model}", protected(func(w http.ResponseWriter, r *http.Request) {
 		m, ok := reg.Get(r.PathValue("model"))

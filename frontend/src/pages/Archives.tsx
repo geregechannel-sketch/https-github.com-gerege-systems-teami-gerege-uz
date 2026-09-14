@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
+import ArchiveTable from "../components/ArchiveTable";
 import "../archives.css";
+import { calendarRange, dateInUTC8 } from "../lib/archiveQuality";
 import {
   IcExpand, IcSave, IcSync, IcPlus, IcMinus, IcCollapse, IcGrid,
   IcClock, IcChevron, IcSearch, IcFunnel, IcReset, IcInfo, IcHelp, IcGear,
@@ -9,28 +11,49 @@ import {
 import { MENU_ICONS } from "../icons";
 
 type Row = Record<string, any>;
-type PNode = { n: string; c?: PNode[] };
 const iso = (d: Date) => d.toISOString().slice(0, 10);
-const ddmmyyyy = (s: string) => s.split("-").reverse().join("-");
+
 
 export default function Archives() {
+  const requestId = useRef(0);
+  const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [measurements, setMeasurements] = useState<Row[]>([]);
+  const [measurement, setMeasurement] = useState("");
   const [groups, setGroups] = useState<Row[]>([]);
   const [points, setPoints] = useState<Row[]>([]);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState<Row | null>(null);
   const [openSvc, setOpenSvc] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [from, setFrom] = useState(iso(new Date()));
-  const [to, setTo] = useState(iso(new Date()));
+  const [from, setFrom] = useState(dateInUTC8());
+  const [to, setTo] = useState(dateInUTC8());
   const [rows, setRows] = useState<Row[] | null>(null);
   const [tab, setTab] = useState("res");
-  const [paramOpen, setParamOpen] = useState<Set<string>>(new Set(["Суточный профиль: Получасовые", "Р мощность"]));
-  const [selParam, setSelParam] = useState<string>("Р мощность");
+
 
   useEffect(() => {
     api.get("groups?limit=5000").then((e) => setGroups((e.data as Row[]) || []));
     api.get("points?limit=1000").then((e) => setPoints((e.data as Row[]) || []));
   }, []);
+
+  useEffect(() => {
+    ++requestId.current;
+    let active = true;
+    setRows(null); setMeasurements([]); setMeasurement(""); setBusy(false);
+    if (!sel) { setStatus(""); return; }
+    setStatus("Загрузка доступных параметров…");
+    api.get("measurementsarchives?POINT_ID=" + encodeURIComponent(sel.POINT_ID)).then(e => {
+      if (!active) return;
+      if (!e.success || !Array.isArray(e.data)) throw new Error();
+      const valid = e.data.filter((r: Row) => [r.ML_ID, r.MD_ID, r.AGGS_ID].every(v => v != null && String(v).trim() !== ""));
+      setMeasurements(valid);
+      setStatus(valid.length ? "Выберите параметр архива" : "Сервер не предоставил параметры архива для этой точки.");
+    }).catch(() => { if (active) setStatus("Не удалось получить параметры архива."); });
+    return () => { active = false; ++requestId.current; };
+  }, [sel]);
+
+  function clearResult() { ++requestId.current; setRows(null); setBusy(false); setStatus(""); }
 
   // Build the group tree (children + points per group). Roots = groups whose
   // parent is null/absent from the set; skip system groups so only the topology
@@ -109,48 +132,29 @@ export default function Archives() {
     );
   }
 
-  const PARAM_TREE: PNode[] = [
-    {
-      n: "Суточный профиль: Получасовые",
-      c: [
-        { n: "Р мощность", c: [{ n: "Средняя Р+ мощность за 30 минут" }, { n: "Средняя Р- мощность за 30 минут" }] },
-        { n: "Q мощность", c: [{ n: "Средняя Q+ мощность за 30 минут" }, { n: "Средняя Q- мощность за 30 минут" }] },
-      ],
-    },
-    { n: "Суточные данные: Суточные", c: [{ n: "Активная энергия A+" }, { n: "Активная энергия A-" }, { n: "Реактивная энергия R+" }, { n: "Реактивная энергия R-" }] },
-    { n: "Нарастающие показания: Суточные", c: [{ n: "Показание A+" }, { n: "Показание A-" }] },
-    { n: "Нарастающие показания: Месячные", c: [{ n: "Показание A+" }, { n: "Показание A-" }] },
-    { n: "Мгновенные данные: Мгновенные", c: [{ n: "Напряжение" }, { n: "Ток" }, { n: "Cos φ" }] },
-  ];
-  function toggleParam(n: string) {
-    setParamOpen((e) => { const s = new Set(e); s.has(n) ? s.delete(n) : s.add(n); return s; });
-  }
-  function ParamNode({ node, depth }: { node: PNode; depth: number }) {
-    const has = !!node.c?.length;
-    const open = paramOpen.has(node.n);
-    return (
-      <>
-        <div className="pnode" style={{ paddingLeft: 8 + depth * 20 }}>
-          {has ? <span className="pw" onClick={() => toggleParam(node.n)}>{open ? "−" : "+"}</span> : <span className="pw pw--leaf" />}
-          {depth === 0 ? <span className="pdots">●○</span> : <span className="pbolt">⚡</span>}
-          <span className={"plabel" + (selParam === node.n ? " sel" : "")} onClick={() => setSelParam(node.n)}>{node.n}</span>
-        </div>
-        {has && open && node.c!.map((c, i) => <ParamNode key={i} node={c} depth={depth + 1} />)}
-      </>
-    );
-  }
-
   function period(kind: "day" | "week" | "month" | "year") {
-    const now = new Date(), f = new Date();
-    if (kind === "week") f.setDate(now.getDate() - 7);
-    if (kind === "month") f.setMonth(now.getMonth() - 1);
-    if (kind === "year") f.setFullYear(now.getFullYear() - 1);
-    setFrom(iso(f)); setTo(iso(now));
+    const now = new Date(dateInUTC8() + "T00:00:00Z"), f = new Date(now);
+    if (kind === "week") f.setUTCDate(now.getUTCDate() - 7);
+    if (kind === "month") f.setUTCMonth(now.getUTCMonth() - 1);
+    if (kind === "year") f.setUTCFullYear(now.getUTCFullYear() - 1);
+    clearResult(); setFrom(iso(f)); setTo(iso(now));
   }
   async function view() {
-    if (!sel) return;
-    const env = await api.post("archives/point", { POINT_ID: sel.POINT_ID, ML_ID: 1, MD_ID: 1, AGGS_ID: 1, FROM: from, TO: to });
-    setRows((env.data as Row[]) || []);
+    const parameter = measurements[Number(measurement)];
+    if (!sel || measurement === "" || !parameter) return;
+    if (!from || !to || from > to) { setStatus("Проверьте начало и конец периода."); return; }
+    let range: ReturnType<typeof calendarRange>;
+    try { range = calendarRange(from, to); } catch (e) { setStatus((e as Error).message); return; }
+    const id = ++requestId.current;
+    setBusy(true); setRows(null); setStatus("Загрузка архива…");
+    try {
+      const env = await api.post("archives/point", { POINT_ID: sel.POINT_ID, ML_ID: parameter.ML_ID, MD_ID: parameter.MD_ID, AGGS_ID: parameter.AGGS_ID, FROM: range.begin, TO: range.end });
+      if (id !== requestId.current) return;
+      if (!env.success || !Array.isArray(env.data)) { setStatus(env.message || "Сервер не вернул данные архива."); return; }
+      setRows(env.data);
+      setStatus(env.data.length ? `Получено строк: ${env.data.length}` : "За выбранный период данные не найдены.");
+    } catch { if (id === requestId.current) setStatus("Ошибка связи при загрузке архива."); }
+    finally { if (id === requestId.current) setBusy(false); }
   }
 
   return (
@@ -168,16 +172,16 @@ export default function Archives() {
         <button className="ic"><IcCollapse size={15} /></button>
       </div>
 
-      <div className="aw__tools">
+      <div className="aw__tools"><span title="Результаты содержат время UTC; период выбирается в UTC+08:00">UTC+08:00</span>
         <button className="pbtn grid"><IcGrid size={16} /></button>
         <button className="pbtn" onClick={() => period("day")}>Сегодня</button>
         <button className="pbtn" onClick={() => period("week")}>Неделя</button>
         <button className="pbtn" onClick={() => period("month")}>Месяц</button>
         <button className="pbtn" onClick={() => period("year")}>Год</button>
         <span className="sp" />
-        <input className="adate" type="text" value={ddmmyyyy(from)} readOnly />
+        <input className="adate" type="date" aria-label="Начало периода" value={from} onChange={e => { clearResult(); setFrom(e.target.value); }} />
         <span>—</span>
-        <input className="adate" type="text" value={ddmmyyyy(to)} readOnly />
+        <input className="adate" type="date" aria-label="Конец периода" value={to} onChange={e => { clearResult(); setTo(e.target.value); }} />
       </div>
 
       <div className="aw__body">
@@ -225,16 +229,16 @@ export default function Archives() {
             ))}
           </div>
           <div className="apane__content">
+            {sel && <select aria-label="Параметр архива" value={measurement} onChange={e => { clearResult(); setMeasurement(e.target.value); }}>
+              <option value="">Выберите доступный параметр</option>
+              {measurements.map((m, i) => <option key={i} value={i}>{m.ML_NAME || `ML ${m.ML_ID}`} / MD {m.MD_ID} / AGGS {m.AGGS_ID}</option>)}
+            </select>}
+            <p role="status" aria-live="polite">{status}</p>
             {rows && rows.length ? (
-              <table className="toshi-grid" style={{ fontSize: 12, width: "100%" }}>
-                <thead><tr>{Object.keys(rows[0]).map((c) => <th key={c}>{c}</th>)}</tr></thead>
-                <tbody>{rows.map((r, i) => (
-                  <tr key={i}>{Object.keys(rows[0]).map((c) => <td key={c}>{String(r[c] ?? "")}</td>)}</tr>
-                ))}</tbody>
-              </table>
+              <ArchiveTable rows={rows} />
             ) : sel ? (
               <div className="ptree">
-                {PARAM_TREE.map((n, i) => <ParamNode key={i} node={n} depth={0} />)}
+                <p>Параметры отображаются только из списка, предоставленного сервером.</p>
               </div>
             ) : (
               <div className="aempty">
@@ -248,8 +252,8 @@ export default function Archives() {
 
       <div className="aw__actions">
         <button className="abtn green"><IcGear size={15} color="#fff" /> Настройки</button>
-        <button className="abtn blue" onClick={view} disabled={!sel}><IcEye size={15} color="#fff" /> Просмотр</button>
-        <button className="abtn blue" onClick={view} disabled={!sel}><IcEye size={15} color="#fff" /> Просмотр (гр.)</button>
+        <button className="abtn blue" onClick={view} disabled={!sel || measurement === "" || busy}><IcEye size={15} color="#fff" /> Просмотр</button>
+        <button className="abtn blue" disabled title="График будет доступен после подключения временного ряда"><IcEye size={15} color="#fff" /> Просмотр (гр.)</button>
       </div>
     </div>
   );

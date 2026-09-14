@@ -35,6 +35,13 @@ func (h *Handler) canRead(r *http.Request, m *Model) bool {
 }
 
 func (h *Handler) canWrite(r *http.Request, m *Model) bool {
+	// Audit evidence is never writable through generic CRUD or bulk import,
+	// including by wildcard administrators. Dedicated append paths are separate.
+	switch m.Name {
+	case "audit", "audit_files", "user_sessions":
+		return false
+	}
+
 	c, ok := auth.FromContext(r.Context())
 	return ok && c.Has(m.WritePriv)
 }
@@ -389,6 +396,26 @@ func normalize(v interface{}) interface{} {
 // If the base has no table (virtual or unknown), it returns an empty envelope so
 // the endpoint still exists, authenticates and enforces RBAC.
 func (h *Handler) SubAction(w http.ResponseWriter, r *http.Request, base *Model) {
+	// Archive actions need a dedicated time-series implementation. A generic grid
+	// ignores the requested point/period and must never masquerade as an archive.
+	if base != nil && base.Name == "archives" {
+		if _, ok := auth.FromContext(r.Context()); !ok {
+			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
+			return
+		}
+		httpx.Fail(w, http.StatusNotImplemented, "Архивный источник ещё не подключён. Данные не получены.")
+		return
+	}
+
+	if base != nil && base.Name == "tarifflists" {
+		if _, ok := auth.FromContext(r.Context()); !ok {
+			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
+			return
+		}
+		httpx.Fail(w, http.StatusNotImplemented, "Правила и расчет тарифов не реализованы. Проверка не выполнена.")
+		return
+	}
+
 	if base == nil {
 		if _, ok := auth.FromContext(r.Context()); !ok {
 			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
