@@ -35,6 +35,13 @@ func (h *Handler) canRead(r *http.Request, m *Model) bool {
 }
 
 func (h *Handler) canWrite(r *http.Request, m *Model) bool {
+	// Audit evidence is never writable through generic CRUD or bulk import,
+	// including by wildcard administrators. Dedicated append paths are separate.
+	switch m.Name {
+	case "audit", "audit_files", "user_sessions":
+		return false
+	}
+
 	c, ok := auth.FromContext(r.Context())
 	return ok && c.Has(m.WritePriv)
 }
