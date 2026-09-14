@@ -389,6 +389,17 @@ func normalize(v interface{}) interface{} {
 // If the base has no table (virtual or unknown), it returns an empty envelope so
 // the endpoint still exists, authenticates and enforces RBAC.
 func (h *Handler) SubAction(w http.ResponseWriter, r *http.Request, base *Model) {
+	// Archive actions need a dedicated time-series implementation. A generic grid
+	// ignores the requested point/period and must never masquerade as an archive.
+	if base != nil && base.Name == "archives" {
+		if _, ok := auth.FromContext(r.Context()); !ok {
+			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
+			return
+		}
+		httpx.Fail(w, http.StatusNotImplemented, "Архивный источник ещё не подключён. Данные не получены.")
+		return
+	}
+
 	if base == nil {
 		if _, ok := auth.FromContext(r.Context()); !ok {
 			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
