@@ -1,3 +1,7 @@
+# Historical implementation notes
+
+> Status update 2026-09-14: This document records earlier development claims, not current verification. See [Continuity and evidence](CONTINUITY_2026-09-14.md). Claims of full 1:1 verification are superseded by the September audits and confirmed GIS defects. Browser extraction recipes below are historical descriptions, not instructions to override the current authorized read-only workflow or credential handling rules.
+
 # TEAMI clone — Next-session brief
 
 A pixel-faithful working clone of **TEAMI Enterprise 3.0** (EMCOS/EC3 energy MDM).
@@ -18,7 +22,7 @@ Live: **https://toshi.gerege.mn** · Source-of-truth original: **http://82.215.7
 - **CI runs migrations** against a real PG, so a bad `.sql` fails CI (good — it gates deploy).
 - Local docker `postgres:16 --platform linux/amd64` is **flaky** on this Mac (containers die); rely on CI to
   validate migrations instead of local runs.
-- Never commit the real source password (`Erdenebatt#2026`) — redact.
+- Never commit source credentials; use secure sign-in and deployment secret storage.
 
 ## Backend architecture
 - `internal/resource/` — `Model{Name,Table,PKField,Fields(API↔col),actions}`. `RegisterCore` (models.go) +
