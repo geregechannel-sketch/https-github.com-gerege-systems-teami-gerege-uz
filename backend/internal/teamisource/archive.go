@@ -1,5 +1,5 @@
 // Package teamisource handles the observed TEAMI archive contract.
-// It performs no network, authentication or database operations.
+// Network and authentication are supplied separately by the integration host.
 package teamisource
 
 import (
