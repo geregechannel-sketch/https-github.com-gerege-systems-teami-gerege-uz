@@ -43,40 +43,22 @@ CREATE TABLE IF NOT EXISTS audit_log (
   aud_id BIGSERIAL PRIMARY KEY, aud_time TIMESTAMPTZ NOT NULL,
   aud_user TEXT, aud_object TEXT, aud_action TEXT, aud_detail TEXT
 );
-TRUNCATE audit_log RESTART IDENTITY;
-INSERT INTO audit_log (aud_time, aud_user, aud_object, aud_action, aud_detail)
-SELECT now() - (g * interval '3 hours'),
-       (ARRAY['erdenebatt','admin','operator'])[1+(g%3)],
-       (ARRAY['points','meters','groups','reports','users'])[1+(g%5)],
-       (ARRAY['CREATE','UPDATE','DELETE','LOGIN','EXPORT'])[1+(g%5)],
-       'Запись изменена пользователем'
-FROM generate_series(0,59) g;
+-- Preserve existing records; never seed synthetic audit_log entries.
+
 
 CREATE TABLE IF NOT EXISTS audit_files (
   af_id BIGSERIAL PRIMARY KEY, af_time TIMESTAMPTZ NOT NULL,
   af_user TEXT, af_file TEXT, af_action TEXT, af_size BIGINT
 );
-TRUNCATE audit_files RESTART IDENTITY;
-INSERT INTO audit_files (af_time, af_user, af_file, af_action, af_size)
-SELECT now() - (g * interval '5 hours'),
-       (ARRAY['erdenebatt','admin'])[1+(g%2)],
-       'report_'||to_char(now() - (g*interval '5 hours'),'YYYYMMDD')||'.xlsx',
-       (ARRAY['UPLOAD','DOWNLOAD','DELETE'])[1+(g%3)],
-       10240 + (g*137)%900000
-FROM generate_series(0,39) g;
+-- Preserve existing records; never seed synthetic audit_files entries.
+
 
 CREATE TABLE IF NOT EXISTS user_sessions (
   us_id BIGSERIAL PRIMARY KEY, us_user TEXT, us_login TIMESTAMPTZ,
   us_logout TIMESTAMPTZ, us_ip TEXT, us_agent TEXT
 );
-TRUNCATE user_sessions RESTART IDENTITY;
-INSERT INTO user_sessions (us_user, us_login, us_logout, us_ip, us_agent)
-SELECT (ARRAY['erdenebatt','admin','operator'])[1+(g%3)],
-       now() - (g*interval '7 hours'),
-       now() - (g*interval '7 hours') + interval '45 minutes',
-       '10.0.0.'||(2+(g%40)),
-       (ARRAY['Chrome/128','Firefox/130','Edge/128'])[1+(g%3)]
-FROM generate_series(0,44) g;
+-- Preserve existing records; never seed synthetic user_sessions entries.
+
 
 -- ===================== Статистика связи =====================
 CREATE TABLE IF NOT EXISTS src_statistics (

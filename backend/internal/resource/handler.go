@@ -407,6 +407,15 @@ func (h *Handler) SubAction(w http.ResponseWriter, r *http.Request, base *Model)
 		return
 	}
 
+	if base != nil && base.Name == "tarifflists" {
+		if _, ok := auth.FromContext(r.Context()); !ok {
+			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
+			return
+		}
+		httpx.Fail(w, http.StatusNotImplemented, "Правила и расчет тарифов не реализованы. Проверка не выполнена.")
+		return
+	}
+
 	if base == nil {
 		if _, ok := auth.FromContext(r.Context()); !ok {
 			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
