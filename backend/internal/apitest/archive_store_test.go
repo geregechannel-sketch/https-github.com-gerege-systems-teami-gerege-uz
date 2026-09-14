@@ -2,6 +2,9 @@ package apitest
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -30,6 +33,18 @@ func TestArchiveStoreIsAtomicAndIdempotent(t *testing.T) {
 	second, err := teamisource.Store(ctx, pool, request, mapping, []byte(sourceBatch))
 	if err != nil || second.Inserted != 0 || second.Unchanged != 2 || second.Receipt != first.Receipt {
 		t.Fatalf("replay: %+v %v", second, err)
+	}
+	source := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("st-token") != "fixture-only" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		io.WriteString(w, sourceBatch)
+	}))
+	defer source.Close()
+	pulled, err := teamisource.PullAndStore(ctx, pool, source.URL+"/ec3api/v1/archives/point", "fixture-only", request, mapping)
+	if err != nil || pulled.Unchanged != 2 || pulled.Inserted != 0 || pulled.Receipt != first.Receipt {
+		t.Fatalf("HTTP pull to transactional storage: %+v %v", pulled, err)
 	}
 	var value string
 	var begin time.Time
