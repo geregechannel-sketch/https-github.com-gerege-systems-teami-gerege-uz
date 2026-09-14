@@ -59,4 +59,5 @@ jobs:
       - run: npm run build
       - run: node --test tests/preview.test.mjs
       - run: node --test tests/sourceComparison.test.mjs
+      - run: node --test tests/gisSnapshot.test.mjs
       - run: node scripts/build-preview.mjs
