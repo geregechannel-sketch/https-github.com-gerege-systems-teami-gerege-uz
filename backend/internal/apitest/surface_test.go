@@ -47,7 +47,7 @@ func TestGeneratedEndpointsRespond(t *testing.T) {
 	}
 
 	// generated sub-actions respond with the envelope (methods per the model config)
-	subs := [][2]string{{"GET", "pointmenuv2/top_gr"}, {"POST", "archives/point"}, {"POST", "bga/execute"}}
+	subs := [][2]string{{"GET", "pointmenuv2/top_gr"}, {"POST", "bga/execute"}}
 	for _, s := range subs {
 		code, r := do(t, srv, s[0], "/ec3api/v1/"+s[1], tok, map[string]interface{}{})
 		if code != 200 || !r.Success {
@@ -55,8 +55,17 @@ func TestGeneratedEndpointsRespond(t *testing.T) {
 		}
 	}
 
+	// Archive requests must not return a generic grid as successful readings.
+	code, archive := do(t, srv, "POST", "/ec3api/v1/archives/point", tok, map[string]interface{}{
+		"POINT_ID": 1, "ML_ID": 1, "MD_ID": 1, "AGGS_ID": 1,
+		"FROM": "2026-09-01", "TO": "2026-09-02",
+	})
+	if code != 501 || archive.Success {
+		t.Fatalf("unconnected archive: code=%d success=%v", code, archive.Success)
+	}
+
 	// auth still enforced on a generated endpoint
-	code, _ := do(t, srv, "GET", "/ec3api/v1/channels", "", nil)
+	code, _ = do(t, srv, "GET", "/ec3api/v1/channels", "", nil)
 	if code != 401 {
 		t.Fatalf("expected 401 without token on generated endpoint, got %d", code)
 	}
