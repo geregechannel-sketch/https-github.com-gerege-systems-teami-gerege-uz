@@ -19,6 +19,43 @@
   font-weight: 500;
 }
 .cw__head .sp { flex: 1; }
+.cw__refresh,
+.cw__foot-icon {
+  width: 26px;
+  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.14);
+  color: inherit;
+  cursor: pointer;
+}
+.cw__foot-icon {
+  width: 24px;
+  background: var(--btnBlueBg);
+  color: #fff;
+}
+.cw__foot-icon:disabled { opacity: 0.45; cursor: default; }
+.cw__message {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  color: #fff;
+  font-size: 12px;
+}
+.cw__message.error { background: var(--btnRedBg); }
+.cw__message.success { background: var(--btnGreenBg); }
+.cw__message button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
 .cw__body {
   flex: 1;
   display: grid;
@@ -88,6 +125,59 @@
 .tree__group { padding: 4px 8px; font-weight: 600; font-size: 12px; cursor: pointer; }
 .tree__empty { text-align: center; color: var(--treeEmptyColor); padding: 40px 0; }
 
+.point-tree__criterion { min-width: 122px; padding: 0 6px; }
+.point-tree__search {
+  flex: 1;
+  min-width: 110px;
+  padding: 0 8px;
+  text-align: left;
+}
+.point-tree__group,
+.point-tree__point,
+.point-tree__orphan button {
+  width: 100%;
+  min-height: 27px;
+  border: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--gridTextColor);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.point-tree__group:hover,
+.point-tree__point:hover,
+.point-tree__orphan button:hover { background: var(--rowHoverBg); }
+.point-tree__group i {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 3px;
+  background: var(--btnGreenBg);
+  color: #fff;
+  font-style: normal;
+}
+.point-tree__toggle { width: 10px; flex: 0 0 10px; font-weight: 700; }
+.point-tree__group b,
+.point-tree__point span:nth-child(2) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.point-tree__point.sel { background: var(--rowSelectedBg); color: #fff; }
+.point-tree__point small { margin-left: auto; padding-right: 8px; opacity: 0.62; }
+.point-tree__bolt { color: var(--btnGreenBg); font-weight: 800; }
+.point-tree__point.sel .point-tree__bolt { color: #fff; }
+.point-tree__orphan > b { display: block; padding: 6px 9px; font-size: 12px; }
+.point-tree__orphan button { padding-left: 31px; }
+.point-tree__clear { padding: 0 10px; }
+
 .pane__foot {
   display: flex;
   align-items: center;
@@ -156,10 +246,29 @@
 .cbtn:disabled { opacity: 0.5; cursor: default; }
 
 .acc {
+  width: 100%;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
   background: var(--panelAccordionHeadBg);
   color: #fff;
   padding: 7px 12px;
   font-size: 12px;
+  text-align: left;
   border-top: 1px solid var(--borderColor);
   cursor: pointer;
+}
+
+.cw__related { overflow: auto; padding: 6px; }
+.cw__related table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.cw__related th,
+.cw__related td { border: 1px solid var(--borderColor); padding: 5px 7px; text-align: left; }
+.cw__related th { background: var(--wellBg); }
+.cw__related-empty { padding: 12px; font-size: 12px; color: var(--treeEmptyColor); }
+
+@media (max-width: 900px) {
+  .cw { height: auto; min-height: calc(100vh - 106px); overflow: visible; }
+  .cw__body { grid-template-columns: 1fr; }
+  .pane { min-height: 440px; }
+  .frow { grid-template-columns: minmax(130px, 38%) 1fr; }
 }

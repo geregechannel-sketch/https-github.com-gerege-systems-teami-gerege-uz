@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { IcExpand, IcInfo, IcPlus, IcSave, IcSearch, IcSync } from "../icons";
 import "../meter-registry.css";
@@ -38,14 +39,16 @@ function apiMessage(message: string | undefined) {
 }
 
 export default function Meters() {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [meterTypeID, setMeterTypeID] = useState("");
   const [mountState, setMountState] = useState("");
-  const [filters, setFilters] = useState({ search: "", meterTypeID: "", mountState: "" });
+  const [filters, setFilters] = useState({ search: initialSearch, meterTypeID: "", mountState: "" });
   const [selectedID, setSelectedID] = useState<number | null>(null);
   const [editing, setEditing] = useState<Row | null>(null);
   const [loading, setLoading] = useState(false);

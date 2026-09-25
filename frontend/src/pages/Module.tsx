@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 
 type Row = Record<string, any>;
@@ -10,8 +10,12 @@ function pkField(cols: string[]): string | undefined {
 
 export default function Module() {
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const baseModel = params.model || "";
   const model = params["*"] ? `${baseModel}/${params["*"]}` : baseModel;
+  const urlFilterCol = searchParams.get("filter") || "";
+  const urlFilterVal = searchParams.get("value") || "";
+  const urlFilterExact = searchParams.get("exact") === "1";
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [limit] = useState(50);
@@ -20,8 +24,13 @@ export default function Module() {
   const [error, setError] = useState("");
   const [sel, setSel] = useState<Row | null>(null);
   const [editing, setEditing] = useState<Row | null>(null);
-  const [filterCol, setFilterCol] = useState("");
-  const [filterVal, setFilterVal] = useState("");
+  const [filterCol, setFilterCol] = useState(urlFilterCol);
+  const [filterVal, setFilterVal] = useState(urlFilterVal);
+  const [appliedFilter, setAppliedFilter] = useState({
+    col: urlFilterCol,
+    val: urlFilterVal,
+    exact: urlFilterExact,
+  });
 
   const cols = useMemo(() => (rows[0] ? Object.keys(rows[0]) : []), [rows]);
   const pk = useMemo(() => pkField(cols), [cols]);
@@ -32,11 +41,18 @@ export default function Module() {
     setSel(null);
     setEditing(null);
     let env;
-    if (filterCol && filterVal) {
+    if (appliedFilter.col && appliedFilter.val) {
+      const numericValue = Number(appliedFilter.val);
       env = await api.post(`${model}/query`, {
         limit,
         offset,
-        filters: [{ c: filterCol, p: "ilike", v: `%${filterVal}%` }],
+        filters: [{
+          c: appliedFilter.col,
+          p: appliedFilter.exact ? "=" : "ilike",
+          v: appliedFilter.exact && Number.isFinite(numericValue)
+            ? numericValue
+            : `%${appliedFilter.val}%`,
+        }],
       });
     } else {
       env = await api.get(`${model}?limit=${limit}&offset=${offset}`);
@@ -50,17 +66,29 @@ export default function Module() {
       setRows([]);
       setTotal(0);
     }
-  }, [model, limit, offset, filterCol, filterVal]);
+  }, [model, limit, offset, appliedFilter]);
 
   useEffect(() => {
     setOffset(0);
-    setFilterCol("");
-    setFilterVal("");
-  }, [model]);
+    setFilterCol(urlFilterCol);
+    setFilterVal(urlFilterVal);
+    setAppliedFilter({ col: urlFilterCol, val: urlFilterVal, exact: urlFilterExact });
+  }, [model, urlFilterCol, urlFilterVal, urlFilterExact]);
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [model, offset]);
+  }, [load]);
+
+  function applyFilter() {
+    setOffset(0);
+    setAppliedFilter({ col: filterCol, val: filterVal.trim(), exact: false });
+  }
+
+  function resetFilter() {
+    setFilterCol("");
+    setFilterVal("");
+    setOffset(0);
+    setAppliedFilter({ col: "", val: "", exact: false });
+  }
 
   async function save() {
     if (!editing) return;
@@ -101,6 +129,7 @@ export default function Module() {
         <div style={{ flex: 1 }} />
         <select className="toshi-select" value={filterCol} onChange={(e) => setFilterCol(e.target.value)}>
           <option value="">— шүүлт багана —</option>
+          {filterCol && !cols.includes(filterCol) && <option value={filterCol}>{filterCol}</option>}
           {cols.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
@@ -110,10 +139,13 @@ export default function Module() {
           placeholder="Утга"
           value={filterVal}
           onChange={(e) => setFilterVal(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && (setOffset(0), load())}
+          onKeyDown={(e) => e.key === "Enter" && applyFilter()}
         />
-        <button className="toshi-btn toshi-btn--blue" onClick={() => (setOffset(0), load())}>
+        <button className="toshi-btn toshi-btn--blue" onClick={applyFilter}>
           Найти
+        </button>
+        <button className="toshi-btn" disabled={!appliedFilter.col && !appliedFilter.val} onClick={resetFilter}>
+          Сбросить
         </button>
         <button
           className="toshi-btn toshi-btn--green"
@@ -164,7 +196,7 @@ export default function Module() {
               ‹ Назад
             </button>
             <span style={{ fontSize: 12, opacity: 0.7 }}>
-              {offset + 1}–{Math.min(offset + limit, total)} / {total}
+              {total ? `${offset + 1}–${Math.min(offset + limit, total)} / ${total}` : "0 / 0"}
             </span>
             <button className="toshi-btn" disabled={offset + limit >= total} onClick={() => setOffset(offset + limit)}>
               Вперед ›

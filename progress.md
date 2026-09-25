@@ -91,3 +91,13 @@
 - Rebuilt sidebar as cascading hover FLYOUT menu (nested), matching real TEAMI; header uses real TOSH logo centered + right icon cluster.
 - 0004 dedup fixed duplicated seeded dictionaries.
 - Verified live: /m/points shows real 87 points; flyout submenu opens on hover.
+
+## Session 3 — Final module completion + topology E2E (2026-09-25)
+- Added bespoke domain APIs and screens for readings, event register, reports, telesignals, schemes, load control,
+  quality reports and meter registry; preserved the TOSH shell and dashboard advantages.
+- Rebuilt `/m/points` around the real recursive group topology. Added root filtering, code/name search, group and
+  recipient/category editing, related profile/tariff data, and point-context links to measurements and meters.
+- Fixed generic Module filtering so Apply uses the submitted value, URL exact filters work, and empty result
+  pagination/filter labels remain correct.
+- Made Vite's dev API proxy configurable with `VITE_API_PROXY` while retaining the live server as the default.
+- Verified with a production frontend build, Go 1.26 backend tests, and a local PostgreSQL/API browser E2E run.

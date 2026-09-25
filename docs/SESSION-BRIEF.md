@@ -60,12 +60,20 @@ Live: **https://toshi.gerege.mn** · Source-of-truth original: **http://82.215.7
 - CSS `:hover` flyouts can't be opened by synthetic mouse events — screenshot after a real click, or set
   `display:block` via JS to inspect.
 
-## What's next (open items)
-- Points config screen (`/m/points`) tree is still flat — could get the same deep group tree as Archives.
-- Deep menu-leaf grids show **synthetic** seed data (event logs, stats, audit) — fine as demo, not real.
-- Archives system-filter groups without seeded children are expandable-empty (real content is a live query).
-- Other module screens (Качество показаний, Регистр событий sub-screens, Отчеты, Телесигналы, Схемы,
-  Управление нагрузкой) still use the generic Module grid — build bespoke 1:1 pages as the user requests them.
-- Workflow when user sends a screenshot: open the real screen in the source tab, compare click-by-click,
-  copy the REAL structure/data (don't invent), seed via migration, wire the frontend, deploy, verify by
-  screenshot.
+## Completion status (2026-09-25)
+- `/m/points` now uses the same deep topology model as Archives, including root selection, recursive groups,
+  code/name search, group assignment, recipient/category data, profile/tariff expansion, and filtered links to
+  point measurements, reading points, transformation coefficients, and the meter registry.
+- Bespoke end-to-end screens now cover reading collection, quality reports, every event category, report
+  viewer/automation/run log, telesignal registry/history/control, scheme viewer, load control, and meter registry.
+- Generic Module filtering accepts URL-provided exact filters and correctly reapplies user filters; point actions
+  preserve their selected point context across modules.
+- Frontend production build and backend Go 1.26 tests pass. A local PostgreSQL/API + Vite E2E run verified the
+  topology expansion, point search/detail, related-data query, filtered module navigation, and meter lookup.
+
+## Known data boundary
+- Deep event/statistics/audit rows remain deterministic seed data where the source deployment did not expose an
+  exportable historical dataset. The workflows and response contracts are implemented; production history must
+  come from an authorized source export.
+- The uncaptured long tail of generated endpoints preserves the documented method, parameter, auth, envelope,
+  CRUD and grid contracts. Domain-specific side effects cannot be claimed without source behavior evidence.
