@@ -48,12 +48,18 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 		if _, err := pool.Exec(ctx, string(b)); err != nil {
 			return fmt.Errorf("migration %s: %w", f, err)
 		}
+		// Feature seeds in later migrations reference the demo point. Create it
+		// after the core dictionaries exist and before those migrations run.
+		if f == "0002_seed.sql" {
+			if err := seedDemoTree(ctx, pool); err != nil {
+				return fmt.Errorf("seed demo tree: %w", err)
+			}
+		}
 	}
 	return nil
 }
 
 // SeedAdmin ensures a default admin user exists (bcrypt password). Idempotent.
-// Also seeds a small demo tree (Mongolia > Choibalsan) with a point + meter.
 func SeedAdmin(ctx context.Context, pool *pgxpool.Pool, username, password string) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -65,8 +71,12 @@ func SeedAdmin(ctx context.Context, pool *pgxpool.Pool, username, password strin
 		ON CONFLICT (user_name) DO NOTHING`, username, string(hash)); err != nil {
 		return err
 	}
+	return seedDemoTree(ctx, pool)
+}
 
-	// Demo group tree + one point + one meter mounting (only if points empty).
+// seedDemoTree adds the minimal topology needed by feature migrations and the
+// local demo. Existing or imported installations are left untouched.
+func seedDemoTree(ctx context.Context, pool *pgxpool.Pool) error {
 	var n int
 	if err := pool.QueryRow(ctx, `SELECT count(*) FROM points`).Scan(&n); err != nil {
 		return err
@@ -74,7 +84,7 @@ func SeedAdmin(ctx context.Context, pool *pgxpool.Pool, username, password strin
 	if n > 0 {
 		return nil
 	}
-	_, err = pool.Exec(ctx, `
+	_, err := pool.Exec(ctx, `
 		WITH country AS (
 			INSERT INTO groups (gr_code, gr_name, gr_type_id, is_public)
 			VALUES ('MN','Монголия',(SELECT gr_type_id FROM group_types WHERE gr_type_code='COUNTRY'),1)
