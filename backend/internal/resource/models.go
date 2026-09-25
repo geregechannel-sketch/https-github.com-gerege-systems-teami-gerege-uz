@@ -113,6 +113,7 @@ func RegisterCore(r *Registry) {
 			f("DP_TYPE_ID", "dp_type_id", true, false),
 			f("DP_ENABLED", "dp_enabled", true, false),
 			f("DP_DELETED", "dp_deleted", true, false),
+			f("DP_INTERNAL", "dp_internal", true, false),
 			f("POINT_ID", "point_id", true, false),
 		},
 	})
@@ -125,6 +126,14 @@ func RegisterCore(r *Registry) {
 		Fields: []Field{
 			f("EV_TIME", "ev_time", false, false),
 			f("EVC_ID", "evc_id", false, false),
+			f("EV_PRIORITY", "ev_priority", false, false),
+			f("EV_LAST_TIME", "ev_last_time", false, false),
+			f("EV_POINT_NAME", "ev_point_name", false, false),
+			f("EV_SOURCE", "ev_source", false, false),
+			f("EV_SOURCE_TYPE", "ev_source_type", false, false),
+			f("EV_CHANNEL", "ev_channel", false, false),
+			f("EV_COUNT", "ev_count", false, false),
+			f("EV_ACKNOWLEDGED", "ev_acknowledged", false, false),
 			f("MDL_ID", "mdl_id", false, false),
 			f("DAS_ID", "das_id", false, false),
 			f("DP_ID", "dp_id", false, false),

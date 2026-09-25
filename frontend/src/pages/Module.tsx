@@ -9,7 +9,9 @@ function pkField(cols: string[]): string | undefined {
 }
 
 export default function Module() {
-  const { model = "" } = useParams();
+  const params = useParams();
+  const baseModel = params.model || "";
+  const model = params["*"] ? `${baseModel}/${params["*"]}` : baseModel;
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [limit] = useState(50);

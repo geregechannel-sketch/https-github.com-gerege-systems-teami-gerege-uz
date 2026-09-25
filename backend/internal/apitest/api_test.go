@@ -178,6 +178,323 @@ func TestDashboard(t *testing.T) {
 	}
 }
 
+func TestReadingsEndToEnd(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+
+	code, filterResp := do(t, srv, "GET", "/ec3api/v1/readings/filter", tok, nil)
+	if code != http.StatusOK || !filterResp.Success {
+		t.Fatalf("reading filter failed: %d %s", code, filterResp.Message)
+	}
+	var filter struct {
+		Points []struct {
+			PointID int64 `json:"POINT_ID"`
+		} `json:"points"`
+	}
+	if err := json.Unmarshal(filterResp.Data, &filter); err != nil || len(filter.Points) == 0 {
+		t.Fatalf("reading filter did not return points: %v", err)
+	}
+
+	body := map[string]interface{}{
+		"point_ids":  []int64{filter.Points[0].PointID},
+		"parameters": []string{"A_PLUS", "VOLTAGE"},
+		"from":       "2026-09-23", "to": "2026-09-23", "action": "COLLECT",
+	}
+	code, taskResp := do(t, srv, "POST", "/ec3api/v1/readings/tasks", tok, body)
+	if code != http.StatusOK || !taskResp.Success {
+		t.Fatalf("reading task failed: %d %s", code, taskResp.Message)
+	}
+
+	code, queryResp := do(t, srv, "POST", "/ec3api/v1/readings/query", tok, body)
+	if code != http.StatusOK || !queryResp.Success {
+		t.Fatalf("reading query failed: %d %s", code, queryResp.Message)
+	}
+	var result struct {
+		Rows  []map[string]interface{} `json:"rows"`
+		Total int                      `json:"total"`
+	}
+	if err := json.Unmarshal(queryResp.Data, &result); err != nil || result.Total == 0 || len(result.Rows) == 0 {
+		t.Fatalf("reading query did not return collected data: total=%d err=%v", result.Total, err)
+	}
+
+	code, jobsResp := do(t, srv, "GET", "/ec3api/v1/readings/jobs", tok, nil)
+	if code != http.StatusOK || !jobsResp.Success || jobsResp.TotalCount == nil || *jobsResp.TotalCount == 0 {
+		t.Fatalf("reading jobs failed: %d %s", code, jobsResp.Message)
+	}
+}
+
+func TestEventLogEndToEnd(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+	today := time.Now().Format("2006-01-02")
+
+	code, queryResp := do(t, srv, "POST", "/ec3api/v1/eventlog/query", tok, map[string]interface{}{
+		"category": "all", "from": today, "to": today, "limit": 50, "offset": 0,
+	})
+	if code != http.StatusOK || !queryResp.Success || queryResp.TotalCount == nil || *queryResp.TotalCount == 0 {
+		t.Fatalf("event query failed: code=%d total=%v message=%s", code, queryResp.TotalCount, queryResp.Message)
+	}
+	var events []map[string]interface{}
+	if err := json.Unmarshal(queryResp.Data, &events); err != nil || len(events) == 0 {
+		t.Fatalf("event query did not return rows: %v", err)
+	}
+	if events[0]["EV_PRIORITY"] == nil || events[0]["EV_SOURCE"] == nil {
+		t.Fatalf("event query missing source fields: %v", events[0])
+	}
+
+	code, summaryResp := do(t, srv, "GET", "/ec3api/v1/eventlog/summary?from="+today+"&to="+today, tok, nil)
+	if code != http.StatusOK || !summaryResp.Success {
+		t.Fatalf("event summary failed: %d %s", code, summaryResp.Message)
+	}
+
+	id := int64(events[0]["EV_ID"].(float64))
+	code, detailResp := do(t, srv, "GET", "/ec3api/v1/eventlog/"+itoa(id), tok, nil)
+	if code != http.StatusOK || !detailResp.Success {
+		t.Fatalf("event detail failed: %d %s", code, detailResp.Message)
+	}
+}
+
+func TestReportingEndToEnd(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+	today := time.Now().Format("2006-01-02")
+
+	code, catalogResp := do(t, srv, "GET", "/ec3api/v1/reporting/catalog", tok, nil)
+	if code != http.StatusOK || !catalogResp.Success {
+		t.Fatalf("report catalog failed: %d %s", code, catalogResp.Message)
+	}
+	var catalog struct {
+		Reports []map[string]interface{} `json:"reports"`
+		Points  []map[string]interface{} `json:"points"`
+	}
+	if err := json.Unmarshal(catalogResp.Data, &catalog); err != nil || len(catalog.Reports) == 0 || len(catalog.Points) == 0 {
+		t.Fatalf("report catalog is incomplete: reports=%d points=%d err=%v", len(catalog.Reports), len(catalog.Points), err)
+	}
+	reportID := int64(catalog.Reports[0]["REPORT_ID"].(float64))
+	pointID := int64(catalog.Points[0]["POINT_ID"].(float64))
+
+	code, previewResp := do(t, srv, "POST", "/ec3api/v1/reporting/preview", tok, map[string]interface{}{
+		"report_id": reportID, "point_ids": []int64{pointID},
+		"from": today, "to": today, "output_format": "XLSX",
+	})
+	if code != http.StatusOK || !previewResp.Success {
+		t.Fatalf("report preview failed: %d %s", code, previewResp.Message)
+	}
+	var preview struct {
+		RunID int                      `json:"run_id"`
+		Rows  []map[string]interface{} `json:"rows"`
+	}
+	if err := json.Unmarshal(previewResp.Data, &preview); err != nil || preview.RunID == 0 || len(preview.Rows) == 0 {
+		t.Fatalf("report preview is empty: run=%d rows=%d err=%v", preview.RunID, len(preview.Rows), err)
+	}
+
+	code, savedResp := do(t, srv, "GET", "/ec3api/v1/reporting/runs/"+itoa(int64(preview.RunID)), tok, nil)
+	if code != http.StatusOK || !savedResp.Success {
+		t.Fatalf("saved report failed: %d %s", code, savedResp.Message)
+	}
+	var saved struct {
+		RunID int                      `json:"run_id"`
+		Rows  []map[string]interface{} `json:"rows"`
+	}
+	if err := json.Unmarshal(savedResp.Data, &saved); err != nil || saved.RunID != preview.RunID || len(saved.Rows) == 0 {
+		t.Fatalf("saved report is empty: run=%d rows=%d err=%v", saved.RunID, len(saved.Rows), err)
+	}
+
+	enabled := true
+	code, automationResp := do(t, srv, "POST", "/ec3api/v1/reporting/automations", tok, map[string]interface{}{
+		"report_id": reportID, "name": "Daily test", "schedule_code": "DAILY",
+		"schedule_time": "08:00", "output_format": "XLSX", "enabled": enabled,
+	})
+	if code != http.StatusOK || !automationResp.Success {
+		t.Fatalf("report automation failed: %d %s", code, automationResp.Message)
+	}
+
+	code, runsResp := do(t, srv, "GET", "/ec3api/v1/reporting/runs", tok, nil)
+	if code != http.StatusOK || !runsResp.Success || runsResp.TotalCount == nil || *runsResp.TotalCount == 0 {
+		t.Fatalf("report runs failed: %d %s", code, runsResp.Message)
+	}
+}
+
+func TestTelesignalsEndToEnd(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+
+	code, catalogResp := do(t, srv, "GET", "/ec3api/v1/telesignals/catalog", tok, nil)
+	if code != http.StatusOK || !catalogResp.Success {
+		t.Fatalf("signal catalog failed: %d %s", code, catalogResp.Message)
+	}
+	var catalog struct {
+		Types  []map[string]interface{} `json:"types"`
+		Points []map[string]interface{} `json:"points"`
+	}
+	if err := json.Unmarshal(catalogResp.Data, &catalog); err != nil || len(catalog.Types) == 0 || len(catalog.Points) == 0 {
+		t.Fatalf("signal catalog incomplete: types=%d points=%d err=%v", len(catalog.Types), len(catalog.Points), err)
+	}
+
+	code, listResp := do(t, srv, "GET", "/ec3api/v1/telesignals/signals?limit=50", tok, nil)
+	if code != http.StatusOK || !listResp.Success || listResp.TotalCount == nil || *listResp.TotalCount == 0 {
+		t.Fatalf("signal list failed: %d %s", code, listResp.Message)
+	}
+	var signals []map[string]interface{}
+	if err := json.Unmarshal(listResp.Data, &signals); err != nil || len(signals) == 0 {
+		t.Fatalf("signal list empty: %v", err)
+	}
+	signalID := int64(signals[0]["SIGNAL_ID"].(float64))
+
+	code, valueResp := do(t, srv, "POST", "/ec3api/v1/telesignals/history", tok, map[string]interface{}{
+		"signal_id": signalID, "value": "1", "comment": "integration", "source": "OPERATOR",
+	})
+	if code != http.StatusOK || !valueResp.Success {
+		t.Fatalf("signal value failed: %d %s", code, valueResp.Message)
+	}
+
+	today := time.Now().Format("2006-01-02")
+	code, historyResp := do(t, srv, "POST", "/ec3api/v1/telesignals/history/query", tok, map[string]interface{}{
+		"signal_ids": []int64{signalID}, "from": today, "to": today, "limit": 100,
+	})
+	if code != http.StatusOK || !historyResp.Success || historyResp.TotalCount == nil || *historyResp.TotalCount == 0 {
+		t.Fatalf("signal history failed: %d %s", code, historyResp.Message)
+	}
+
+	blocked := true
+	code, stateResp := do(t, srv, "PUT", "/ec3api/v1/telesignals/signals/"+itoa(signalID)+"/state", tok, map[string]interface{}{
+		"blocked": blocked, "comment": "maintenance",
+	})
+	if code != http.StatusOK || !stateResp.Success {
+		t.Fatalf("signal block failed: %d %s", code, stateResp.Message)
+	}
+	blocked = false
+	code, stateResp = do(t, srv, "PUT", "/ec3api/v1/telesignals/signals/"+itoa(signalID)+"/state", tok, map[string]interface{}{
+		"blocked": blocked, "comment": "",
+	})
+	if code != http.StatusOK || !stateResp.Success {
+		t.Fatalf("signal unblock failed: %d %s", code, stateResp.Message)
+	}
+
+	code, commandResp := do(t, srv, "POST", "/ec3api/v1/telesignals/signals/"+itoa(signalID)+"/commands", tok, map[string]interface{}{"action": "DEVICE"})
+	if code != http.StatusOK || !commandResp.Success {
+		t.Fatalf("signal command failed: %d %s", code, commandResp.Message)
+	}
+}
+
+func TestSchemesEndToEnd(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+
+	code, catalogResp := do(t, srv, "GET", "/ec3api/v1/schemes", tok, nil)
+	if code != http.StatusOK || !catalogResp.Success || catalogResp.TotalCount == nil || *catalogResp.TotalCount == 0 {
+		t.Fatalf("scheme catalog failed: %d %s", code, catalogResp.Message)
+	}
+	var catalog []map[string]interface{}
+	if err := json.Unmarshal(catalogResp.Data, &catalog); err != nil || len(catalog) == 0 {
+		t.Fatalf("scheme catalog empty: %v", err)
+	}
+	schemeID := int64(catalog[0]["SCHEME_ID"].(float64))
+
+	code, viewResp := do(t, srv, "GET", "/ec3api/v1/schemes/"+itoa(schemeID)+"/view", tok, nil)
+	if code != http.StatusOK || !viewResp.Success {
+		t.Fatalf("scheme view failed: %d %s", code, viewResp.Message)
+	}
+	var view struct {
+		Layout  map[string]interface{}   `json:"layout"`
+		Signals []map[string]interface{} `json:"signals"`
+	}
+	if err := json.Unmarshal(viewResp.Data, &view); err != nil || len(view.Signals) == 0 || view.Layout["nodes"] == nil {
+		t.Fatalf("scheme view incomplete: signals=%d layout=%v err=%v", len(view.Signals), view.Layout, err)
+	}
+}
+
+func TestLoadControlEndToEnd(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+
+	code, catalogResp := do(t, srv, "GET", "/ec3api/v1/loadcontrol/catalog", tok, nil)
+	if code != http.StatusOK || !catalogResp.Success {
+		t.Fatalf("load-control catalog failed: %d %s", code, catalogResp.Message)
+	}
+	var catalog struct {
+		Points []map[string]interface{} `json:"points"`
+	}
+	if err := json.Unmarshal(catalogResp.Data, &catalog); err != nil || len(catalog.Points) == 0 {
+		t.Fatalf("load-control points empty: %v", err)
+	}
+	pointID := int64(catalog.Points[0]["POINT_ID"].(float64))
+
+	code, relayResp := do(t, srv, "POST", "/ec3api/v1/loadcontrol/relays/query", tok, map[string]interface{}{"point_ids": []int64{pointID}})
+	if code != http.StatusOK || !relayResp.Success || relayResp.TotalCount == nil || *relayResp.TotalCount == 0 {
+		t.Fatalf("relay query failed: %d %s", code, relayResp.Message)
+	}
+	var relays []map[string]interface{}
+	_ = json.Unmarshal(relayResp.Data, &relays)
+	relayID := int64(relays[0]["RELAY_ID"].(float64))
+	code, relayCommandResp := do(t, srv, "POST", "/ec3api/v1/loadcontrol/relays/command", tok, map[string]interface{}{"ids": []int64{relayID}, "action": "DISABLE"})
+	if code != http.StatusOK || !relayCommandResp.Success {
+		t.Fatalf("relay command failed: %d %s", code, relayCommandResp.Message)
+	}
+	_, _ = do(t, srv, "POST", "/ec3api/v1/loadcontrol/relays/command", tok, map[string]interface{}{"ids": []int64{relayID}, "action": "ENABLE"})
+
+	code, limitResp := do(t, srv, "POST", "/ec3api/v1/loadcontrol/limits/query", tok, map[string]interface{}{"point_ids": []int64{pointID}})
+	if code != http.StatusOK || !limitResp.Success || limitResp.TotalCount == nil || *limitResp.TotalCount == 0 {
+		t.Fatalf("limit query failed: %d %s", code, limitResp.Message)
+	}
+	var limits []map[string]interface{}
+	_ = json.Unmarshal(limitResp.Data, &limits)
+	limitID := int64(limits[0]["LIMIT_ID"].(float64))
+	value := 88.0
+	code, limitCommandResp := do(t, srv, "POST", "/ec3api/v1/loadcontrol/limits/command", tok, map[string]interface{}{"ids": []int64{limitID}, "action": "SET", "value": value})
+	if code != http.StatusOK || !limitCommandResp.Success {
+		t.Fatalf("limit command failed: %d %s", code, limitCommandResp.Message)
+	}
+}
+
+func TestMeterRegistryEndToEnd(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+
+	code, catalogResp := do(t, srv, "GET", "/ec3api/v1/meterregistry/catalog", tok, nil)
+	if code != http.StatusOK || !catalogResp.Success {
+		t.Fatalf("meter catalog failed: %d %s", code, catalogResp.Message)
+	}
+	var catalog struct {
+		Types []map[string]interface{} `json:"types"`
+	}
+	if err := json.Unmarshal(catalogResp.Data, &catalog); err != nil || len(catalog.Types) == 0 {
+		t.Fatalf("meter types empty: %v", err)
+	}
+	typeID := int64(catalog.Types[0]["METER_TYPE_ID"].(float64))
+
+	code, createResp := do(t, srv, "POST", "/ec3api/v1/meterregistry/save", tok, map[string]interface{}{
+		"meter_type_id": typeID, "meter_number": "E2E-METER-001", "made": "2026-01-15",
+		"expl_start": "2026-02-01", "meter_class": "0.5S",
+	})
+	if code != http.StatusOK || !createResp.Success {
+		t.Fatalf("meter create failed: %d %s", code, createResp.Message)
+	}
+	var created map[string]interface{}
+	_ = json.Unmarshal(createResp.Data, &created)
+	meterID := int64(created["METER_ID"].(float64))
+
+	code, queryResp := do(t, srv, "POST", "/ec3api/v1/meterregistry/query", tok, map[string]interface{}{
+		"search": "E2E-METER-001", "mount_state": "UNMOUNTED", "limit": 25,
+	})
+	if code != http.StatusOK || !queryResp.Success || queryResp.TotalCount == nil || *queryResp.TotalCount != 1 {
+		t.Fatalf("meter query failed: %d %s", code, queryResp.Message)
+	}
+
+	code, updateResp := do(t, srv, "POST", "/ec3api/v1/meterregistry/save", tok, map[string]interface{}{
+		"meter_id": meterID, "meter_type_id": typeID, "meter_number": "E2E-METER-001",
+		"made": "2026-01-15", "expl_start": "2026-02-01", "meter_class": "1.0",
+	})
+	if code != http.StatusOK || !updateResp.Success {
+		t.Fatalf("meter update failed: %d %s", code, updateResp.Message)
+	}
+
+	code, deleteResp := do(t, srv, "DELETE", "/ec3api/v1/meterregistry/"+itoa(meterID), tok, nil)
+	if code != http.StatusOK || !deleteResp.Success {
+		t.Fatalf("meter delete failed: %d %s", code, deleteResp.Message)
+	}
+}
+
 func TestPointsCRUD(t *testing.T) {
 	srv, _ := setup(t)
 	tok := login(t, srv, "admin", "admin123")

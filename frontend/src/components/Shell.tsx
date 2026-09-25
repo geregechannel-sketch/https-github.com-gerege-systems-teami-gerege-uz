@@ -88,7 +88,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <div className="tm-status">
             <span>Статус:</span>
             <b style={{ color: "#fff" }}>0</b><span className="tm-status__sep">/</span>
-            <b style={{ color: "#2ecc71" }}>0</b><span className="tm-status__sep">/</span>
+            <b style={{ color: "#2ecc71" }}>2</b><span className="tm-status__sep">/</span>
             <b style={{ color: "#f39c12" }}>0</b><span className="tm-status__sep">/</span>
             <b style={{ color: "#e74c3c" }}>0</b>
             <span className="sp" style={{ flex: 1 }} />

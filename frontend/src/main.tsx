@@ -11,6 +11,14 @@ import Gis from "./pages/Gis";
 import Archives from "./pages/Archives";
 import Points from "./pages/Points";
 import SavedForms from "./pages/SavedForms";
+import QualityReports from "./pages/QualityReports";
+import Readings from "./pages/Readings";
+import EventLog from "./pages/EventLog";
+import Reports from "./pages/Reports";
+import Telesignals from "./pages/Telesignals";
+import Schemes from "./pages/Schemes";
+import LoadControl from "./pages/LoadControl";
+import Meters from "./pages/Meters";
 
 // Theme init (mirrors the real app).
 try {
@@ -33,8 +41,16 @@ function App() {
         <Route path="/archives" element={<Protected><Archives /></Protected>} />
         <Route path="/gis" element={<Protected><Gis /></Protected>} />
         <Route path="/saved" element={<Protected><SavedForms /></Protected>} />
+        <Route path="/quality_reports" element={<Protected><QualityReports /></Protected>} />
+        <Route path="/show" element={<Protected><Readings /></Protected>} />
+        <Route path="/events/:category" element={<Protected><EventLog /></Protected>} />
+        <Route path="/reports/:mode" element={<Protected><Reports /></Protected>} />
+        <Route path="/telesignals/:mode" element={<Protected><Telesignals /></Protected>} />
+        <Route path="/schemes/:mode" element={<Protected><Schemes /></Protected>} />
+        <Route path="/load-control/:mode" element={<Protected><LoadControl /></Protected>} />
+        <Route path="/meters" element={<Protected><Meters /></Protected>} />
         <Route path="/m/points" element={<Protected><Points /></Protected>} />
-        <Route path="/m/:model" element={<Protected><Module /></Protected>} />
+        <Route path="/m/:model/*" element={<Protected><Module /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

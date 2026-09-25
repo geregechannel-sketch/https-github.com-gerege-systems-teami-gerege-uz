@@ -48,9 +48,16 @@ func (d *Dashboard) Data(w http.ResponseWriter, r *http.Request) {
 	_ = d.pool.QueryRow(ctx,
 		`SELECT count(*) FROM points WHERE point_enabled=1 AND point_code <> 'EMCOS_STATUS'`).Scan(&accountingPoints)
 	_ = d.pool.QueryRow(ctx,
-		`SELECT count(*) FROM data_points WHERE dp_deleted=0 AND dp_enabled=1`).Scan(&readingPoints)
+		`SELECT count(*)
+		   FROM data_points dp
+		   LEFT JOIN points p ON p.point_id = dp.point_id
+		  WHERE dp.dp_deleted=0
+		    AND dp.dp_enabled=1
+		    AND COALESCE(dp.dp_internal,0)=0
+		    AND COALESCE(dp.dp_code,'') NOT IN ('GENERATED_BY_ORACLE','EMCOS_STATUS')
+		    AND COALESCE(p.point_code,'') <> 'EMCOS_STATUS'`).Scan(&readingPoints)
 	_ = d.pool.QueryRow(ctx, `SELECT count(*) FROM data_servers`).Scan(&channelsTotal)
-	_ = d.pool.QueryRow(ctx, `SELECT count(*) FROM data_servers WHERE das_active=1`).Scan(&channelsUp)
+	_ = d.pool.QueryRow(ctx, `SELECT count(*) FROM data_servers WHERE das_enabled=1`).Scan(&channelsUp)
 
 	pct := "100 %"
 	if channelsTotal > 0 {

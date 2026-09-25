@@ -18,6 +18,14 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	rh := resource.NewHandler(pool, reg)
 	authH := handlers.NewAuth(pool, mgr)
 	dash := handlers.NewDashboard(pool)
+	quality := handlers.NewQuality(pool)
+	readings := handlers.NewReadings(pool)
+	events := handlers.NewEventLog(pool)
+	reporting := handlers.NewReporting(pool)
+	telesignals := handlers.NewTelesignals(pool)
+	schemes := handlers.NewSchemes(pool)
+	loadControl := handlers.NewLoadControl(pool)
+	meterRegistry := handlers.NewMeterRegistry(pool)
 	us := handlers.NewUserSettings(pool)
 
 	protected := func(fn http.HandlerFunc) http.Handler {
@@ -62,6 +70,69 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 		seen[pattern] = true
 		mux.Handle(pattern, h)
 	}
+
+	// Quality reports use source-compatible response shapes instead of the
+	// generic sub-action envelope.
+	handle("GET "+base+"qualityreports/cnt", protected(quality.Count))
+	handle("GET "+base+"qualityreports/holes", protected(quality.Holes))
+
+	// Reading collection keeps the source TEAMI filter, archive and DAS task
+	// flows behind a compact domain API.
+	handle("GET "+base+"readings/filter", protected(readings.Filter))
+	handle("POST "+base+"readings/query", protected(readings.Query))
+	handle("POST "+base+"readings/tasks", protected(readings.CreateTask))
+	handle("GET "+base+"readings/jobs", protected(readings.Jobs))
+
+	// Event register preserves TEAMI's category, date, source and detail flow.
+	handle("POST "+base+"eventlog/query", protected(events.Query))
+	handle("GET "+base+"eventlog/summary", protected(events.Summary))
+	handle("GET "+base+"eventlog/{id}", protected(events.Detail))
+
+	// Reports use a domain API for catalog, previews, schedules and run history.
+	handle("GET "+base+"reporting/catalog", protected(reporting.Catalog))
+	handle("POST "+base+"reporting/preview", protected(reporting.Preview))
+	handle("GET "+base+"reporting/runs", protected(reporting.Runs))
+	handle("GET "+base+"reporting/runs/{id}", protected(reporting.RunResult))
+	handle("GET "+base+"reporting/automations", protected(reporting.Automations))
+	handle("POST "+base+"reporting/automations", protected(reporting.CreateAutomation))
+	handle("PUT "+base+"reporting/automations/{id}", protected(reporting.UpdateAutomation))
+
+	// Telesignals preserve the registry, history and operator-control workflows.
+	handle("GET "+base+"telesignals/catalog", protected(telesignals.Catalog))
+	handle("GET "+base+"telesignals/signals", protected(telesignals.List))
+	handle("GET "+base+"telesignals/signals/{id}", protected(telesignals.Get))
+	handle("POST "+base+"telesignals/signals", protected(telesignals.Create))
+	handle("PUT "+base+"telesignals/signals/{id}", protected(telesignals.Update))
+	handle("DELETE "+base+"telesignals/signals/{id}", protected(telesignals.Delete))
+	handle("PUT "+base+"telesignals/signals/{id}/state", protected(telesignals.State))
+	handle("POST "+base+"telesignals/signals/{id}/commands", protected(telesignals.Command))
+	handle("GET "+base+"telesignals/types", protected(telesignals.Types))
+	handle("POST "+base+"telesignals/types", protected(telesignals.CreateType))
+	handle("PUT "+base+"telesignals/types/{id}", protected(telesignals.UpdateType))
+	handle("DELETE "+base+"telesignals/types/{id}", protected(telesignals.DeleteType))
+	handle("POST "+base+"telesignals/history/query", protected(telesignals.History))
+	handle("POST "+base+"telesignals/history", protected(telesignals.AddHistory))
+	handle("PUT "+base+"telesignals/history/{id}", protected(telesignals.UpdateHistory))
+	handle("GET "+base+"telesignals/rules", protected(telesignals.Rules))
+	handle("POST "+base+"telesignals/rules", protected(telesignals.CreateRule))
+	handle("DELETE "+base+"telesignals/rules/{id}", protected(telesignals.DeleteRule))
+
+	// Mnemonic diagrams combine a stored layout with current telesignal states.
+	handle("GET "+base+"schemes", protected(schemes.Catalog))
+	handle("GET "+base+"schemes/{id}/view", protected(schemes.View))
+
+	// Load control preserves relay and device-limit operator workflows.
+	handle("GET "+base+"loadcontrol/catalog", protected(loadControl.Catalog))
+	handle("POST "+base+"loadcontrol/relays/query", protected(loadControl.Relays))
+	handle("POST "+base+"loadcontrol/limits/query", protected(loadControl.Limits))
+	handle("POST "+base+"loadcontrol/relays/command", protected(loadControl.RelayCommand))
+	handle("POST "+base+"loadcontrol/limits/command", protected(loadControl.LimitCommand))
+
+	// Meter registry joins classifier, mounting and point data into one workflow.
+	handle("GET "+base+"meterregistry/catalog", protected(meterRegistry.Catalog))
+	handle("POST "+base+"meterregistry/query", protected(meterRegistry.Query))
+	handle("POST "+base+"meterregistry/save", protected(meterRegistry.Save))
+	handle("DELETE "+base+"meterregistry/{id}", protected(meterRegistry.Delete))
 
 	// Bulk import (admin): POST /ec3api/v1/admin/import/{model}
 	mux.Handle("POST "+base+"admin/import/{model}", protected(func(w http.ResponseWriter, r *http.Request) {

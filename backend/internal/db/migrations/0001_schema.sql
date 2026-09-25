@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS data_points (
     dp_type_id INT NOT NULL DEFAULT 1,
     dp_enabled INT NOT NULL DEFAULT 1,
     dp_deleted INT NOT NULL DEFAULT 0,
+    dp_internal INT NOT NULL DEFAULT 0,
     point_id   BIGINT REFERENCES points(point_id)
 );
 

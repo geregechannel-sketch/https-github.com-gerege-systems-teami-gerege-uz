@@ -11,20 +11,21 @@ export interface MenuNode {
 export const MENU: MenuNode[] = [
   { label: "Сохраненные формы", icon: "saved", path: "/saved" },
   { label: "Просмотр архивов", icon: "archive", path: "/archives" },
-  { label: "Качество показаний", icon: "quality", model: "qualityreports" },
+  { label: "Качество показаний", icon: "quality", path: "/quality_reports" },
   {
     label: "Регистр событий",
     icon: "events",
+    path: "/events/all",
     children: [
       {
         label: "События",
         children: [
-          { label: "Все сообщения", model: "events" },
-          { label: "Сообщения Oracle", model: "event_log_oracle" },
-          { label: "Сообщения программ", model: "event_log_software" },
-          { label: "Сообщения связи", model: "event_log_connection" },
-          { label: "Сообщения данных", model: "event_log_data" },
-          { label: "Сообщения системы", model: "event_log_system" },
+          { label: "Все сообщения", path: "/events/all" },
+          { label: "Сообщения Oracle", path: "/events/oracle" },
+          { label: "Сообщения программ", path: "/events/software" },
+          { label: "Сообщения связи", path: "/events/connection" },
+          { label: "Сообщения данных", path: "/events/data" },
+          { label: "Сообщения системы", path: "/events/system" },
         ],
       },
       { label: "Подтверждение событий", model: "ev_ack" },
@@ -54,7 +55,7 @@ export const MENU: MenuNode[] = [
       { label: "Лимиты", model: "limiter" },
     ],
   },
-  { label: "Считывание показаний", icon: "read", model: "dataservers" },
+  { label: "Считывание показаний", icon: "read", path: "/show" },
   {
     label: "Конфигурация системы",
     icon: "config",
@@ -63,7 +64,7 @@ export const MENU: MenuNode[] = [
         label: "Классификаторы и списки",
         children: [
           { label: "Точки", model: "points" },
-          { label: "Счетчики", model: "measuringdevices" },
+          { label: "Счетчики", path: "/meters" },
           { label: "Монтажи счетчиков", model: "mountings" },
           { label: "Обходные точки", model: "bypasspoints" },
           { label: "Соотношения точек", model: "relationships" },
@@ -104,27 +105,38 @@ export const MENU: MenuNode[] = [
   {
     label: "Отчеты",
     icon: "reports",
+    path: "/reports/viewer",
     children: [
-      { label: "Отчеты", model: "reports" },
-      { label: "Журнал отчетов", model: "reportslog" },
-      { label: "Типы отчетов", model: "reporttypes" },
+      { label: "Просмотр отчетов", path: "/reports/viewer" },
+      { label: "Автоматизированные отчеты", path: "/reports/automated" },
+      { label: "Журнал отчетов", path: "/reports/log" },
     ],
   },
-  { label: "Телесигналы", icon: "signals", model: "discretesignals" },
-  { label: "Схемы", icon: "schema", model: "schemas" },
+  {
+    label: "Телесигналы",
+    icon: "signals",
+    path: "/telesignals/overview",
+    children: [
+      { label: "Сигналы", path: "/telesignals/signals" },
+      { label: "История / управление", path: "/telesignals/history" },
+    ],
+  },
+  {
+    label: "Схемы",
+    icon: "schema",
+    path: "/schemes/overview",
+    children: [{ label: "Просмотр схем", path: "/schemes/viewer" }],
+  },
   { label: "GIS", icon: "gis", path: "/gis" },
   {
     label: "Управление нагрузкой",
     icon: "load",
-    children: [
-      { label: "BGA", model: "bga" },
-      { label: "RGB план", model: "pobj" },
-      { label: "Ограничители", model: "limiter" },
-    ],
+    path: "/load-control/relays",
   },
 ];
 
-// Dictionaries shown as reference lists under a "Справочники" quick menu.
+// TOSH extension: keep these quick reference lists even though the source TEAMI
+// account did not expose a separate "Справочники" section on the dashboard.
 export const DICTS: MenuNode[] = [
   { label: "Типы групп", model: "grouptypes" },
   { label: "Типы точек", model: "pointtypes" },

@@ -1,0 +1,129 @@
+.ts { min-height: calc(100vh - 76px); color: #555; }
+.ts *, .ts *::before, .ts *::after { box-sizing: border-box; }
+.ts button, .ts input, .ts select, .ts textarea { font: inherit; }
+.ts-tabs { display: flex; min-height: 34px; border: 1px solid #d4d4d4; border-top: 0; background: #f2f2f2; overflow-x: auto; }
+.ts-tabs button { min-width: 150px; padding: 8px 14px; border: 0; border-right: 1px solid #d1d1d1; background: transparent; color: #777; cursor: pointer; white-space: nowrap; }
+.ts-tabs button.active { background: #238ece; color: #fff; }
+.ts-message { display: flex; align-items: center; justify-content: space-between; margin: 7px 10px 0; padding: 7px 10px; color: #fff; }
+.ts-message.error { background: #e86464; }
+.ts-message.success { background: #38ad78; }
+.ts-message button { border: 0; background: transparent; color: inherit; font-size: 18px; cursor: pointer; }
+.ts-overview { padding: 10px; }
+.ts-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ts-kpis article { min-height: 126px; padding: 15px; border-radius: 4px; color: #fff; background: #38b57b; box-shadow: 0 1px 3px #0003; display: grid; grid-template-rows: auto auto 1fr; }
+.ts-kpis article:nth-child(2) { background: #2f9fc9; }
+.ts-kpis article:nth-child(3) { background: #429f83; }
+.ts-kpis span { font-size: 16px; font-weight: 600; }
+.ts-kpis small { margin-top: 15px; opacity: .9; }
+.ts-kpis strong { align-self: end; justify-self: end; font-size: 28px; font-weight: 500; }
+.ts-overview-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; max-width: 960px; }
+.ts-overview-actions section { min-height: 130px; display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: start; padding: 16px; border: 1px solid #d4d4d4; background: #fff; box-shadow: 0 1px 3px #0002; }
+.ts-overview-actions h2 { margin: 0 0 14px; color: #45a7d9; font-size: 15px; letter-spacing: 0; }
+.ts-overview-actions p { margin: 0; color: #777; line-height: 1.45; }
+.ts-overview-actions button, .ts-actions button, .ts-history-actions button, .ts-rule-form button { align-self: end; min-height: 32px; padding: 6px 14px; border: 0; border-radius: 3px; background: #5aaee0; color: #fff; cursor: pointer; }
+.ts-registry { display: grid; grid-template-rows: auto minmax(260px, 1fr) auto auto; min-height: calc(100vh - 145px); padding: 9px; }
+.ts-filterbar { display: flex; align-items: end; gap: 8px; padding: 9px; border: 1px solid #d5d5d5; background: #f7f7f7; }
+.ts-filterbar > svg { color: #637ed1; align-self: center; margin-right: auto; }
+.ts-filterbar label { display: grid; gap: 3px; min-width: 240px; }
+.ts-filterbar label span { font-size: 11px; color: #888; }
+.ts-filterbar input, .ts-filterbar select { height: 31px; border: 1px solid #d2d2d2; padding: 0 9px; color: #555; background: #fff; }
+.ts-filterbar button { height: 31px; border: 0; border-radius: 3px; padding: 0 14px; color: #fff; cursor: pointer; }
+.ts button.green, .ts .green { background: #39b978; color: #fff; }
+.ts button.red, .ts .red, .ts button.danger { background: #ec6868; color: #fff; }
+.ts-table-wrap { overflow: auto; border: 1px solid #d5d5d5; background: #fff; }
+.ts-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.ts-table th { padding: 9px 8px; text-align: left; color: #555; background: #f7f7f7; border: 1px solid #d6d6d6; white-space: nowrap; }
+.ts-table td { padding: 8px; border: 1px solid #dedede; white-space: nowrap; }
+.ts-table tbody tr { cursor: pointer; }
+.ts-table tbody tr:hover { background: #f0f8fd; }
+.ts-table tbody tr.selected { background: #dceefa; }
+.ts-signal-table { min-width: 1780px; }
+.ts-signal-table th:nth-child(2), .ts-signal-table td:nth-child(2) { min-width: 230px; }
+.ts-empty { height: 170px; text-align: center; color: #bbb; font-size: 18px; }
+.ts-value { display: inline-flex; min-width: 76px; justify-content: center; padding: 3px 6px; border-radius: 3px; font-weight: 600; }
+.ts-value.on { color: #157043; background: #d8f3e5; }
+.ts-value.off { color: #8b4d22; background: #f9e6d6; }
+.ts-pager { display: flex; gap: 20px; padding: 7px 10px; border: 1px solid #d4d4d4; border-top: 0; color: #777; background: #fafafa; }
+.ts-actions { display: grid; gap: 5px; padding-top: 6px; }
+.ts-actions.six { grid-template-columns: 1.25fr 1fr 1fr 1fr 1fr 1fr; }
+.ts-actions button { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ts button:disabled { opacity: .42; cursor: not-allowed; }
+.ts-history-layout { display: grid; grid-template-columns: minmax(285px, 36%) minmax(520px, 1fr); gap: 8px; min-height: calc(100vh - 145px); padding: 9px; }
+.ts-pane { min-width: 0; border: 1px solid #cfcfcf; background: #fff; display: grid; }
+.ts-pane-head { min-height: 30px; padding: 7px 9px; color: #fff; background: #50abe0; font-weight: 600; }
+.ts-tree-pane { grid-template-rows: auto auto minmax(320px, 1fr) auto; }
+.ts-tree-tools { display: flex; gap: 5px; padding: 8px; border-bottom: 1px solid #ddd; }
+.ts-tree-tools label { display: flex; flex: 1; align-items: center; gap: 6px; height: 31px; padding: 0 8px; border: 1px solid #d4d4d4; }
+.ts-tree-tools input { min-width: 0; flex: 1; border: 0; outline: 0; }
+.ts-tree-tools button { border: 0; background: #5faee0; color: #fff; padding: 0 10px; cursor: pointer; }
+.ts-object-tree { overflow: auto; padding: 5px; }
+.ts-tree-group { width: 100%; height: 27px; display: flex; align-items: center; gap: 6px; border: 0; background: transparent; color: #555; text-align: left; cursor: pointer; }
+.ts-tree-group:hover { background: #edf7fc; }
+.ts-tree-point { display: grid; gap: 2px; }
+.ts-tree-point > strong { padding: 5px 0 3px; color: #6d6d6d; }
+.ts-tree-point label { display: grid; grid-template-columns: 16px 9px 1fr; gap: 5px; align-items: center; padding: 4px 4px 4px 14px; cursor: pointer; }
+.ts-tree-point label:hover { background: #edf7fc; }
+.ts-dot { width: 8px; height: 8px; border-radius: 50%; }
+.ts-dot.on { background: #38b57b; }
+.ts-dot.off { background: #d9894a; }
+.ts-tree-footer { display: flex; justify-content: space-between; align-items: center; min-height: 35px; padding: 5px 8px; border-top: 1px solid #ddd; }
+.ts-tree-footer button { border: 0; padding: 6px 9px; background: #62b5e5; color: #fff; }
+.ts-history-pane { grid-template-rows: auto auto minmax(300px, 1fr) auto; }
+.ts-period { display: flex; flex-wrap: wrap; gap: 6px; align-items: end; padding: 8px; border-bottom: 1px solid #ddd; }
+.ts-period label { display: grid; gap: 2px; font-size: 11px; color: #777; }
+.ts-period label.check { display: flex; align-items: center; min-height: 31px; margin-left: auto; }
+.ts-period input[type="date"] { height: 31px; border: 1px solid #d2d2d2; padding: 0 7px; }
+.ts-period button { display: inline-flex; align-items: center; gap: 5px; min-height: 31px; padding: 5px 10px; border: 0; background: #7795dd; color: #fff; cursor: pointer; }
+.ts-history-table-wrap { border-width: 0 0 1px; }
+.ts-history-table-wrap table { min-width: 850px; }
+.ts-history-actions { display: grid; grid-template-columns: repeat(5, minmax(115px, 1fr)); gap: 5px; padding: 6px; }
+.ts-history-actions button { min-width: 0; min-height: 31px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ts-history-actions button.process { background: #5f78ce; }
+.ts-history-actions button.process span { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: #ec6868; }
+.ts-modal { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 20px; background: #0005; }
+.ts-dialog { width: min(720px, 96vw); max-height: 90vh; overflow: auto; border: 1px solid #8ca7bd; border-radius: 4px; background: #f7f7f7; box-shadow: 0 5px 18px #0004; }
+.ts-dialog-head { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; min-height: 34px; padding: 7px 11px; background: #587cd2; color: #fff; font-weight: 600; }
+.ts-dialog-head button { border: 0; background: transparent; color: #fff; font-size: 22px; cursor: pointer; }
+.signal-dialog { width: min(620px, 96vw); }
+.ts-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 13px; }
+.ts-form-grid label, .ts-type-form > label, .ts-compact-form label { display: grid; gap: 4px; }
+.ts-form-grid label span, .ts-type-form label span, .ts-compact-form label span { color: #777; font-size: 11px; }
+.ts-form-grid input, .ts-form-grid select, .ts-type-form input, .ts-compact-form select, .ts-compact-form textarea { width: 100%; min-height: 32px; border: 1px solid #d3d3d3; padding: 5px 8px; background: #fff; color: #555; }
+.ts-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 13px 12px; padding: 10px; border: 1px solid #ddd; background: #fff; }
+.ts-check-grid label { display: flex; align-items: center; gap: 6px; }
+.ts-submit { width: calc(100% - 26px); min-height: 34px; margin: 0 13px 13px; border: 0; border-radius: 3px; background: #37b67a; color: #fff; cursor: pointer; }
+.types-dialog { width: min(760px, 96vw); }
+.ts-types-layout { display: grid; grid-template-columns: 1fr 1fr; min-height: 410px; }
+.ts-type-list { padding: 10px; border-right: 1px solid #d4d4d4; background: #fff; }
+.ts-type-list button { width: 100%; padding: 8px; border: 0; background: transparent; color: #555; text-align: left; cursor: pointer; }
+.ts-type-list button.active { background: #58afe1; color: #fff; }
+.ts-type-form { display: grid; align-content: start; gap: 8px; padding: 12px; }
+.ts-type-form label.check { display: flex; align-items: center; gap: 6px; min-height: 30px; border: 1px solid #d6d6d6; padding: 6px; background: #fff; }
+.ts-type-form button { min-height: 32px; border: 0; border-radius: 3px; background: #58afe1; color: #fff; cursor: pointer; }
+.rules-dialog { width: min(900px, 96vw); }
+.rules-dialog .ts-table-wrap { min-height: 300px; border: 0; }
+.ts-rule-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 6px; padding: 9px; border-top: 1px solid #ddd; }
+.ts-rule-form select { width: 100%; min-width: 0; min-height: 32px; border: 1px solid #d3d3d3; padding: 0 6px; }
+.ts-icon-danger { width: 26px; height: 26px; border: 0; border-radius: 3px; background: #e96767; color: #fff; cursor: pointer; }
+.ts-dialog.compact { width: min(440px, 96vw); }
+.ts-compact-form { display: grid; gap: 10px; padding: 14px; }
+.ts-compact-form textarea { min-height: 82px; resize: vertical; }
+.ts-compact-form button { min-height: 34px; border: 0; border-radius: 3px; cursor: pointer; }
+@media (max-width: 1050px) {
+  .ts-history-layout { grid-template-columns: 1fr; }
+  .ts-tree-pane { min-height: 430px; }
+  .ts-history-pane { min-height: 560px; }
+  .ts-actions.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ts-history-actions { grid-template-columns: repeat(3, minmax(110px, 1fr)); }
+  .ts-filterbar { flex-wrap: wrap; }
+  .ts-filterbar > svg { margin-right: 0; }
+}
+@media (max-width: 720px) {
+  .ts-kpis, .ts-overview-actions { grid-template-columns: 1fr; }
+  .ts-overview-actions section { grid-template-columns: 32px 1fr; }
+  .ts-overview-actions section button { grid-column: 1 / -1; width: 100%; }
+  .ts-actions.six, .ts-history-actions { grid-template-columns: 1fr 1fr; }
+  .ts-filterbar label { min-width: 100%; }
+  .ts-form-grid, .ts-check-grid, .ts-types-layout, .ts-rule-form { grid-template-columns: 1fr; }
+  .ts-type-list { min-height: 150px; border-right: 0; border-bottom: 1px solid #d4d4d4; }
+}
