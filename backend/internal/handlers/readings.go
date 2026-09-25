@@ -18,14 +18,14 @@ type Readings struct{ pool *pgxpool.Pool }
 func NewReadings(pool *pgxpool.Pool) *Readings { return &Readings{pool: pool} }
 
 type readingsRequest struct {
-	PointIDs  []int64  `json:"point_ids"`
+	PointIDs   []int64  `json:"point_ids"`
 	Parameters []string `json:"parameters"`
-	From      string   `json:"from"`
-	To        string   `json:"to"`
-	Action    string   `json:"action"`
-	DLTypeID  string   `json:"dl_type_id"`
-	DPTypeID  string   `json:"dp_type_id"`
-	PHTypeID  string   `json:"ph_type_id"`
+	From       string   `json:"from"`
+	To         string   `json:"to"`
+	Action     string   `json:"action"`
+	DLTypeID   string   `json:"dl_type_id"`
+	DPTypeID   string   `json:"dp_type_id"`
+	PHTypeID   string   `json:"ph_type_id"`
 }
 
 type readingParameter struct {
@@ -182,13 +182,13 @@ func (h *Readings) Filter(w http.ResponseWriter, r *http.Request) {
 	pointRows.Close()
 
 	httpx.OK(w, map[string]interface{}{
-		"groups": groups,
-		"points": points,
+		"groups":     groups,
+		"points":     points,
 		"parameters": readingParameters,
 		"connections": map[string]interface{}{
 			"downlinks": []map[string]string{{"id": "AUTO", "name": "Автоматически"}, {"id": "TCP", "name": "TCP/IP"}, {"id": "GSM", "name": "GSM/CSD"}},
 			"protocols": []map[string]string{{"id": "AUTO", "name": "Автоматически"}, {"id": "DLMS", "name": "DLMS/COSEM"}, {"id": "IEC", "name": "IEC 62056-21"}},
-			"channels": []map[string]string{{"id": "AUTO", "name": "Автоматически"}, {"id": "PRIMARY", "name": "Основной"}, {"id": "BACKUP", "name": "Резервный"}},
+			"channels":  []map[string]string{{"id": "AUTO", "name": "Автоматически"}, {"id": "PRIMARY", "name": "Основной"}, {"id": "BACKUP", "name": "Резервный"}},
 		},
 	})
 }
