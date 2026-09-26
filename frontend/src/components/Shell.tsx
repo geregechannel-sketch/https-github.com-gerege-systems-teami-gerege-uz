@@ -1,4 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { MENU, DICTS, MenuNode } from "../menu";
 import { api } from "../api";
 import "../menu.css";
@@ -24,20 +25,30 @@ function target(n: MenuNode): string | undefined {
 function Item({ node }: { node: MenuNode }) {
   const nav = useNavigate();
   const loc = useLocation();
+  const [open, setOpen] = useState(false);
   const t = target(node);
   const active = t && loc.pathname === t;
   const hasChildren = !!node.children?.length;
   const Ico = node.icon ? MENU_ICONS[node.icon] : null;
 
   return (
-    <li className="tm-item">
+    <li className={`tm-item${open ? " is-open" : ""}`}>
       <div
         className={"tm-link" + (active ? " is-active" : "")}
-        onClick={() => (t ? nav(t) : undefined)}
+        onClick={() => (t ? nav(t) : hasChildren ? setOpen((value) => !value) : undefined)}
       >
         {Ico && <span className="tm-ico"><Ico size={16} /></span>}
         <span className="tm-label">{node.label}</span>
-        {hasChildren && <span className="tm-caret">▸</span>}
+        {hasChildren && (
+          <button
+            className="tm-caret"
+            aria-label={open ? "Свернуть" : "Развернуть"}
+            aria-expanded={open}
+            onClick={(event) => { event.stopPropagation(); setOpen((value) => !value); }}
+          >
+            ▸
+          </button>
+        )}
       </div>
       {hasChildren && (
         <ul className="tm-flyout">
@@ -52,6 +63,9 @@ function Item({ node }: { node: MenuNode }) {
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const nav = useNavigate();
+  const loc = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => setMenuOpen(false), [loc.pathname]);
   const user = (() => {
     try {
       return localStorage.getItem("userName") || "ADMIN";
@@ -65,8 +79,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      <nav className="tm-menu">
+    <div className="toshi-shell">
+      <nav id="app-menu" className={`tm-menu${menuOpen ? " is-open" : ""}`}>
         <Link to="/" className="tm-brand">
           TEAMI ENTERPRISE <small>3.0</small>
         </Link>
@@ -96,12 +110,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </nav>
+      {menuOpen && <button className="tm-backdrop is-open" onClick={() => setMenuOpen(false)} aria-label="Закрыть меню" />}
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <div className="toshi-shell__main">
         <header className="toshi-header" style={{ flex: "0 0 auto", justifyContent: "space-between", position: "relative" }}>
-          <button className="toshi-header__btn" title="Меню">☰</button>
-          <img src={logo} alt="TOSH ELECTROAPPARAT" style={{ height: 46, position: "absolute", left: "50%", transform: "translateX(-50%)" }} />
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <button className="toshi-header__btn" title="Меню" aria-controls="app-menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>☰</button>
+          <img src={logo} alt="TOSH ELECTROAPPARAT" className="toshi-header__logo" />
+          <div className="toshi-header__actions">
             {hbtn("Скрыть", <IcEyeSlash size={16} />)}
             {hbtn("Профиль", <span style={{ display: "flex", alignItems: "center", gap: 6 }}><IcUser size={15} /> {user}</span>)}
             {hbtn("Инфо", <IcInfo size={15} />)}
@@ -113,7 +128,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {hbtn("Выход", <IcLogout size={15} />, () => { api.logout(); nav("/login"); })}
           </div>
         </header>
-        <main className="toshi-content" style={{ flex: 1, overflow: "auto", padding: 18 }}>{children}</main>
+        <main className="toshi-content">{children}</main>
       </div>
     </div>
   );

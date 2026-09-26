@@ -1,4 +1,17 @@
 /* Cascading flyout sidebar menu (mirrors the real TEAMI behaviour). */
+.toshi-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.toshi-shell__main {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .tm-menu {
   width: 240px;
   flex: 0 0 240px;
@@ -64,7 +77,21 @@
   background: rgba(255, 255, 255, 0.12);
   color: var(--textColorHover);
 }
-.tm-caret { opacity: 0.55; font-size: 11px; }
+.tm-caret {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.tm-item.is-open > .tm-link .tm-caret { transform: rotate(90deg); }
 
 /* flyout panel to the right, shown on hover of the parent item */
 .tm-flyout {
@@ -107,3 +134,50 @@
 }
 .tm-status__sep { opacity: .5; }
 .tm-status svg { fill: #fff; }
+
+.tm-backdrop { display: none; }
+
+@media (max-width: 760px) {
+  .tm-menu {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1200;
+    width: min(300px, 86vw);
+    flex-basis: auto;
+    transform: translateX(-101%);
+    transition: transform 160ms ease-out;
+    overflow-y: auto;
+    border-radius: 0;
+    box-shadow: 8px 0 24px rgb(0 0 0 / 32%);
+  }
+
+  .tm-menu.is-open { transform: translateX(0); }
+  .tm-body { overflow: visible; }
+
+  .tm-flyout {
+    position: static;
+    min-width: 0;
+    border-left: 0;
+    box-shadow: none;
+    background: rgb(255 255 255 / 4%);
+  }
+
+  .tm-item:hover > .tm-flyout { display: none; }
+  .tm-item.is-open > .tm-flyout { display: block; }
+  .tm-flyout .tm-link { padding-left: 34px; }
+  .tm-flyout .tm-flyout .tm-link { padding-left: 50px; }
+
+  .tm-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1190;
+    display: block;
+    border: 0;
+    background: rgb(12 22 29 / 54%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease-out;
+  }
+
+  .tm-backdrop.is-open { opacity: 1; pointer-events: auto; }
+}

@@ -101,3 +101,12 @@
   pagination/filter labels remain correct.
 - Made Vite's dev API proxy configurable with `VITE_API_PROXY` while retaining the live server as the default.
 - Verified with a production frontend build, Go 1.26 backend tests, and a local PostgreSQL/API browser E2E run.
+
+## Session 4 — GIS parity + responsive application shell (2026-09-26)
+- Compared the source and TOSH GIS screens side by side in Chrome and restored the source toolbar structure:
+  object search, map/object selectors, legend, orientation reset and six-row live object summary.
+- Switched the map workflow from meter-only markers to accounting-point markers with point/meter detail,
+  configured two-day availability state, direct point/meter navigation and OSM/Esri layer switching.
+- Rebuilt the application shell below 760px as an overlay drawer with nested touch-friendly menu expansion;
+  compacted the header and content spacing so all modules retain usable viewport width on mobile.
+- Verified the production build, desktop search/detail flow, both tile layers, legend, 390x844 layout and mobile drawer.

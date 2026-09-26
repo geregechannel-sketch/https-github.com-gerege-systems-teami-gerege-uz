@@ -70,10 +70,16 @@ Live: **https://toshi.gerege.mn** · Source-of-truth original: **http://82.215.7
   preserve their selected point context across modules.
 - Frontend production build and backend Go 1.26 tests pass. A local PostgreSQL/API + Vite E2E run verified the
   topology expansion, point search/detail, related-data query, filtered module navigation, and meter lookup.
+- GIS now mirrors the source screen's search, map selector, legend, reset and object-summary workflow while
+  retaining TOSH's working Leaflet map, point/meter drill-down and an optional Esri satellite layer.
+- The application shell uses an overlay navigation drawer below 760px, with expandable nested menus and a
+  compact header; GIS was visually verified at 390x844 as well as desktop size.
 
 ## Known data boundary
 - Deep event/statistics/audit rows remain deterministic seed data where the source deployment did not expose an
   exportable historical dataset. The workflows and response contracts are implemented; production history must
   come from an authorized source export.
+- GIS marker positions use a deterministic Choibalsan layout because source coordinates were not exportable.
+  Search, status and detail data are API-backed; production geometry must come from an authorized GIS export.
 - The uncaptured long tail of generated endpoints preserves the documented method, parameter, auth, envelope,
   CRUD and grid contracts. Domain-specific side effects cannot be claimed without source behavior evidence.

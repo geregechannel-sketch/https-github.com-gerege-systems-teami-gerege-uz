@@ -252,6 +252,19 @@ html, body, #root { margin: 0; padding: 0; height: 100%; }
 }
 .toshi-header__btn:hover { background: var(--headerButtonHover); }
 
+.toshi-header__logo {
+  position: absolute;
+  left: 50%;
+  height: 46px;
+  transform: translateX(-50%);
+}
+
+.toshi-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .toshi-menu {
   width: var(--toshi-menu-w); background: var(--menuBg); color: var(--menuTextColor);
   height: 100%; overflow-y: auto;
@@ -262,7 +275,21 @@ html, body, #root { margin: 0; padding: 0; height: 100%; }
 }
 .toshi-menu__item:hover, .toshi-menu__item.is-active { background: rgba(255,255,255,.08); }
 
-.toshi-content { background: var(--contentBg); color: var(--textColor); }
+.toshi-content {
+  flex: 1;
+  overflow: auto;
+  padding: 18px;
+  background: var(--contentBg);
+  color: var(--textColor);
+}
+
+@media (max-width: 760px) {
+  .toshi-header { padding: 0 8px; }
+  .toshi-header__logo { width: 116px; height: auto; }
+  .toshi-header__actions .toshi-header__btn { display: none; }
+  .toshi-header__actions .toshi-header__btn:nth-last-child(-n + 3) { display: inline-flex; }
+  .toshi-content { padding: 8px; }
+}
 
 /* =============================================================================
    5) КАРТ / WELL / INFOBOX (dashboard модулийн карт)
