@@ -122,7 +122,7 @@ func SimulateTick(ctx context.Context, pool *pgxpool.Pool) error {
 		INSERT INTO reading_values
 		(point_id, meter_id, parameter_code, reading_time, reading_value, unit, status, source)
 		SELECT p.point_id, am.meter_id, prm.code, date_trunc('second', now()),
-		       round((prm.base * (0.85 + (p.point_id % 7) * 0.05)
+		       round((prm.base * (CASE WHEN prm.swing > 0 THEN 0.85 + (p.point_id % 7) * 0.05 ELSE 1 END)
 		              * (1 + prm.swing * sin(extract(epoch FROM now()) / 600 + p.point_id))
 		              + prm.base * prm.jitter * (random() - 0.5))::numeric, 3),
 		       prm.unit, 'OK', 'SIM'
