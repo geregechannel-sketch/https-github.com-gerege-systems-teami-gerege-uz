@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import logo from "../assets/logo.png";
 import "../login.css";
+import { getLang, setLang as saveLang } from "../i18n";
 
 const LANGS = [
+  { v: "mn", label: "Монгол" },
   { v: "ru", label: "Русский" },
   { v: "en", label: "English" },
   { v: "uz", label: "Oʻzbek" },
-  { v: "mn", label: "Монгол" },
 ] as const;
 
 const COPY = {
@@ -57,13 +58,7 @@ const COPY = {
 type Lang = keyof typeof COPY;
 type LoginError = "invalidCredentials" | "loginFailed";
 
-function readLanguage(): Lang {
-  try {
-    const saved = localStorage.getItem("lang");
-    if (saved && saved in COPY) return saved as Lang;
-  } catch {}
-  return "ru";
-}
+const readLanguage = (): Lang => getLang();
 
 export default function Login() {
   const [login, setLogin] = useState("admin");
@@ -83,7 +78,6 @@ export default function Login() {
     if (env.success) {
       try {
         localStorage.setItem("userName", String((env.data as any)?.USER_NAME || login).toUpperCase());
-        localStorage.setItem("lang", lang);
       } catch {}
       nav("/", { replace: true });
     } else {
@@ -93,9 +87,7 @@ export default function Login() {
 
   function changeLanguage(next: Lang) {
     setLang(next);
-    try {
-      localStorage.setItem("lang", next);
-    } catch {}
+    saveLang(next);
   }
 
   return (

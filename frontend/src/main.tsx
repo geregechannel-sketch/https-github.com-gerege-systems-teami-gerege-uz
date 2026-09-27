@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import "./theme.css";
 import { getToken } from "./api";
+import { startTranslator } from "./i18n";
 import Shell from "./components/Shell";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -72,4 +73,5 @@ function App() {
 
 // StrictMode intentionally omitted: it double-invokes effects, which breaks the
 // MapLibre map lifecycle (create -> remove -> create) on the GIS screen.
+startTranslator();
 createRoot(document.getElementById("root")!).render(<App />);
