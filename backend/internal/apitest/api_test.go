@@ -57,6 +57,7 @@ func setup(t *testing.T) (*httptest.Server, *pgxpool.Pool) {
 	reg := resource.NewRegistry()
 	resource.RegisterCore(reg)
 	resource.RegisterGenerated(reg)
+	resource.RegisterExtras(reg)
 	srv := httptest.NewServer(router.New(pool, mgr, reg))
 	t.Cleanup(func() { srv.Close(); pool.Close() })
 	return srv, pool

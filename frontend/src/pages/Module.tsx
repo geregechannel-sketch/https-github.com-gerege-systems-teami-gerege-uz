@@ -16,6 +16,7 @@ export default function Module() {
   const urlFilterCol = searchParams.get("filter") || "";
   const urlFilterVal = searchParams.get("value") || "";
   const urlFilterExact = searchParams.get("exact") === "1";
+  const readOnly = ["audit", "audit_files", "user_sessions"].includes(model);
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [limit] = useState(50);
@@ -91,7 +92,7 @@ export default function Module() {
   }
 
   async function save() {
-    if (!editing) return;
+    if (readOnly || !editing) return;
     const body: Row = {};
     for (const k of Object.keys(editing)) if (k !== pk || editing.__new) body[k] = editing[k];
     let env;
@@ -112,7 +113,7 @@ export default function Module() {
   }
 
   async function remove() {
-    if (!editing || !pk || editing.__new) return;
+    if (readOnly || !editing || !pk || editing.__new) return;
     if (!confirm("Устгах уу?")) return;
     const env = await api.del(`${model}/${editing[pk]}`);
     if (env.success) {
@@ -147,7 +148,7 @@ export default function Module() {
         <button className="toshi-btn" disabled={!appliedFilter.col && !appliedFilter.val} onClick={resetFilter}>
           Сбросить
         </button>
-        <button
+        {!readOnly && <button
           className="toshi-btn toshi-btn--green"
           onClick={() => {
             const blank: Row = { __new: true };
@@ -156,7 +157,8 @@ export default function Module() {
           }}
         >
           + Новый
-        </button>
+        </button>}
+        {readOnly && <span>Бүртгэл — зөвхөн унших</span>}
       </div>
 
       {error && <div style={{ color: "var(--btnRedBg)", marginBottom: 10 }}>{error}</div>}
@@ -216,17 +218,17 @@ export default function Module() {
                     <input
                       className="toshi-input"
                       style={{ width: "100%" }}
-                      disabled={k === pk && !editing.__new}
+                      disabled={readOnly || (k === pk && !editing.__new)}
                       value={editing[k] ?? ""}
                       onChange={(e) => setEditing({ ...editing, [k]: e.target.value })}
                     />
                   </div>
                 ))}
               <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button className="toshi-btn toshi-btn--green" onClick={save}>
+                {!readOnly && <button className="toshi-btn toshi-btn--green" onClick={save}>
                   Сохранить
-                </button>
-                {!editing.__new && (
+                </button>}
+                {!readOnly && !editing.__new && (
                   <button className="toshi-btn toshi-btn--red" onClick={remove}>
                     Удалить
                   </button>

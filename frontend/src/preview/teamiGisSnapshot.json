@@ -1,0 +1,902 @@
+{
+  "kind": "recorded-gis-response",
+  "capturedAt": "2026-09-14T08:59:28.102Z",
+  "coordinateResponseCount": 40,
+  "map": {
+    "OBJ_NAME": "UZ (Монголия)",
+    "X1": 114.57397886109945,
+    "X2": 114.57949348283421,
+    "Y1": 48.11954261530327,
+    "Y2": 48.110889777779484
+  },
+  "summary": [
+    {
+      "label": "Количество точек учета объекта",
+      "value": "87"
+    },
+    {
+      "label": "Есть показания за последние 2 сутки",
+      "value": "85"
+    },
+    {
+      "label": "Наименование объекта",
+      "value": "UZ (Монголия)"
+    },
+    {
+      "label": "Общее количество ТП/КТП",
+      "value": null
+    }
+  ],
+  "points": [
+    {
+      "id": 1194458,
+      "name": "Ул. Баялаг.Щит №10.Хэрлэн 8-р баг Баялаг 9-913 /хуучин 1-07/ тп43-63",
+      "status": 2,
+      "longitude": 114.575058,
+      "latitude": 48.116061,
+      "coordinateError": null,
+      "rawLongitude": "114.575058",
+      "rawLatitude": "48.116061"
+    },
+    {
+      "id": 1194462,
+      "name": "Ул. Баялаг.Щит №20.Хэрлэн 8-р баг Баялаг 5-06",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194475,
+      "name": "Ул. Баялаг.Щит №5.Хэрлэн 8-р баг Зутгуур 5-03 тп43-01",
+      "status": 2,
+      "longitude": 114.573586,
+      "latitude": 48.114264,
+      "coordinateError": null,
+      "rawLongitude": "114.573586",
+      "rawLatitude": "48.114264"
+    },
+    {
+      "id": 1194478,
+      "name": "Ул. Баялаг.Щит №15.Хэрлэн 8-р баг Баялаг 6-08 тп43-44",
+      "status": 2,
+      "longitude": 114.577472,
+      "latitude": 48.116767,
+      "coordinateError": null,
+      "rawLongitude": "114.577472",
+      "rawLatitude": "48.116767"
+    },
+    {
+      "id": 1194488,
+      "name": "Ул. Баялаг.Щит №6.Хэрлэн 8-р баг Зутгуур 5-01 тп43-65",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194503,
+      "name": "Ул. Баялаг.Щит №35.Хэрлэн 8-р баг Баялаг 1-02 тп43-06",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194511,
+      "name": "Ул. Баялаг.Щит №27.Хэрлэн 8-р баг Баялаг 3-1 тп43-02",
+      "status": 2,
+      "longitude": 114.575028,
+      "latitude": 48.113594,
+      "coordinateError": null,
+      "rawLongitude": "114.575028",
+      "rawLatitude": "48.113594"
+    },
+    {
+      "id": 1194512,
+      "name": "Ул. Баялаг.Щит №27.Хэрлэн 8-р баг Баялаг 3-03 тп43-19",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194522,
+      "name": "Ул. Баялаг.Щит №25.Хэрлэн 8-р баг Баялаг 4-04 тп43-26",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194524,
+      "name": "Ул. Баялаг.Щит №31.Хэрлэн 8-р баг Баялаг 1-05 /2-209/",
+      "status": 2,
+      "longitude": 114.577278,
+      "latitude": 48.11385,
+      "coordinateError": null,
+      "rawLongitude": "114.577278",
+      "rawLatitude": "48.113850"
+    },
+    {
+      "id": 1194470,
+      "name": "Ул. Баялаг.Щит №32.Хэрлэн 8-р баг Баялаг 0-02 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194483,
+      "name": "Ул. Баялаг.Щит №29.Хэрлэн 8-р баг Баялаг 2-09 тп-43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194499,
+      "name": "Ул. Баялаг.Щит №24.Хэрлэн 8-р баг Баялаг 4-06 тп43-27",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194523,
+      "name": "Ул. Баялаг.Щит №26.Хэрлэн 8-р баг Баялаг 4-02 тп43-23",
+      "status": 2,
+      "longitude": 114.575572,
+      "latitude": 48.114522,
+      "coordinateError": null,
+      "rawLongitude": "114.575572",
+      "rawLatitude": "48.114522"
+    },
+    {
+      "id": 1194526,
+      "name": "Ул. Баялаг.Щит №34.Хэрлэн 8-р баг Баялаг 2-02 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194527,
+      "name": "Ул. Баялаг.Щит № ГС-2.Хэрлэн-8-р баг Баялаг ГС-2",
+      "status": 2,
+      "longitude": 114.574875,
+      "latitude": 48.114928,
+      "coordinateError": null,
+      "rawLongitude": "114.574875",
+      "rawLatitude": "48.114928"
+    },
+    {
+      "id": 1194536,
+      "name": "Ул. Баялаг.Щит №23.Хэрлэн 8-р баг Баян нуур 5-02",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194457,
+      "name": "Ул. Баялаг.Щит №8.Хэрлэн 8-р баг Баялаг 7-715 /жонш 1-06/",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194463,
+      "name": "Ул. Баялаг.Щит №20.Хэрлэн 8-р баг Баялаг 5-09а тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194468,
+      "name": "Ул. Баялаг.Щит №29.Хэрлэн 8-р баг Баялаг 2-07 тп43-16",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194479,
+      "name": "Ул. Баялаг.Щит №16.Хэрлэн 8-р баг Баялаг 6-14",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194480,
+      "name": "Ул. Баялаг.Щит №20.Хэрлэн 8-р баг Баялаг 5-08 тп43-34",
+      "status": 2,
+      "longitude": 114.577519,
+      "latitude": 48.116244,
+      "coordinateError": null,
+      "rawLongitude": "114.577519",
+      "rawLatitude": "48.116244"
+    },
+    {
+      "id": 1194481,
+      "name": "Ул. Баялаг.Щит №24.Хэрлэн 8-р баг Баялаг 4-07 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194489,
+      "name": "Ул. Баялаг.Щит №17.Хэрлэн 8-р баг Баялаг-14 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194491,
+      "name": "Ул. Баялаг.Щит №23.Хэрлэн 8-р баг Баялаг 5-03 тп43-33",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": "Эхийн координатын формат буруу",
+      "rawLongitude": "114.576536",
+      "rawLatitude": "48.115544,"
+    },
+    {
+      "id": 1194492,
+      "name": "Ул. Баялаг.Щит №28.Хэрлэн 8-р баг Баялаг 3-05 тп43-21",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194498,
+      "name": "Ул. Баялаг.Щит №14.Хэрлэн 8-р баг Баялаг 6-11 тп43-59",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194505,
+      "name": "Ул. Баялаг.Щит № ГС-1.Хэрлэн-8-р баг Баялаг ГС-1",
+      "status": 2,
+      "longitude": 114.574147,
+      "latitude": 48.117239,
+      "coordinateError": null,
+      "rawLongitude": "114.574147",
+      "rawLatitude": "48.117239"
+    },
+    {
+      "id": 1194517,
+      "name": "Ул. Баялаг.Щит №9.Хэрлэн-8-р баг зутгуур 6-06",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194530,
+      "name": "Ул. Баялаг.Щит №7.Хэрлэн 8-р баг Зутгуур 1-05 тп43-67",
+      "status": 2,
+      "longitude": 114.575289,
+      "latitude": 48.115269,
+      "coordinateError": null,
+      "rawLongitude": "114.575289",
+      "rawLatitude": "48.115269"
+    },
+    {
+      "id": 1194535,
+      "name": "Ул. Баялаг.Щит №17.Хэрлэн 8-р баг Баялаг 4-12 тп43-30",
+      "status": 2,
+      "longitude": 114.579178,
+      "latitude": 48.116597,
+      "coordinateError": null,
+      "rawLongitude": "114.579178",
+      "rawLatitude": "48.116597"
+    },
+    {
+      "id": 1194537,
+      "name": "Ул. Баялаг.Щит №27.Хэрлэн 8-р баг Баялаг 3-01 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194460,
+      "name": "Ул. Баялаг.Щит №11.Хэрлэн 8-р баг Баялаг 2-07 тп43-64",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194473,
+      "name": "Ул. Баялаг.Щит №2.Хэрлэн 8-р баг Жонш 1-02 тп43-55",
+      "status": 2,
+      "longitude": 114.573653,
+      "latitude": 48.116939,
+      "coordinateError": null,
+      "rawLongitude": "114.573653",
+      "rawLatitude": "48.116939"
+    },
+    {
+      "id": 1194484,
+      "name": "Ул. Баялаг.Щит №33.Хэрлэн 8-р баг Баялаг 2-05",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194485,
+      "name": "Ул. Баялаг.Щит № Ш4.Хэрлэн 8-р баг Баялаг 2-06 43-18",
+      "status": 2,
+      "longitude": 114.576422,
+      "latitude": 48.113908,
+      "coordinateError": null,
+      "rawLongitude": "114.576422",
+      "rawLatitude": "48.113908"
+    },
+    {
+      "id": 1194508,
+      "name": "Ул. Баялаг.Щит №16.Хэрлэн-8-р баг Баялаг 7-741а",
+      "status": 2,
+      "longitude": 114.578592,
+      "latitude": 48.117267,
+      "coordinateError": null,
+      "rawLongitude": "114.578592",
+      "rawLatitude": "48.117267"
+    },
+    {
+      "id": 1194510,
+      "name": "Ул. Баялаг.Щит №26.Хэрлэн-8-р баг Баялаг  6-607",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194514,
+      "name": "Ул. Баялаг.Щит №3.Хэрлэн 8-р баг Жонш 1-05",
+      "status": 2,
+      "longitude": 114.573442,
+      "latitude": 48.116242,
+      "coordinateError": null,
+      "rawLongitude": "114.573442",
+      "rawLatitude": "48.116242"
+    },
+    {
+      "id": 1194515,
+      "name": "Ул. Баялаг.Щит №4.Хэрлэн 8-р баг Зутгуур 5-13 тп43-50",
+      "status": 2,
+      "longitude": 114.573044,
+      "latitude": 48.114308,
+      "coordinateError": null,
+      "rawLongitude": "114.573044",
+      "rawLatitude": "48.114308"
+    },
+    {
+      "id": 1194520,
+      "name": "Ул. Баялаг.Щит №21.Хэрлэн 8-р баг Баялаг 5-3а",
+      "status": 2,
+      "longitude": 114.576894,
+      "latitude": 48.115825,
+      "coordinateError": null,
+      "rawLongitude": "114.576894",
+      "rawLatitude": "48.115825"
+    },
+    {
+      "id": 1194525,
+      "name": "Ул. Баялаг.Щит №32.Хэрлэн 8-р баг Баялаг 1-04",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194538,
+      "name": "Ул. Баялаг.Щит №33.Хэрлэн 8-р баг Баялаг 2-04 тп-43 Утас:99585102",
+      "status": 2,
+      "longitude": 114.575953,
+      "latitude": 48.113631,
+      "coordinateError": null,
+      "rawLongitude": "114.575953",
+      "rawLatitude": "48.113631"
+    },
+    {
+      "id": 1194454,
+      "name": "Ул. Баялаг.Щит №2.8-р баг жонш 2-225",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194469,
+      "name": "Ул. Баялаг.Щит №32.Хэрлэн 8-р баг Баялаг 1-03 тп43-12",
+      "status": 2,
+      "longitude": 114.576844,
+      "latitude": 48.113539,
+      "coordinateError": null,
+      "rawLongitude": "114.576844",
+      "rawLatitude": "48.113539"
+    },
+    {
+      "id": 1194474,
+      "name": "Ул. Баялаг.Щит №3.Хэрлэн 6-р баг Жонш 1-06 тп43-57",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194486,
+      "name": "Ул. Баялаг.Щит №1.Хэрлэн 8-р баг Жонш 2-05 тп43",
+      "status": 2,
+      "longitude": 114.576403,
+      "latitude": 48.118736,
+      "coordinateError": null,
+      "rawLongitude": "114.576403",
+      "rawLatitude": "48.118736"
+    },
+    {
+      "id": 1194501,
+      "name": "Ул. Баялаг.Щит №30.Хэрлэн 1-р баг Баялаг 1-07",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194516,
+      "name": "Ул. Баялаг.Щит №34.Хэрлэн 8-р баг баялаг 3-301/2-01/",
+      "status": 2,
+      "longitude": 114.575556,
+      "latitude": 48.113311,
+      "coordinateError": null,
+      "rawLongitude": "114.575556",
+      "rawLatitude": "48.113311"
+    },
+    {
+      "id": 1194519,
+      "name": "Ул. Баялаг.Щит №19.Хэрлэн 8-р баг Баялаг 4-10 тп43-49",
+      "status": 2,
+      "longitude": 114.577814,
+      "latitude": 48.115886,
+      "coordinateError": null,
+      "rawLongitude": "114.577814",
+      "rawLatitude": "48.115886"
+    },
+    {
+      "id": 1194528,
+      "name": "Ул. Баялаг.Щит №4.Хэрлэн 8-р баг Зутгуур 5-15 тп43-48 Утас:88583675",
+      "status": 2,
+      "longitude": 114.573044,
+      "latitude": 48.114308,
+      "coordinateError": null,
+      "rawLongitude": "114.573044",
+      "rawLatitude": "48.114308"
+    },
+    {
+      "id": 1194532,
+      "name": "Ул. Баялаг.Щит №12.Хэрлэн сум 8-р баг Баялаг 7-723 тоот",
+      "status": 2,
+      "longitude": 114.576528,
+      "latitude": 48.116203,
+      "coordinateError": null,
+      "rawLongitude": "114.576528",
+      "rawLatitude": "48.116203"
+    },
+    {
+      "id": 1194455,
+      "name": "Ул. Баялаг.Щит №3.Хэрлэн 8-р баг Ирээд?й хороолол 6-13 тп43-62",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194461,
+      "name": "Ул. Баялаг.Щит №14.Хэрлэн 8-р баг Баялаг 6-10 тп43-47",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194465,
+      "name": "Ул. Баялаг.Щит №22.Хэрлэн 8-р баг Баялаг 4-09 тп43-29",
+      "status": 2,
+      "longitude": 114.577361,
+      "latitude": 48.115719,
+      "coordinateError": null,
+      "rawLongitude": "114.577361",
+      "rawLatitude": "48.115719"
+    },
+    {
+      "id": 1194493,
+      "name": "Ул. Баялаг.Щит №29.Хэрлэн 8-р баг Баялаг 3-08 тп43-54",
+      "status": 2,
+      "longitude": 114.577219,
+      "latitude": 48.114528,
+      "coordinateError": null,
+      "rawLongitude": "114.577219",
+      "rawLatitude": "48.114528"
+    },
+    {
+      "id": 1194500,
+      "name": "Ул. Баялаг.Щит №28.Хэрлэн 8-р баг Баялаг 3-05 тп43-45",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194506,
+      "name": "Ул. Баялаг.Щит №1.Хэрлэн 8-р баг Чулуут 1-02 /Жонш 1-12/",
+      "status": 2,
+      "longitude": 114.576403,
+      "latitude": 48.118736,
+      "coordinateError": null,
+      "rawLongitude": "114.576403",
+      "rawLatitude": "48.118736"
+    },
+    {
+      "id": 1194507,
+      "name": "Ул. Баялаг.Щит №9.Хэрлэн 8-р баг Зутгуур 6-07 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194518,
+      "name": "Ул. Баялаг.Щит №13.Хэрлэн 8-р баг Баялаг 6-06 тп43-60",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194531,
+      "name": "Ул. Баялаг.Щит №9.Хэрлэн 8-р баг Зутгуур 5-05 тп43 Утас:80156215",
+      "status": 2,
+      "longitude": 114.575417,
+      "latitude": 48.115797,
+      "coordinateError": null,
+      "rawLongitude": "114.575417",
+      "rawLatitude": "48.115797"
+    },
+    {
+      "id": 1194533,
+      "name": "Ул. Баялаг.Щит №13.Хэрлэн 8-р баг Баялаг 6-07 тп43-04",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194539,
+      "name": "Ул. Баялаг.Щит № Ш1.Хэрлэн-8-р баг Баялаг 6-627",
+      "status": 2,
+      "longitude": 114.578661,
+      "latitude": 48.116361,
+      "coordinateError": null,
+      "rawLongitude": "114.578661",
+      "rawLatitude": "48.116361"
+    },
+    {
+      "id": 1194453,
+      "name": "Ул. Баялаг.ТП 43.Балансовый счётчик",
+      "status": 2,
+      "longitude": 114.576278,
+      "latitude": 48.1175,
+      "coordinateError": null,
+      "rawLongitude": "114.576278",
+      "rawLatitude": "48.117500"
+    },
+    {
+      "id": 1194456,
+      "name": "Ул. Баялаг.Щит №5.Хэрлэн 8-р баг Зутгуур 6-02в тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194459,
+      "name": "Ул. Баялаг.Щит №11.Хэрлэн 8-р баг Баялаг 6-02 тп43-40",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194464,
+      "name": "Ул. Баялаг.Щит №21.Хэрлэн 8-р баг Баялаг 5-3",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194466,
+      "name": "Ул. Баялаг.Щит №25.Хэрлэн 8-р баг Баялаг 4-03 тп43-11",
+      "status": 2,
+      "longitude": 114.576008,
+      "latitude": 48.11485,
+      "coordinateError": null,
+      "rawLongitude": "114.576008",
+      "rawLatitude": "48.114850"
+    },
+    {
+      "id": 1194467,
+      "name": "Ул. Баялаг.Щит №25.Хэрлэн 8-р баг Баялаг 4-02 тп43-24",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194471,
+      "name": "Ул. Баялаг.Щит №35.Хэрлэн-8-р баг Баялаг 2-201",
+      "status": 2,
+      "longitude": 114.576067,
+      "latitude": 48.112933,
+      "coordinateError": null,
+      "rawLongitude": "114.576067",
+      "rawLatitude": "48.112933"
+    },
+    {
+      "id": 1194490,
+      "name": "Ул. Баялаг.Щит №18.Хэрлэн 8-р баг Баялаг 4-11",
+      "status": 2,
+      "longitude": 114.578264,
+      "latitude": 48.116111,
+      "coordinateError": null,
+      "rawLongitude": "114.578264",
+      "rawLatitude": "48.116111"
+    },
+    {
+      "id": 1194495,
+      "name": "Ул. Баялаг.Щит №5.Хэрлэн 8-р баг Зутгуур 6-02б тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194497,
+      "name": "Ул. Баялаг.Щит №14.Хэрлэн 8-р баг Баялаг 6-12 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194502,
+      "name": "Ул. Баялаг.Щит №34.Хэрлэн 8-р баг Баялаг 2-03 тп43-61",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194534,
+      "name": "Ул. Баялаг.Щит №13.Хэрлэн 8-р баг Баялаг 6-05 тп43-43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194472,
+      "name": "Ул. Баялаг.Щит № Ш2.Хэрлэн-8-р баг Баялаг 6-611",
+      "status": 2,
+      "longitude": 114.576161,
+      "latitude": 48.115278,
+      "coordinateError": null,
+      "rawLongitude": "114.576161",
+      "rawLatitude": "48.115278"
+    },
+    {
+      "id": 1194476,
+      "name": "Ул. Баялаг.Щит №5.Хэрлэн 8-р баг Зутгуур 5-02б",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194477,
+      "name": "Ул. Баялаг.Щит №11.Хэрлэн 8-р баг Баялаг 6-3 тп43-41",
+      "status": 2,
+      "longitude": 114.575719,
+      "latitude": 48.1156,
+      "coordinateError": null,
+      "rawLongitude": "114.575719",
+      "rawLatitude": "48.115600"
+    },
+    {
+      "id": 1194482,
+      "name": "Ул. Баялаг.Щит №29.Хэрлэн 8-р баг Баялаг 2-09 тп43-17",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194487,
+      "name": "Ул. Баялаг.Щит №6.Хэрлэн 8-р баг Зутгуур 0-02 тп43-08",
+      "status": 2,
+      "longitude": 114.574028,
+      "latitude": 48.114264,
+      "coordinateError": null,
+      "rawLongitude": "114.574028",
+      "rawLatitude": "48.114264"
+    },
+    {
+      "id": 1194494,
+      "name": "Ул. Баялаг.Щит №30.Хэрлэн 8-р баг Баялаг 1-06 тп43-15",
+      "status": 2,
+      "longitude": 114.577697,
+      "latitude": 48.114183,
+      "coordinateError": null,
+      "rawLongitude": "114.577697",
+      "rawLatitude": "48.114183"
+    },
+    {
+      "id": 1194496,
+      "name": "Ул. Баялаг.Щит №6.Хэрлэн 8-р баг Зутгуур 0-01 тп43 05003818",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194504,
+      "name": "Ул. Баялаг.Щит № Ш3 ГС.Хэрлэн-8-р баг Баялаг Ш3 ГС",
+      "status": 2,
+      "longitude": 114.575306,
+      "latitude": 48.114519,
+      "coordinateError": null,
+      "rawLongitude": "114.575306",
+      "rawLatitude": "48.114519"
+    },
+    {
+      "id": 1194509,
+      "name": "Ул. Баялаг.Щит №17.Хэрлэн 8-р баг Баялаг 4-14 тп43-32",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194513,
+      "name": "Ул. Баялаг.Щит №28.Хэрлэн 8-р баг Баялаг 3-04",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    },
+    {
+      "id": 1194521,
+      "name": "Ул. Баялаг.Щит №24.Хэрлэн 8-р баг Баялаг 4-05 тп43-10",
+      "status": 2,
+      "longitude": 114.576867,
+      "latitude": 48.115386,
+      "coordinateError": null,
+      "rawLongitude": "114.576867",
+      "rawLatitude": "48.115386"
+    },
+    {
+      "id": 1194529,
+      "name": "Ул. Баялаг.Щит №6.Хэрлэн 8-р баг Зутгуур 5-01 тп43",
+      "status": 2,
+      "longitude": null,
+      "latitude": null,
+      "coordinateError": null,
+      "rawLongitude": null,
+      "rawLatitude": null
+    }
+  ]
+}

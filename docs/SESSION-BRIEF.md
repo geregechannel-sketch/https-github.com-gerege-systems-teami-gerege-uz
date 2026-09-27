@@ -18,7 +18,7 @@ Live: **https://toshi.gerege.mn** · Source-of-truth original: **http://82.215.7
 - **CI runs migrations** against a real PG, so a bad `.sql` fails CI (good — it gates deploy).
 - Local docker `postgres:16 --platform linux/amd64` is **flaky** on this Mac (containers die); rely on CI to
   validate migrations instead of local runs.
-- Never commit the real source password (`Erdenebatt#2026`) — redact.
+- Never commit the real source password (kept out of the repo) — redact.
 
 ## Backend architecture
 - `internal/resource/` — `Model{Name,Table,PKField,Fields(API↔col),actions}`. `RegisterCore` (models.go) +

@@ -6,21 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:quality": "tsc src/lib/archiveQuality.ts --target ES2020 --module ES2020 --moduleResolution bundler --skipLibCheck --outDir .test-build && node --test tests/archiveQuality.test.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
-    "maplibre-gl": "^4.7.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.22",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^5.2.0",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11"
+    "vite": "^7.3.6"
   }
 }

@@ -1,0 +1,1011 @@
+{
+  "pointmenuv2/point_ffp": {
+    "capturedAt": "2026-09-14T09:03:40.326Z",
+    "sourceFile": "01-82.215.77.202-10.har",
+    "rows": [
+      {
+        "FFP_DATA_ID": 141,
+        "FFP_DATA_NAME": "№ Л/С или договора",
+        "FFP_VAL_SORT_NUM": 0,
+        "FFP_VAL_ROW_NUM": 1
+      },
+      {
+        "FFP_DATA_ID": 343,
+        "FFP_DATA_NAME": "PS Наименование",
+        "FFP_VAL_SORT_NUM": 1,
+        "FFP_VAL_ROW_NUM": 15
+      },
+      {
+        "FFP_DATA_ID": 344,
+        "FFP_DATA_NAME": "RES Наименование",
+        "FFP_VAL_SORT_NUM": 2,
+        "FFP_VAL_ROW_NUM": 16
+      },
+      {
+        "FFP_DATA_ID": 345,
+        "FFP_DATA_NAME": "SP Наименование",
+        "FFP_VAL_SORT_NUM": 3,
+        "FFP_VAL_ROW_NUM": 17
+      },
+      {
+        "FFP_DATA_ID": 145,
+        "FFP_DATA_NAME": "Адрес (квартира)",
+        "FFP_VAL_SORT_NUM": 4,
+        "FFP_VAL_ROW_NUM": 5
+      },
+      {
+        "FFP_DATA_ID": 142,
+        "FFP_DATA_NAME": "Адрес (населенный пункт)",
+        "FFP_VAL_SORT_NUM": 5,
+        "FFP_VAL_ROW_NUM": 2
+      },
+      {
+        "FFP_DATA_ID": 144,
+        "FFP_DATA_NAME": "Адрес (номер дома)",
+        "FFP_VAL_SORT_NUM": 6,
+        "FFP_VAL_ROW_NUM": 4
+      },
+      {
+        "FFP_DATA_ID": 143,
+        "FFP_DATA_NAME": "Адрес (улица)",
+        "FFP_VAL_SORT_NUM": 7,
+        "FFP_VAL_ROW_NUM": 3
+      },
+      {
+        "FFP_DATA_ID": 446,
+        "FFP_DATA_NAME": "Тип потребителя",
+        "FFP_VAL_SORT_NUM": 8,
+        "FFP_VAL_ROW_NUM": 10
+      },
+      {
+        "FFP_DATA_ID": 423,
+        "FFP_DATA_NAME": "Инсталированная мощность, kW",
+        "FFP_VAL_SORT_NUM": 9,
+        "FFP_VAL_ROW_NUM": 24
+      },
+      {
+        "FFP_DATA_ID": 401,
+        "FFP_DATA_NAME": "Код СОАТО",
+        "FFP_VAL_SORT_NUM": 10,
+        "FFP_VAL_ROW_NUM": 23
+      },
+      {
+        "FFP_DATA_ID": 151,
+        "FFP_DATA_NAME": "Ктн",
+        "FFP_VAL_SORT_NUM": 11,
+        "FFP_VAL_ROW_NUM": 12
+      },
+      {
+        "FFP_DATA_ID": 152,
+        "FFP_DATA_NAME": "Ктт",
+        "FFP_VAL_SORT_NUM": 12,
+        "FFP_VAL_ROW_NUM": 11
+      },
+      {
+        "FFP_DATA_ID": 88,
+        "FFP_DATA_NAME": "Мастер, проводивший последнюю поверку счетчика",
+        "FFP_VAL_SORT_NUM": 13,
+        "FFP_VAL_ROW_NUM": 88
+      },
+      {
+        "FFP_DATA_ID": 92,
+        "FFP_DATA_NAME": "Начало эксплуатации",
+        "FFP_VAL_SORT_NUM": 14,
+        "FFP_VAL_ROW_NUM": 92
+      },
+      {
+        "FFP_DATA_ID": 346,
+        "FFP_DATA_NAME": "Номер контроллера",
+        "FFP_VAL_SORT_NUM": 15,
+        "FFP_VAL_ROW_NUM": 18
+      },
+      {
+        "FFP_DATA_ID": 97,
+        "FFP_DATA_NAME": "Номер счётчика",
+        "FFP_VAL_SORT_NUM": 16,
+        "FFP_VAL_ROW_NUM": 97
+      },
+      {
+        "FFP_DATA_ID": 182,
+        "FFP_DATA_NAME": "Описание состояния реле №1",
+        "FFP_VAL_SORT_NUM": 17,
+        "FFP_VAL_ROW_NUM": 100
+      },
+      {
+        "FFP_DATA_ID": 149,
+        "FFP_DATA_NAME": "Организация, настроившая сбор",
+        "FFP_VAL_SORT_NUM": 18,
+        "FFP_VAL_ROW_NUM": 9
+      },
+      {
+        "FFP_DATA_ID": 121,
+        "FFP_DATA_NAME": "Основная проблема",
+        "FFP_VAL_SORT_NUM": 19,
+        "FFP_VAL_ROW_NUM": 98
+      },
+      {
+        "FFP_DATA_ID": 148,
+        "FFP_DATA_NAME": "Пользователь, настроивший сбор",
+        "FFP_VAL_SORT_NUM": 20,
+        "FFP_VAL_ROW_NUM": 8
+      },
+      {
+        "FFP_DATA_ID": 147,
+        "FFP_DATA_NAME": "Порядковый номер счетчика в MIT",
+        "FFP_VAL_SORT_NUM": 21,
+        "FFP_VAL_ROW_NUM": 7
+      },
+      {
+        "FFP_DATA_ID": 93,
+        "FFP_DATA_NAME": "Принадлежность счетчика",
+        "FFP_VAL_SORT_NUM": 22,
+        "FFP_VAL_ROW_NUM": 93
+      },
+      {
+        "FFP_DATA_ID": 75,
+        "FFP_DATA_NAME": "Регион. Код",
+        "FFP_VAL_SORT_NUM": 23,
+        "FFP_VAL_ROW_NUM": 75
+      },
+      {
+        "FFP_DATA_ID": 77,
+        "FFP_DATA_NAME": "Регион. Наименование",
+        "FFP_VAL_SORT_NUM": 24,
+        "FFP_VAL_ROW_NUM": 77
+      },
+      {
+        "FFP_DATA_ID": 181,
+        "FFP_DATA_NAME": "Состояние реле №1",
+        "FFP_VAL_SORT_NUM": 25,
+        "FFP_VAL_ROW_NUM": 99
+      },
+      {
+        "FFP_DATA_ID": 96,
+        "FFP_DATA_NAME": "Тип счётчика",
+        "FFP_VAL_SORT_NUM": 26,
+        "FFP_VAL_ROW_NUM": 96
+      },
+      {
+        "FFP_DATA_ID": 73,
+        "FFP_DATA_NAME": "Тип точки учёта",
+        "FFP_VAL_SORT_NUM": 27,
+        "FFP_VAL_ROW_NUM": 73
+      },
+      {
+        "FFP_DATA_ID": 71,
+        "FFP_DATA_NAME": "Точка измерения, примечания",
+        "FFP_VAL_SORT_NUM": 28,
+        "FFP_VAL_ROW_NUM": 71
+      },
+      {
+        "FFP_DATA_ID": 341,
+        "FFP_DATA_NAME": "ТП Наименование",
+        "FFP_VAL_SORT_NUM": 29,
+        "FFP_VAL_ROW_NUM": 13
+      },
+      {
+        "FFP_DATA_ID": 342,
+        "FFP_DATA_NAME": "Ф-6/10 Наименование",
+        "FFP_VAL_SORT_NUM": 30,
+        "FFP_VAL_ROW_NUM": 14
+      },
+      {
+        "FFP_DATA_ID": 622,
+        "FFP_DATA_NAME": "COM порт",
+        "FFP_VAL_SORT_NUM": null,
+        "FFP_VAL_ROW_NUM": 72
+      },
+      {
+        "FFP_DATA_ID": 482,
+        "FFP_DATA_NAME": "Коэффициент трансформации тока",
+        "FFP_VAL_SORT_NUM": null,
+        "FFP_VAL_ROW_NUM": 25
+      },
+      {
+        "FFP_DATA_ID": 541,
+        "FFP_DATA_NAME": "Переключения реле №1",
+        "FFP_VAL_SORT_NUM": null,
+        "FFP_VAL_ROW_NUM": 22
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "grouptypes": {
+    "capturedAt": "2026-09-14T09:03:40.326Z",
+    "sourceFile": "01-82.215.77.202-10.har",
+    "rows": [
+      {
+        "GR_TYPE_ID": 6,
+        "GR_TYPE_CODE": "UD",
+        "GR_TYPE_NAME": "Группы пользователей"
+      },
+      {
+        "GR_TYPE_ID": 47,
+        "GR_TYPE_CODE": "otdel",
+        "GR_TYPE_NAME": "otdel"
+      },
+      {
+        "GR_TYPE_ID": 18,
+        "GR_TYPE_CODE": "POLES",
+        "GR_TYPE_NAME": "PS"
+      },
+      {
+        "GR_TYPE_ID": 23,
+        "GR_TYPE_CODE": "POLE",
+        "GR_TYPE_NAME": "RES"
+      },
+      {
+        "GR_TYPE_ID": 22,
+        "GR_TYPE_CODE": "BUILDING",
+        "GR_TYPE_NAME": "SP"
+      },
+      {
+        "GR_TYPE_ID": 4,
+        "GR_TYPE_CODE": "TOWN",
+        "GR_TYPE_NAME": "Город"
+      },
+      {
+        "GR_TYPE_ID": 1,
+        "GR_TYPE_CODE": "OBJ",
+        "GR_TYPE_NAME": "Объект"
+      },
+      {
+        "GR_TYPE_ID": 42,
+        "GR_TYPE_CODE": "OBJ_J",
+        "GR_TYPE_NAME": "Объект Юридическое"
+      },
+      {
+        "GR_TYPE_ID": 37,
+        "GR_TYPE_CODE": "CONSUMER",
+        "GR_TYPE_NAME": "Потребитель"
+      },
+      {
+        "GR_TYPE_ID": 52,
+        "GR_TYPE_CODE": "SUBSTATION",
+        "GR_TYPE_NAME": "ПС"
+      },
+      {
+        "GR_TYPE_ID": 3,
+        "GR_TYPE_CODE": "REGION",
+        "GR_TYPE_NAME": "Регион"
+      },
+      {
+        "GR_TYPE_ID": 2,
+        "GR_TYPE_CODE": "SYSTEM",
+        "GR_TYPE_NAME": "Системные группы"
+      },
+      {
+        "GR_TYPE_ID": 32,
+        "GR_TYPE_CODE": "TEST_GR",
+        "GR_TYPE_NAME": "Тестовая"
+      },
+      {
+        "GR_TYPE_ID": 12,
+        "GR_TYPE_CODE": "DP",
+        "GR_TYPE_NAME": "Точка считывания"
+      },
+      {
+        "GR_TYPE_ID": 5,
+        "GR_TYPE_CODE": "TP",
+        "GR_TYPE_NAME": "ТП"
+      },
+      {
+        "GR_TYPE_ID": 57,
+        "GR_TYPE_CODE": "UNIT",
+        "GR_TYPE_NAME": "Ф-0_4"
+      },
+      {
+        "GR_TYPE_ID": 27,
+        "GR_TYPE_CODE": "SWITCHGEAR",
+        "GR_TYPE_NAME": "Ф-6/10"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "measuringdevicetypes": {
+    "capturedAt": "2026-09-14T09:03:40.327Z",
+    "sourceFile": "01-82.215.77.202-10.har",
+    "rows": [
+      {
+        "METER_TYPE_ID": 97,
+        "METER_TYPE_NAME": "CE102",
+        "METER_TYPE_PRODUCER": "Energomera"
+      },
+      {
+        "METER_TYPE_ID": 262,
+        "METER_TYPE_NAME": "CE208",
+        "METER_TYPE_PRODUCER": "Energomera"
+      },
+      {
+        "METER_TYPE_ID": 98,
+        "METER_TYPE_NAME": "CE303",
+        "METER_TYPE_PRODUCER": "Energomera"
+      },
+      {
+        "METER_TYPE_ID": 86,
+        "METER_TYPE_NAME": "CE308",
+        "METER_TYPE_PRODUCER": "Energomera"
+      },
+      {
+        "METER_TYPE_ID": 87,
+        "METER_TYPE_NAME": "EX-18",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 252,
+        "METER_TYPE_NAME": "EX518",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 42,
+        "METER_TYPE_NAME": "TE71 MP-1-3",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 222,
+        "METER_TYPE_NAME": "TE71 MP-1-3N",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 228,
+        "METER_TYPE_NAME": "TE71 МG-1-3N",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 267,
+        "METER_TYPE_NAME": "TE73 BG 1-0",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 217,
+        "METER_TYPE_NAME": "TE73 SG-1-0",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 227,
+        "METER_TYPE_NAME": "TE73 SG-1-3",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 232,
+        "METER_TYPE_NAME": "TE73 SG-2-3",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 38,
+        "METER_TYPE_NAME": "TE73 SP-1-0",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 242,
+        "METER_TYPE_NAME": "TE73 SP-1-3",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 32,
+        "METER_TYPE_NAME": "TE73 SP-2-3",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 257,
+        "METER_TYPE_NAME": "TE73 S-0-2",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 27,
+        "METER_TYPE_NAME": "TE73 S-1-0",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 237,
+        "METER_TYPE_NAME": "TE73 S-1-1",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 22,
+        "METER_TYPE_NAME": "TE73 S-1-3",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      },
+      {
+        "METER_TYPE_ID": 248,
+        "METER_TYPE_NAME": "TE73 S-2-3",
+        "METER_TYPE_PRODUCER": "Toshelectroapparat"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "pointtypes": {
+    "capturedAt": "2026-09-14T09:03:40.327Z",
+    "sourceFile": "01-82.215.77.202-10.har",
+    "rows": [
+      {
+        "POINT_TYPE_ID": 12,
+        "POINT_TYPE_CODE": "VIRTUAL",
+        "POINT_TYPE_NAME": "Виртуальная"
+      },
+      {
+        "POINT_TYPE_ID": 1,
+        "POINT_TYPE_CODE": "ELECTRICITY",
+        "POINT_TYPE_NAME": "Учет электричества"
+      },
+      {
+        "POINT_TYPE_ID": 2,
+        "POINT_TYPE_CODE": "ELECTRICITY_GU",
+        "POINT_TYPE_NAME": "Учет электричества GU"
+      },
+      {
+        "POINT_TYPE_ID": 7,
+        "POINT_TYPE_CODE": "ELECTRICITY_LIGHT",
+        "POINT_TYPE_NAME": "Учет электричества осв."
+      },
+      {
+        "POINT_TYPE_ID": 17,
+        "POINT_TYPE_CODE": "ELECTRICITY_fider",
+        "POINT_TYPE_NAME": "Учет электричества фидер"
+      },
+      {
+        "POINT_TYPE_ID": 22,
+        "POINT_TYPE_CODE": "ELECTRICITY_1",
+        "POINT_TYPE_NAME": "Учет электричества1"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "pointmenuv2/groups": {
+    "capturedAt": "2026-09-14T09:03:41.419Z",
+    "sourceFile": "01-82.215.77.202-10.har",
+    "rows": [
+      {
+        "GR_ID": 7,
+        "GR_CODE": "USER_GROUPS",
+        "GR_NAME": "Служебные группы",
+        "GR_TYPE_ID": 2,
+        "GR_TYPE_NAME": "Системные группы",
+        "PARENT": 0,
+        "HAS_CHILDS": null
+      },
+      {
+        "GR_ID": 534623,
+        "GR_CODE": "Монголия",
+        "GR_NAME": "Монголия",
+        "GR_TYPE_ID": 3,
+        "GR_TYPE_NAME": "Регион",
+        "PARENT": 0,
+        "HAS_CHILDS": null
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "homedashboard/data": {
+    "capturedAt": "2026-09-14T09:03:21.966Z",
+    "sourceFile": "02-82.215.77.202-9.har",
+    "rows": [
+      {
+        "TITLE": "Всего действительных точек учета",
+        "DATE_VALUE": "2026-09-14 14:04:47",
+        "STAT": "87 шт."
+      },
+      {
+        "TITLE": "Всего действительных точек считывания",
+        "DATE_VALUE": "2026-09-14 14:04:47",
+        "STAT": "30 шт."
+      },
+      {
+        "TITLE": "Процент доступных каналов связи",
+        "DATE_VALUE": "2026-09-14 14:04:47",
+        "STAT": "100 %"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "pointmenuv2/signals": {
+    "capturedAt": "2026-09-14T09:01:54.103Z",
+    "sourceFile": "06-82.215.77.202-5.har",
+    "rows": [],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "dl_type_show": {
+    "capturedAt": "2026-09-14T09:01:54.844Z",
+    "sourceFile": "06-82.215.77.202-5.har",
+    "rows": [
+      {
+        "DL_TYPE_ID": 2,
+        "DL_TYPE_NAME": "В счетчике"
+      },
+      {
+        "DL_TYPE_ID": 1,
+        "DL_TYPE_NAME": "В УСПД"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "dp_type_show": {
+    "capturedAt": "2026-09-14T09:01:54.844Z",
+    "sourceFile": "06-82.215.77.202-5.har",
+    "rows": [
+      {
+        "DP_TYPE_ID": 1,
+        "DP_TYPE_NAME": "Основной контур"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "ph_type_show": {
+    "capturedAt": "2026-09-14T09:01:54.845Z",
+    "sourceFile": "06-82.215.77.202-5.har",
+    "rows": [
+      {
+        "PH_TYPE_ID": 24,
+        "PH_TYPE_NAME": "DCU_TEC70_CAS (электричество)"
+      },
+      {
+        "PH_TYPE_ID": 39,
+        "PH_TYPE_NAME": "GSM Modem"
+      },
+      {
+        "PH_TYPE_ID": 2,
+        "PH_TYPE_NAME": "LAN (электричество)"
+      },
+      {
+        "PH_TYPE_ID": 29,
+        "PH_TYPE_NAME": "TID GPRS (MIT485GG PRO)"
+      },
+      {
+        "PH_TYPE_ID": 14,
+        "PH_TYPE_NAME": "TID GPRS (MLS-4R-9C)"
+      },
+      {
+        "PH_TYPE_ID": 4,
+        "PH_TYPE_NAME": "TID GPRS:6431 (электричество)"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "userviews/groups": {
+    "capturedAt": "2026-09-14T09:00:44.984Z",
+    "sourceFile": "08-82.215.77.202-3.har",
+    "rows": [
+      {
+        "UV_GROUP": "ARCH_GROUP",
+        "TYPE": "UV_GROUP"
+      },
+      {
+        "UV_GROUP": "QUALITY_GROUP",
+        "TYPE": "UV_GROUP"
+      },
+      {
+        "UV_GROUP": "SHOW_GROUP",
+        "TYPE": "UV_GROUP"
+      },
+      {
+        "UV_GROUP": "CONFIGURATION_GROUP",
+        "TYPE": "UV_GROUP"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "ecocategories": {
+    "capturedAt": "2026-09-14T09:00:57.486Z",
+    "sourceFile": "08-82.215.77.202-3.har",
+    "rows": [
+      {
+        "EC_ID": 8,
+        "EC_CODE": "NO_BALANCE",
+        "EC_NAME": "Не в балансе",
+        "EC_IN": null
+      },
+      {
+        "EC_ID": 2,
+        "EC_CODE": "OUT",
+        "EC_NAME": "Отдача",
+        "EC_IN": 0
+      },
+      {
+        "EC_ID": 1,
+        "EC_CODE": "IN",
+        "EC_NAME": "Прием",
+        "EC_IN": 1
+      },
+      {
+        "EC_ID": 7,
+        "EC_CODE": "SUMM",
+        "EC_NAME": "Сумма",
+        "EC_IN": 1
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "groupmodifications": {
+    "capturedAt": "2026-09-14T09:00:57.486Z",
+    "sourceFile": "08-82.215.77.202-3.har",
+    "rows": [],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "parammenuv2/ms_type": {
+    "capturedAt": "2026-09-14T09:01:13.307Z",
+    "sourceFile": "08-82.215.77.202-3.har",
+    "rows": [
+      {
+        "MS_TYPE_ID": 0,
+        "MS_TYPE_NAME": "Другие измерения",
+        "TYPE": "MS_TYPE"
+      },
+      {
+        "MS_TYPE_ID": 1,
+        "MS_TYPE_NAME": "Электричество",
+        "TYPE": "MS_TYPE"
+      },
+      {
+        "MS_TYPE_ID": 2,
+        "MS_TYPE_NAME": "Воздух",
+        "TYPE": "MS_TYPE"
+      },
+      {
+        "MS_TYPE_ID": 5,
+        "MS_TYPE_NAME": "Холод",
+        "TYPE": "MS_TYPE"
+      },
+      {
+        "MS_TYPE_ID": 6,
+        "MS_TYPE_NAME": "Теплоноситель",
+        "TYPE": "MS_TYPE"
+      },
+      {
+        "MS_TYPE_ID": 7,
+        "MS_TYPE_NAME": "Газ",
+        "TYPE": "MS_TYPE"
+      },
+      {
+        "MS_TYPE_ID": 8,
+        "MS_TYPE_NAME": "Холодная вода",
+        "TYPE": "MS_TYPE"
+      },
+      {
+        "MS_TYPE_ID": 11,
+        "MS_TYPE_NAME": "Горячая вода",
+        "TYPE": "MS_TYPE"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "exchangeaddresses/quality": {
+    "capturedAt": "2026-09-14T09:01:13.308Z",
+    "sourceFile": "08-82.215.77.202-3.har",
+    "rows": [],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "profilesdata/rm_ffp_data": {
+    "capturedAt": "2026-09-14T09:01:13.313Z",
+    "sourceFile": "08-82.215.77.202-3.har",
+    "rows": [
+      {
+        "FFP_DATA_ID": 141,
+        "FFP_DATA_NAME": "№ Л/С или договора",
+        "FFP_VAL_ROW_NUM": 1
+      },
+      {
+        "FFP_DATA_ID": 343,
+        "FFP_DATA_NAME": "PS Наименование",
+        "FFP_VAL_ROW_NUM": 15
+      },
+      {
+        "FFP_DATA_ID": 344,
+        "FFP_DATA_NAME": "RES Наименование",
+        "FFP_VAL_ROW_NUM": 16
+      },
+      {
+        "FFP_DATA_ID": 345,
+        "FFP_DATA_NAME": "SP Наименование",
+        "FFP_VAL_ROW_NUM": 17
+      },
+      {
+        "FFP_DATA_ID": 145,
+        "FFP_DATA_NAME": "Адрес (квартира)",
+        "FFP_VAL_ROW_NUM": 5
+      },
+      {
+        "FFP_DATA_ID": 142,
+        "FFP_DATA_NAME": "Адрес (населенный пункт)",
+        "FFP_VAL_ROW_NUM": 2
+      },
+      {
+        "FFP_DATA_ID": 144,
+        "FFP_DATA_NAME": "Адрес (номер дома)",
+        "FFP_VAL_ROW_NUM": 4
+      },
+      {
+        "FFP_DATA_ID": 143,
+        "FFP_DATA_NAME": "Адрес (улица)",
+        "FFP_VAL_ROW_NUM": 3
+      },
+      {
+        "FFP_DATA_ID": 446,
+        "FFP_DATA_NAME": "Тип потребителя",
+        "FFP_VAL_ROW_NUM": 10
+      },
+      {
+        "FFP_DATA_ID": 423,
+        "FFP_DATA_NAME": "Инсталированная мощность, kW",
+        "FFP_VAL_ROW_NUM": 24
+      },
+      {
+        "FFP_DATA_ID": 401,
+        "FFP_DATA_NAME": "Код СОАТО",
+        "FFP_VAL_ROW_NUM": 23
+      },
+      {
+        "FFP_DATA_ID": 151,
+        "FFP_DATA_NAME": "Ктн",
+        "FFP_VAL_ROW_NUM": 12
+      },
+      {
+        "FFP_DATA_ID": 152,
+        "FFP_DATA_NAME": "Ктт",
+        "FFP_VAL_ROW_NUM": 11
+      },
+      {
+        "FFP_DATA_ID": 88,
+        "FFP_DATA_NAME": "Мастер, проводивший последнюю поверку счетчика",
+        "FFP_VAL_ROW_NUM": 88
+      },
+      {
+        "FFP_DATA_ID": 92,
+        "FFP_DATA_NAME": "Начало эксплуатации",
+        "FFP_VAL_ROW_NUM": 92
+      },
+      {
+        "FFP_DATA_ID": 346,
+        "FFP_DATA_NAME": "Номер контроллера",
+        "FFP_VAL_ROW_NUM": 18
+      },
+      {
+        "FFP_DATA_ID": 97,
+        "FFP_DATA_NAME": "Номер счётчика",
+        "FFP_VAL_ROW_NUM": 97
+      },
+      {
+        "FFP_DATA_ID": 182,
+        "FFP_DATA_NAME": "Описание состояния реле №1",
+        "FFP_VAL_ROW_NUM": 100
+      },
+      {
+        "FFP_DATA_ID": 149,
+        "FFP_DATA_NAME": "Организация, настроившая сбор",
+        "FFP_VAL_ROW_NUM": 9
+      },
+      {
+        "FFP_DATA_ID": 121,
+        "FFP_DATA_NAME": "Основная проблема",
+        "FFP_VAL_ROW_NUM": 98
+      },
+      {
+        "FFP_DATA_ID": 148,
+        "FFP_DATA_NAME": "Пользователь, настроивший сбор",
+        "FFP_VAL_ROW_NUM": 8
+      },
+      {
+        "FFP_DATA_ID": 147,
+        "FFP_DATA_NAME": "Порядковый номер счетчика в MIT",
+        "FFP_VAL_ROW_NUM": 7
+      },
+      {
+        "FFP_DATA_ID": 93,
+        "FFP_DATA_NAME": "Принадлежность счетчика",
+        "FFP_VAL_ROW_NUM": 93
+      },
+      {
+        "FFP_DATA_ID": 75,
+        "FFP_DATA_NAME": "Регион. Код",
+        "FFP_VAL_ROW_NUM": 75
+      },
+      {
+        "FFP_DATA_ID": 77,
+        "FFP_DATA_NAME": "Регион. Наименование",
+        "FFP_VAL_ROW_NUM": 77
+      },
+      {
+        "FFP_DATA_ID": 181,
+        "FFP_DATA_NAME": "Состояние реле №1",
+        "FFP_VAL_ROW_NUM": 99
+      },
+      {
+        "FFP_DATA_ID": 96,
+        "FFP_DATA_NAME": "Тип счётчика",
+        "FFP_VAL_ROW_NUM": 96
+      },
+      {
+        "FFP_DATA_ID": 73,
+        "FFP_DATA_NAME": "Тип точки учёта",
+        "FFP_VAL_ROW_NUM": 73
+      },
+      {
+        "FFP_DATA_ID": 71,
+        "FFP_DATA_NAME": "Точка измерения, примечания",
+        "FFP_VAL_ROW_NUM": 71
+      },
+      {
+        "FFP_DATA_ID": 341,
+        "FFP_DATA_NAME": "ТП Наименование",
+        "FFP_VAL_ROW_NUM": 13
+      },
+      {
+        "FFP_DATA_ID": 342,
+        "FFP_DATA_NAME": "Ф-6/10 Наименование",
+        "FFP_VAL_ROW_NUM": 14
+      },
+      {
+        "FFP_DATA_ID": 622,
+        "FFP_DATA_NAME": "COM порт",
+        "FFP_VAL_ROW_NUM": 72
+      },
+      {
+        "FFP_DATA_ID": 482,
+        "FFP_DATA_NAME": "Коэффициент трансформации тока",
+        "FFP_VAL_ROW_NUM": 25
+      },
+      {
+        "FFP_DATA_ID": 541,
+        "FFP_DATA_NAME": "Переключения реле №1",
+        "FFP_VAL_ROW_NUM": 22
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  },
+  "measurelinessets": {
+    "capturedAt": "2026-09-14T09:01:13.943Z",
+    "sourceFile": "08-82.215.77.202-3.har",
+    "rows": [
+      {
+        "MLSET_ID": 132,
+        "MLSET_CODE": "FOR_ADD",
+        "MLSET_NAME": "For add"
+      },
+      {
+        "MLSET_ID": 157,
+        "MLSET_CODE": "FOR_ADD_FIX_1H",
+        "MLSET_NAME": "For add (fix 1h)"
+      },
+      {
+        "MLSET_ID": 147,
+        "MLSET_CODE": "FOR_ADD1",
+        "MLSET_NAME": "For add1"
+      },
+      {
+        "MLSET_ID": 162,
+        "MLSET_CODE": "FOR_DEL",
+        "MLSET_NAME": "For DEL"
+      },
+      {
+        "MLSET_ID": 122,
+        "MLSET_CODE": "GEN_P30_Q30_Apday_RpDAY",
+        "MLSET_NAME": "Gen. P30, Q30, A+day, R+day"
+      },
+      {
+        "MLSET_ID": 117,
+        "MLSET_CODE": "MIT5000",
+        "MLSET_NAME": "MIT5000 (TE71, TE73)"
+      },
+      {
+        "MLSET_ID": 152,
+        "MLSET_CODE": "ml_deleted",
+        "MLSET_NAME": "ml deleted"
+      },
+      {
+        "MLSET_ID": 62,
+        "MLSET_CODE": "TE71",
+        "MLSET_NAME": "TE71"
+      },
+      {
+        "MLSET_ID": 72,
+        "MLSET_CODE": "TE71_abonent",
+        "MLSET_NAME": "TE71 abonent"
+      },
+      {
+        "MLSET_ID": 137,
+        "MLSET_CODE": "TE71_abonent_Sergeli",
+        "MLSET_NAME": "TE71 abonent Sergeli"
+      },
+      {
+        "MLSET_ID": 107,
+        "MLSET_CODE": "TE71_ALL",
+        "MLSET_NAME": "TE71 all"
+      },
+      {
+        "MLSET_ID": 78,
+        "MLSET_CODE": "TE71_modem_ApAmRpRm",
+        "MLSET_NAME": "TE71 cherez modem (A+A-R+R-)"
+      },
+      {
+        "MLSET_ID": 98,
+        "MLSET_CODE": "TE71_modem_summom_prof",
+        "MLSET_NAME": "TE71 cherez modem sum.mom, prof."
+      },
+      {
+        "MLSET_ID": 106,
+        "MLSET_CODE": "TE71_Apmmod_T1-T4_TEA",
+        "MLSET_NAME": "TE71 активная электроэнергия T1-T4 (TEA)"
+      },
+      {
+        "MLSET_ID": 104,
+        "MLSET_CODE": "TE71_mom_TEA",
+        "MLSET_NAME": "TE71 параметры электросети (TEA)"
+      },
+      {
+        "MLSET_ID": 105,
+        "MLSET_CODE": "TE71_prof_TEA_30",
+        "MLSET_NAME": "TE71 профили нагрузки 30 (TEA)"
+      },
+      {
+        "MLSET_ID": 108,
+        "MLSET_CODE": "TE73_ALL",
+        "MLSET_NAME": "TE73 all"
+      },
+      {
+        "MLSET_ID": 67,
+        "MLSET_CODE": "TE73_balance_TP_ApAmRpRm",
+        "MLSET_NAME": "TE73 balance TP (A+A-R+R-)"
+      },
+      {
+        "MLSET_ID": 77,
+        "MLSET_CODE": "TE73_modem_ApAmRpRm",
+        "MLSET_NAME": "TE73 cherez modem (A+A-R+R-)"
+      },
+      {
+        "MLSET_ID": 97,
+        "MLSET_CODE": "TE73_modem_summom_prof15",
+        "MLSET_NAME": "TE73 cherez modem sum.mom, prof.15"
+      },
+      {
+        "MLSET_ID": 87,
+        "MLSET_CODE": "TE73_gener_day _Ap",
+        "MLSET_NAME": "TE73 gener.day (A+)"
+      },
+      {
+        "MLSET_ID": 82,
+        "MLSET_CODE": "TE73_gener_month _Ap",
+        "MLSET_NAME": "TE73 gener.month (A+)"
+      },
+      {
+        "MLSET_ID": 92,
+        "MLSET_CODE": "TE73_gener_sum_fix_day _Ap",
+        "MLSET_NAME": "TE73 gener.sum.fiks.day (A+)"
+      },
+      {
+        "MLSET_ID": 142,
+        "MLSET_CODE": "TE73_L",
+        "MLSET_NAME": "TE73 (L)"
+      },
+      {
+        "MLSET_ID": 112,
+        "MLSET_CODE": "TE73_Z",
+        "MLSET_NAME": "TE73 (Z)"
+      },
+      {
+        "MLSET_ID": 103,
+        "MLSET_CODE": "TE73_ARpmmod_T1-T4_TEA",
+        "MLSET_NAME": "TE73 активная и реактивная электроэнергия T1-T4 (TEA)"
+      },
+      {
+        "MLSET_ID": 63,
+        "MLSET_CODE": "TE73_mom_TEA",
+        "MLSET_NAME": "TE73 параметры электросети (TEA)"
+      },
+      {
+        "MLSET_ID": 102,
+        "MLSET_CODE": "TE73_prof_TEA_15",
+        "MLSET_NAME": "TE73 профили нагрузки 15 (TEA)"
+      },
+      {
+        "MLSET_ID": 127,
+        "MLSET_CODE": "TE73_prof_sum_TEA_15",
+        "MLSET_NAME": "TE73 профили суммарной энергии 15 (TEA)"
+      },
+      {
+        "MLSET_ID": 57,
+        "MLSET_CODE": "NEEDLESS",
+        "MLSET_NAME": "Нежелательные для автоматической конфигурации измерения"
+      }
+    ],
+    "scope": "Тухайн хүсэлтийн хариу; бүх системийн бүрэн жагсаалт гэж үзэхгүй."
+  }
+}
