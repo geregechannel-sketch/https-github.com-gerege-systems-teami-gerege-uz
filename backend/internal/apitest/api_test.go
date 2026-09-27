@@ -13,6 +13,7 @@ import (
 
 	"github.com/emcos/ec3-backend/internal/auth"
 	"github.com/emcos/ec3-backend/internal/db"
+	"github.com/emcos/ec3-backend/internal/handlers"
 	"github.com/emcos/ec3-backend/internal/resource"
 	"github.com/emcos/ec3-backend/internal/router"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -221,6 +222,25 @@ func TestReadingsEndToEnd(t *testing.T) {
 	code, jobsResp := do(t, srv, "GET", "/ec3api/v1/readings/jobs", tok, nil)
 	if code != http.StatusOK || !jobsResp.Success || jobsResp.TotalCount == nil || *jobsResp.TotalCount == 0 {
 		t.Fatalf("reading jobs failed: %d %s", code, jobsResp.Message)
+	}
+}
+
+func TestMonitorLive(t *testing.T) {
+	srv, pool := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+	if err := handlers.SimulateTick(context.Background(), pool); err != nil {
+		t.Fatalf("simulate: %v", err)
+	}
+	code, r := do(t, srv, "GET", "/ec3api/v1/monitor/live", tok, nil)
+	if code != http.StatusOK || !r.Success {
+		t.Fatalf("monitor live failed: %d %s", code, r.Message)
+	}
+	var data struct {
+		Live  []map[string]interface{} `json:"live"`
+		Trend []map[string]interface{} `json:"trend"`
+	}
+	if err := json.Unmarshal(r.Data, &data); err != nil || len(data.Live) == 0 || len(data.Trend) == 0 {
+		t.Fatalf("monitor returned no live data: live=%d trend=%d err=%v", len(data.Live), len(data.Trend), err)
 	}
 }
 

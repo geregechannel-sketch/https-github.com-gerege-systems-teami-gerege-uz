@@ -71,6 +71,21 @@ jobs:
             ln -sf /etc/nginx/sites-available/toshi.gerege.mn /etc/nginx/sites-enabled/toshi.gerege.mn
             nginx -t && systemctl reload nginx || true
           fi
+          # monitor.toshi.gerege.mn: once DNS points here, serve the ACME challenge
+          # over HTTP, issue the cert, then install the full TLS site.
+          M=monitor.toshi.gerege.mn
+          if [ ! -f /etc/letsencrypt/live/\$M/fullchain.pem ] && getent hosts \$M >/dev/null; then
+            mkdir -p /var/www/certbot
+            sed '/# TLS-BEGIN/,\$d' deploy/nginx-monitor.conf > /etc/nginx/sites-available/\$M
+            ln -sf /etc/nginx/sites-available/\$M /etc/nginx/sites-enabled/\$M
+            nginx -t && systemctl reload nginx
+            certbot certonly --webroot -w /var/www/certbot -d \$M --non-interactive --agree-tos --register-unsafely-without-email || true
+          fi
+          if [ -f /etc/letsencrypt/live/\$M/fullchain.pem ]; then
+            cp deploy/nginx-monitor.conf /etc/nginx/sites-available/\$M
+            ln -sf /etc/nginx/sites-available/\$M /etc/nginx/sites-enabled/\$M
+            nginx -t && systemctl reload nginx || true
+          fi
           # build + run api + db
           docker compose -f docker-compose.deploy.yml --env-file .env up -d --build
           docker image prune -f

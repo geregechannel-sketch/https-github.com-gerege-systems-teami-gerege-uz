@@ -27,6 +27,7 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	loadControl := handlers.NewLoadControl(pool)
 	meterRegistry := handlers.NewMeterRegistry(pool)
 	us := handlers.NewUserSettings(pool)
+	monitor := handlers.NewMonitor(pool)
 
 	protected := func(fn http.HandlerFunc) http.Handler {
 		return mgr.Middleware(fn)
@@ -44,6 +45,9 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	// Auth (login is public; change_pw protected)
 	mux.HandleFunc("POST "+base+"user/login", authH.Login)
 	mux.Handle("POST "+base+"user/change_pw", protected(authH.ChangePw))
+
+	// Real-time monitor (monitor.toshi.gerege.mn)
+	mux.Handle("GET "+base+"monitor/live", protected(monitor.Live))
 
 	// Dashboard
 	mux.Handle("GET "+base+"homedashboard/query", protected(dash.Query))

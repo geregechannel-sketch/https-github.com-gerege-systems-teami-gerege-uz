@@ -14,6 +14,7 @@ import (
 	"github.com/emcos/ec3-backend/internal/auth"
 	"github.com/emcos/ec3-backend/internal/config"
 	"github.com/emcos/ec3-backend/internal/db"
+	"github.com/emcos/ec3-backend/internal/handlers"
 	"github.com/emcos/ec3-backend/internal/resource"
 	"github.com/emcos/ec3-backend/internal/router"
 )
@@ -42,6 +43,9 @@ func main() {
 	resource.RegisterCore(reg)
 	resource.RegisterGenerated(reg) // full ~983-endpoint surface
 	resource.RegisterExtras(reg)    // deep menu-leaf models (event logs, audit, stats, config)
+
+	// Simulated DAS feeding the real-time monitor; stops with the process.
+	go handlers.RunSimulator(ctx, pool, 15*time.Second)
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,

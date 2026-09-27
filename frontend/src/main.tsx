@@ -20,6 +20,7 @@ import Telesignals from "./pages/Telesignals";
 import Schemes from "./pages/Schemes";
 import LoadControl from "./pages/LoadControl";
 import Meters from "./pages/Meters";
+import Monitor from "./pages/Monitor";
 
 // Theme init (mirrors the real app).
 try {
@@ -33,12 +34,22 @@ function Protected({ children }: { children: React.ReactNode }) {
   return <Shell>{children}</Shell>;
 }
 
+// monitor.toshi.gerege.mn serves the same bundle; there "/" is the full-screen monitor.
+const IS_MONITOR_HOST = location.hostname.startsWith("monitor.");
+
+function Bare({ children }: { children: React.ReactNode }) {
+  const loc = useLocation();
+  if (!getToken()) return <Navigate to="/login" state={{ from: loc }} replace />;
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Protected><Dashboard /></Protected>} />
+        <Route path="/" element={IS_MONITOR_HOST ? <Bare><Monitor /></Bare> : <Protected><Dashboard /></Protected>} />
+        <Route path="/monitor" element={<Bare><Monitor /></Bare>} />
         <Route path="/archives" element={<Protected><Archives /></Protected>} />
         <Route path="/gis" element={<Protected><Gis /></Protected>} />
         <Route path="/saved" element={<Protected><SavedForms /></Protected>} />
