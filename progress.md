@@ -110,3 +110,10 @@
 - Rebuilt the application shell below 760px as an overlay drawer with nested touch-friendly menu expansion;
   compacted the header and content spacing so all modules retain usable viewport width on mobile.
 - Verified the production build, desktop search/detail flow, both tile layers, legend, 390x844 layout and mobile drawer.
+
+## Session 5 — precision GIS parity + full-system audit (2026-09-30)
+- Audited all 11 primary TEAMI/TOSH route pairs at the same 1920x889 viewport; every route loaded and both browser audit tabs remained free of console errors.
+- Replaced approximate GIS markers with the exact source 22x30 green/gray PNG assets, matched the ArcGIS y-offset anchor, restored 87 records on 46 source coordinate slots, refined the initial map framing and added the metric scale bar.
+- Exercised the GIS popup and downstream links end to end. Archive selection already worked; repaired the quality-report deep-link so it selects the requested point and expands its parent groups.
+- Kept TOSH operational advantages, including populated event/report/relay views and reference dictionaries, instead of copying source empty states.
+- Added the reproducible audit report at `docs/10-system-parity-audit.md`.

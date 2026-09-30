@@ -172,9 +172,9 @@ func TestDashboard(t *testing.T) {
 	if len(tiles) != 3 {
 		t.Fatalf("expected 3 KPI tiles, got %d", len(tiles))
 	}
-	// seed inserted 1 enabled point -> "1 шт."
-	if tiles[0]["STAT"] != "1 шт." {
-		t.Fatalf("expected accounting points '1 шт.', got %v", tiles[0]["STAT"])
+	// Source-parity seeds provide 87 GIS points plus 4 internal accounting points.
+	if tiles[0]["STAT"] != "91 шт." {
+		t.Fatalf("expected accounting points '91 шт.', got %v", tiles[0]["STAT"])
 	}
 }
 

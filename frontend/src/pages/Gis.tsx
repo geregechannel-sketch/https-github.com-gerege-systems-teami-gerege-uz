@@ -6,7 +6,8 @@ import { api } from "../api";
 import { IcChevron, IcExpand, IcFunnel, IcGrid, IcHome, IcInfo, IcReset, IcSearch, IcSync } from "../icons";
 import "../gis.css";
 
-const CENTER: [number, number] = [48.1158, 114.5726];
+const CENTER: [number, number] = [48.116295, 114.580217];
+const OBJECT_COORDINATE_ORIGIN: [number, number] = [48.1158, 114.5726];
 const INITIAL_ZOOM = 16;
 
 const MAP_STYLES = {
@@ -69,22 +70,20 @@ const DAILY_PARAMETERS = [
 
 function locationFor(index: number): [number, number] {
   const anchor = SOURCE_MARKER_OFFSETS[index % SOURCE_MARKER_OFFSETS.length];
-  const overlapPass = Math.floor(index / SOURCE_MARKER_OFFSETS.length);
-  const pixelNudge = overlapPass ? ((index * 3) % 5) - 2 : 0;
   return [
-    CENTER[0] - (anchor[1] + pixelNudge) * LATITUDE_PER_PIXEL,
-    CENTER[1] + (anchor[0] - pixelNudge) * LONGITUDE_PER_PIXEL,
+    OBJECT_COORDINATE_ORIGIN[0] - anchor[1] * LATITUDE_PER_PIXEL,
+    OBJECT_COORDINATE_ORIGIN[1] + anchor[0] * LONGITUDE_PER_PIXEL,
   ];
 }
 
 function markerIcon(item: MapItem, selected: boolean) {
-  const state = selected ? "selected" : item.recent ? "recent" : "stale";
-  return L.divIcon({
-    className: "gis-marker-shell",
-    html: `<span class="gis-marker gis-marker--${state}"><i></i></span>`,
-    iconSize: [18, 25],
-    iconAnchor: [9, 23],
-    tooltipAnchor: [0, -21],
+  return L.icon({
+    iconUrl: item.recent ? "/assets/gis/pinGreen.png" : "/assets/gis/pinGray.png",
+    className: `gis-marker-shell${selected ? " gis-marker-shell--selected" : ""}`,
+    iconSize: [22, 30],
+    // ArcGIS renders the source 22x30 picture marker with yoffset: 5.
+    iconAnchor: [11, 20],
+    tooltipAnchor: [0, -20],
   });
 }
 
@@ -160,6 +159,7 @@ export default function Gis() {
     if (!containerRef.current) return;
     const map = L.map(containerRef.current, { zoomControl: false }).setView(CENTER, INITIAL_ZOOM);
     L.control.zoom({ position: "bottomright" }).addTo(map);
+    L.control.scale({ position: "bottomleft", metric: true, imperial: false, maxWidth: 125 }).addTo(map);
     mapRef.current = map;
     markerLayerRef.current = L.layerGroup().addTo(map);
     window.setTimeout(() => map.invalidateSize(), 100);

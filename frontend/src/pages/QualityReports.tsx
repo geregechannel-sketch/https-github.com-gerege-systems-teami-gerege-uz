@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import "../archives.css";
 import "../quality.css";
@@ -67,6 +68,8 @@ function dateSequence(from: string, to: string) {
 }
 
 export default function QualityReports() {
+  const [searchParams] = useSearchParams();
+  const queryPointID = searchParams.get("point");
   const [groups, setGroups] = useState<Row[]>([]);
   const [points, setPoints] = useState<Row[]>([]);
   const [measureSets, setMeasureSets] = useState<Row[]>([]);
@@ -131,6 +134,26 @@ export default function QualityReports() {
   useEffect(() => {
     if (!expanded.size && tree.roots.length) setExpanded(new Set(tree.roots.map((g) => String(g.GR_ID))));
   }, [tree.roots]);
+
+  useEffect(() => {
+    if (!queryPointID || !points.length) return;
+    const point = points.find((item) => String(item.POINT_ID) === queryPointID || String(item.POINT_CODE) === queryPointID);
+    if (!point) return;
+
+    const pointId = String(point.POINT_ID);
+    setSelectedPoints(new Set([pointId]));
+    setExpanded((current) => {
+      const next = new Set(current);
+      const byId = new Map(groups.map((group) => [String(group.GR_ID), group]));
+      let groupId = point.GR_ID == null ? "" : String(point.GR_ID);
+      while (groupId && byId.has(groupId) && !next.has(groupId)) {
+        next.add(groupId);
+        const parent = byId.get(groupId)?.PARENT_GR_ID;
+        groupId = parent == null ? "" : String(parent);
+      }
+      return next;
+    });
+  }, [groups, points, queryPointID]);
 
   const selectedPointIds = useMemo(() => {
     const ids = new Set(selectedPoints);
