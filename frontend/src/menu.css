@@ -12,9 +12,15 @@
   flex-direction: column;
 }
 
+.toshi-shell__main--source .toshi-header { display: none; }
+.toshi-content--gis { padding: 0; overflow: hidden; }
+.toshi-content--schemes-overview { padding: 8px 14px; overflow: auto; }
+.toshi-content--archives { padding: 8px 10px; overflow: hidden; }
+.toshi-content--load-control { padding: 10px; overflow: hidden; }
+
 .tm-menu {
-  width: 240px;
-  flex: 0 0 240px;
+  width: 216px;
+  flex: 0 0 216px;
   background: var(--menuBg);
   color: var(--menuTextColor);
   height: 100%;
@@ -25,6 +31,58 @@
      (any *-auto turns the other axis into a clipping container). */
   overflow: visible;
 }
+.tm-menu.is-collapsed { width: 0; flex-basis: 0; border: 0; overflow: hidden; }
+.tm-menu--source { position: relative; }
+.tm-menu--load-control { width: 220px; flex-basis: 220px; }
+.tm-menu--load-control .tm-source-menu-toggle { left: 95px; right: auto; }
+.tm-menu--load-control .tm-brand {
+  height: 70px;
+  justify-content: center;
+  padding: 35px 20px 15px;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.tm-menu--load-control .tm-body { overflow-y: auto; scrollbar-width: none; }
+.tm-menu--load-control .tm-body::-webkit-scrollbar { display: none; }
+.tm-menu--load-control .tm-link { min-height: 50px; padding: 0 12px; gap: 10px; }
+.tm-menu--load-control .tm-link.is-active {
+  color: #f5b51b;
+  background: rgb(0 0 0 / 22%);
+}
+.tm-menu--source .tm-brand { padding-top: 42px; }
+.tm-menu--source.tm-menu--load-control .tm-brand {
+  box-sizing: border-box;
+  height: 70px;
+  flex: 0 0 70px;
+  padding: 40px 20px 10px;
+}
+.tm-source-menu-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+.tm-source-menu-reopen {
+  position: fixed;
+  z-index: 1150;
+  top: 10px;
+  left: 10px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 3px;
+  background: #2b3036;
+  color: #fff;
+  cursor: pointer;
+}
 .tm-body { flex: 1 1 auto; overflow: visible; }
 .tm-brand {
   display: flex;
@@ -32,7 +90,7 @@
   gap: 8px;
   padding: 16px 16px;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.3px;
   color: #fff;
   text-decoration: none;
@@ -66,7 +124,7 @@
   color: var(--menuTextColor);
   cursor: pointer;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 12px;
 }
 .tm-link:hover,
 .tm-item.is-open > .tm-link {
@@ -77,6 +135,7 @@
   background: rgba(255, 255, 255, 0.12);
   color: var(--textColorHover);
 }
+.tm-link.has-active-child { color: #f5aa16; }
 .tm-caret {
   width: 22px;
   height: 22px;
@@ -108,6 +167,15 @@
 .tm-item:hover > .tm-flyout {
   display: block;
 }
+.tm-item.is-open > .tm-flyout {
+  position: static;
+  display: block;
+  min-width: 0;
+  border-left: 0;
+  background: rgb(255 255 255 / 7%);
+  box-shadow: none;
+}
+.tm-item.is-open > .tm-flyout .tm-link { padding-left: 16px; }
 .tm-flyout .tm-link {
   padding: 9px 16px;
 }
@@ -138,6 +206,13 @@
 .tm-backdrop { display: none; }
 
 @media (max-width: 760px) {
+  .toshi-shell__main--source .toshi-header { display: flex; }
+  .toshi-content--gis { padding: 0; }
+  .toshi-content--schemes-overview { padding: 8px; }
+  .toshi-content--archives { padding: 8px; overflow: auto; }
+  .toshi-content--load-control { padding: 8px; overflow: auto; }
+  .tm-source-menu-toggle, .tm-source-menu-reopen { display: none; }
+
   .tm-menu {
     position: fixed;
     inset: 0 auto 0 0;

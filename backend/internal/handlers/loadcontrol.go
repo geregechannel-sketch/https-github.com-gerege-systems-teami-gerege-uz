@@ -88,7 +88,7 @@ func (h *LoadControl) Catalog(w http.ResponseWriter, r *http.Request) {
 		       (SELECT count(*) FROM load_control_relays r WHERE r.point_id=p.point_id),
 		       (SELECT count(*) FROM load_control_limits l WHERE l.point_id=p.point_id)
 		FROM points p
-		WHERE p.point_enabled=1 AND (EXISTS(SELECT 1 FROM load_control_relays r WHERE r.point_id=p.point_id) OR EXISTS(SELECT 1 FROM load_control_limits l WHERE l.point_id=p.point_id))
+		WHERE p.point_enabled=1 AND p.point_internal=0
 		ORDER BY p.point_code`)
 	if err != nil {
 		httpx.Fail(w, http.StatusInternalServerError, "load-control points failed")

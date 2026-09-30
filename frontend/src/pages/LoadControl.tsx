@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import { IcExpand, IcFolder, IcFunnel, IcGear, IcInfo, IcSave, IcSearch, IcSitemap, IcSync, MENU_ICONS } from "../icons";
+import { IcExpand, IcFolder, IcFunnel, IcGear, IcGrid, IcHelp, IcInfo, IcMeter, IcReset, IcSave, IcSearch, IcSitemap, IcSync, MENU_ICONS } from "../icons";
 import "../archives.css";
 import "../load-control.css";
 
@@ -35,7 +35,6 @@ export default function LoadControl() {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [treeSearch, setTreeSearch] = useState("");
-  const [search, setSearch] = useState("");
   const [channelType, setChannelType] = useState("");
   const [readingPointType, setReadingPointType] = useState("");
   const [dataLocation, setDataLocation] = useState("");
@@ -55,8 +54,21 @@ export default function LoadControl() {
       return;
     }
     setCatalog(env.data);
-    const first = env.data.points[0];
-    if (first) setSelectedPoints((current) => current.size ? current : new Set([String(first.POINT_ID)]));
+    const first = env.data.points.find((point) => Number(mode === "relays" ? point.RELAYS : point.LIMITS) > 0) || env.data.points[0];
+    if (first) {
+      setSelectedPoints((current) => current.size ? current : new Set([String(first.POINT_ID)]));
+      setExpandedGroups((current) => {
+        if (current.size) return current;
+        const byID = new Map(env.data!.groups.map((group) => [String(group.GR_ID), group]));
+        const next = new Set<string>();
+        let groupID = String(first.GR_ID || "");
+        while (groupID && byID.has(groupID)) {
+          next.add(groupID);
+          groupID = String(byID.get(groupID)?.PARENT_GR_ID || "");
+        }
+        return next;
+      });
+    }
   }
 
   async function loadData(clearFilters = false) {
@@ -67,7 +79,7 @@ export default function LoadControl() {
     }
     setLoading(true);
     const env = await api.post<Row[]>(`loadcontrol/${mode}/query`, {
-      point_ids: Array.from(selectedPoints).map(Number), search: clearFilters ? "" : search.trim(),
+      point_ids: Array.from(selectedPoints).map(Number), search: "",
       channel_type: clearFilters ? "" : channelType,
       reading_point_type: clearFilters ? "" : readingPointType,
       data_location: clearFilters ? "" : dataLocation,
@@ -90,17 +102,18 @@ export default function LoadControl() {
   }, []);
 
   const pointKey = useMemo(() => Array.from(selectedPoints).sort().join(","), [selectedPoints]);
+  const filterKey = `${channelType}|${readingPointType}|${dataLocation}`;
 
   useEffect(() => {
     setSelectedRows(new Set());
     if (selectedPoints.size) loadData();
-  }, [mode, pointKey]);
+  }, [mode, pointKey, filterKey]);
 
   useEffect(() => {
     if (!autoRefresh || !selectedPoints.size) return;
     const interval = window.setInterval(() => loadData(), Math.max(5, refreshSeconds) * 1000);
     return () => window.clearInterval(interval);
-  }, [autoRefresh, refreshSeconds, mode, pointKey, search, channelType, readingPointType, dataLocation]);
+  }, [autoRefresh, refreshSeconds, mode, pointKey, channelType, readingPointType, dataLocation]);
 
   const tree = useMemo(() => {
     const groups = catalog?.groups || [];
@@ -152,8 +165,20 @@ export default function LoadControl() {
     const points = tree.groupPoints.get(id) || [];
     const expanded = expandedGroups.has(id);
     return <div className="lc-tree-branch">
-      <button className="lc-tree-group" style={{ paddingLeft: 7 + depth * 16 }} onClick={() => toggleGroup(id)}><span>{expanded ? "−" : "+"}</span><IcFolder size={14} />{group.GR_NAME}</button>
-      {expanded && <>{children.map((child) => <GroupNode key={child.GR_ID} group={child} depth={depth + 1} />)}{points.filter((point) => `${point.POINT_CODE} ${point.POINT_NAME}`.toLowerCase().includes(treeSearch.trim().toLowerCase())).map((point) => <label className="lc-tree-point" key={point.POINT_ID} style={{ paddingLeft: 28 + depth * 16 }}><input type="checkbox" checked={selectedPoints.has(String(point.POINT_ID))} onChange={() => togglePoint(String(point.POINT_ID))} /><IcSitemap size={13} /><span>{point.POINT_CODE} · {point.POINT_NAME}</span><small>{mode === "relays" ? point.RELAYS : point.LIMITS}</small></label>)}</>}
+      <button className="lc-tree-group" style={{ paddingLeft: 7 + depth * 14 }} onClick={() => toggleGroup(id)}>
+        <span className="lc-tree-toggle">{expanded ? "−" : "+"}</span>
+        <span className={`lc-tree-kind lc-tree-kind--${Math.min(depth, 3)}`}><IcFolder size={12} /></span>
+        <span className="lc-tree-label">{group.GR_NAME}</span>
+      </button>
+      {expanded && <>{children.map((child) => <GroupNode key={child.GR_ID} group={child} depth={depth + 1} />)}{points.filter((point) => `${point.POINT_CODE} ${point.POINT_NAME}`.toLowerCase().includes(treeSearch.trim().toLowerCase())).map((point) => {
+        const selected = selectedPoints.has(String(point.POINT_ID));
+        const controlled = Number(point.RELAYS) > 0 || Number(point.LIMITS) > 0;
+        return <label className={`lc-tree-point${selected ? " selected" : ""}`} key={point.POINT_ID} style={{ paddingLeft: 38 + depth * 14 }}>
+          <input className="lc-tree-check" type="checkbox" checked={selected} onChange={() => togglePoint(String(point.POINT_ID))} />
+          <span className={`lc-point-icon${controlled ? " lc-point-icon--meter" : ""}`}>{controlled ? <IcMeter size={20} /> : "ϟ"}</span>
+          <span className="lc-point-label">{point.POINT_NAME || point.POINT_CODE}</span>
+        </label>;
+      })}</>}
     </div>;
   }
 
@@ -163,6 +188,13 @@ export default function LoadControl() {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  }
+
+  function toggleAllRows() {
+    const idKey = mode === "relays" ? "RELAY_ID" : "LIMIT_ID";
+    const ids = rows.map((row) => String(row[idKey]));
+    const allSelected = ids.length > 0 && ids.every((id) => selectedRows.has(id));
+    setSelectedRows(allSelected ? new Set() : new Set(ids));
   }
 
   async function runCommand(action: string, allIfEmpty = false, value?: number) {
@@ -195,8 +227,6 @@ export default function LoadControl() {
 
   if (!catalog) return <div className="toshi-loader" />;
   const nextUpdate = updatedAt && autoRefresh ? new Date(updatedAt.getTime() + refreshSeconds * 1000) : null;
-  const allSelected = rows.length > 0 && selectedRows.size === rows.length;
-
   return <div className="aw lc">
     <div className="aw__title"><IcExpand size={14} /><span>Управление нагрузкой</span><span className="sp" /><button className="ic" aria-label="Обновить" onClick={() => loadData()}><IcSync size={14} /></button></div>
     {error && <div className="lc-message error">{error}<button onClick={() => setError("")}>×</button></div>}
@@ -205,10 +235,20 @@ export default function LoadControl() {
     <div className="lc-layout">
       <section className="lc-pane lc-selector">
         <div className="lc-pane-head">Выбор ТУ</div>
-        <div className="lc-tree-tools"><label><IcSearch size={14} /><input value={treeSearch} onChange={(event) => setTreeSearch(event.target.value)} placeholder="Поиск" /></label><button title="Выбрать все" onClick={() => setSelectedPoints(new Set(catalog.points.map((point) => String(point.POINT_ID))))}><IcFunnel size={15} /></button><button title="Сбросить" onClick={() => setSelectedPoints(new Set())}>↶</button></div>
+        <div className="lc-tree-tools">
+          <button className="lc-meter-button" title="Тип поиска"><IcMeter size={24} /></button>
+          <select aria-label="Тип поиска"><option>Дин...</option></select>
+          <label><input value={treeSearch} onChange={(event) => setTreeSearch(event.target.value)} placeholder="Поиск" /></label>
+          <button className="green" title="Найти"><IcSearch size={15} /></button>
+          <button className="blue" title="Выбрать все" onClick={() => setSelectedPoints(new Set(catalog.points.map((point) => String(point.POINT_ID))))}><IcFunnel size={15} /></button>
+          <button className="red" title="Сбросить" onClick={() => { setTreeSearch(""); setSelectedPoints(new Set()); }}><IcReset size={15} /></button>
+        </div>
         <div className="lc-root-select"><span>Корневая группа</span><select aria-label="Корневая группа"><option>Начальная корневая группа</option></select></div>
-        <div className="lc-tree">{tree.roots.map((group) => <GroupNode key={group.GR_ID} group={group} depth={0} />)}</div>
-        <div className="lc-tree-footer"><button disabled={!selectedPoints.size} onClick={() => setSelectedPoints(new Set())}>Снять отм. всем</button><span>Выделено элементов: {selectedPoints.size}</span><button title="Информация"><IcInfo size={14} /></button><button title="Настройки" onClick={() => setModal("settings")}><IcGear size={14} /></button></div>
+        <div className="lc-tree">
+          <button className="lc-tree-group lc-tree-service"><span className="lc-tree-toggle">+</span><span className="lc-tree-kind lc-tree-kind--service"><IcSitemap size={12} /></span><span className="lc-tree-label">Служебные группы</span></button>
+          {tree.roots.map((group) => <GroupNode key={group.GR_ID} group={group} depth={0} />)}
+        </div>
+        <div className="lc-tree-footer"><button disabled={!selectedPoints.size} onClick={() => setSelectedPoints(new Set())}>Снять отм. всем</button><span>Выделено элементов: {selectedPoints.size}</span><button title="Информация"><IcInfo size={14} /></button><button title="Справка"><IcHelp size={14} /></button><button title="Настройки" onClick={() => setModal("settings")}><IcGear size={14} /></button></div>
         <button className="lc-legend-button" onClick={() => setModal("legend")}><LoadIcon size={15} /> Обозначения</button>
       </section>
 
@@ -217,13 +257,13 @@ export default function LoadControl() {
         <div className="lc-filters">
           <div className="lc-filter-row"><span>Установки связи:</span><label>Отображаемые {mode === "relays" ? "реле" : "лимиты"}<select aria-label="Отображаемые элементы"><option>Все {mode === "relays" ? "реле" : "лимиты"}</option></select></label></div>
           <div className="lc-filter-row triple"><label>Тип канала<select value={channelType} onChange={(event) => setChannelType(event.target.value)}><option value="">Использовать действительные</option>{catalog.filters.CHANNEL_TYPES.map((value: string) => <option key={value}>{value}</option>)}</select></label><label>Тип точки считывания<select value={readingPointType} onChange={(event) => setReadingPointType(event.target.value)}><option value="">Использовать действительные</option>{catalog.filters.READING_POINT_TYPES.map((value: string) => <option key={value}>{value}</option>)}</select></label><label>Расположение данных<select value={dataLocation} onChange={(event) => setDataLocation(event.target.value)}><option value="">Использовать действительные</option>{catalog.filters.DATA_LOCATIONS.map((value: string) => <option key={value}>{value}</option>)}</select></label></div>
-          <div className="lc-search-row"><label><IcSearch size={13} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Код, точка, параметр" onKeyDown={(event) => event.key === "Enter" && loadData()} /></label><button onClick={() => loadData()}>Применить</button><button className="red" onClick={() => { setSearch(""); setChannelType(""); setReadingPointType(""); setDataLocation(""); setTimeout(() => loadData(true), 0); }}>Сбросить</button></div>
         </div>
 
         <div className="lc-table-wrap">
           <table className="lc-table">
-            {mode === "relays" ? <><thead><tr><th><input type="checkbox" aria-label="Выбрать все реле" checked={allSelected} onChange={() => setSelectedRows(allSelected ? new Set() : new Set(rows.map((row) => String(row.RELAY_ID))))} /></th><th>Код точки</th><th>Имя точки</th><th>Реле</th><th>Состояние</th><th>Статус выполнения команды</th><th>Состояние (в БД)</th><th>Время (в БД)</th><th>Состояние (в устройстве)</th><th>Время (в устройстве)</th><th>Установленное значение</th></tr></thead><tbody>{rows.map((row) => <tr key={row.RELAY_ID} className={selectedRows.has(String(row.RELAY_ID)) ? "selected" : ""} onClick={() => toggleRow(String(row.RELAY_ID))}><td><input type="checkbox" checked={selectedRows.has(String(row.RELAY_ID))} onChange={() => toggleRow(String(row.RELAY_ID))} onClick={(event) => event.stopPropagation()} /></td><td>{row.POINT_CODE}</td><td>{row.POINT_NAME}</td><td>{row.RELAY_NAME}</td><td><span className={`lc-state ${row.CURRENT_STATE == null ? "unknown" : row.CURRENT_STATE ? "on" : "off"}`}>{stateText(row.CURRENT_STATE)}</span></td><td>{statusText(row.COMMAND_STATUS)}</td><td>{stateText(row.DB_STATE)}</td><td>{formatDate(row.DB_AT)}</td><td>{stateText(row.DEVICE_STATE)}</td><td>{formatDate(row.DEVICE_AT)}</td><td>{stateText(row.DESIRED_STATE)}</td></tr>)}{!rows.length && <tr><td colSpan={11} className="lc-empty">Список пустой</td></tr>}</tbody></> : <><thead><tr><th><input type="checkbox" aria-label="Выбрать все лимиты" checked={allSelected} onChange={() => setSelectedRows(allSelected ? new Set() : new Set(rows.map((row) => String(row.LIMIT_ID))))} /></th><th>Код точки</th><th>Имя точки</th><th>Параметр</th><th>Значение</th><th>Статус выполнения команды</th><th>Данные из</th><th>Обновлено</th></tr></thead><tbody>{rows.map((row) => <tr key={row.LIMIT_ID} className={selectedRows.has(String(row.LIMIT_ID)) ? "selected" : ""} onClick={() => toggleRow(String(row.LIMIT_ID))}><td><input type="checkbox" checked={selectedRows.has(String(row.LIMIT_ID))} onChange={() => toggleRow(String(row.LIMIT_ID))} onClick={(event) => event.stopPropagation()} /></td><td>{row.POINT_CODE}</td><td>{row.POINT_NAME}</td><td>{row.PARAMETER_NAME}</td><td><strong>{Number(row.LIMIT_VALUE).toLocaleString("ru-RU")} {row.UNIT}</strong></td><td>{statusText(row.COMMAND_STATUS)}</td><td>{row.DATA_SOURCE}</td><td>{formatDate(row.UPDATED_AT)}</td></tr>)}{!rows.length && <tr><td colSpan={8} className="lc-empty">Список пустой</td></tr>}</tbody></>}
+            {mode === "relays" ? <><colgroup><col style={{ width: 35 }} /><col style={{ width: 150 }} /><col style={{ width: 100 }} /><col style={{ width: 80 }} /><col style={{ width: 90 }} /><col style={{ width: 230 }} /><col style={{ width: 90 }} /><col style={{ width: 120 }} /><col style={{ width: 160 }} /><col style={{ width: 190 }} /><col style={{ width: 200 }} /></colgroup><thead><tr><th className="lc-select-col"><input aria-label="Выбрать все строки" type="checkbox" checked={rows.length > 0 && rows.every((row) => selectedRows.has(String(row.RELAY_ID)))} onChange={toggleAllRows} /></th><th>Код точки</th><th>Имя точки</th><th>Реле</th><th>Состояние</th><th>Статус выполнения команды</th><th>Состояние (в БД)</th><th>Время (в БД)</th><th>Состояние (в устройстве)</th><th>Время (в устройстве)</th><th>Установленное значение</th></tr></thead><tbody>{rows.map((row, index) => <tr key={`${row.RELAY_ID ?? "relay"}-${row.RELAY_CODE ?? index}`} className={selectedRows.has(String(row.RELAY_ID)) ? "selected" : ""} onClick={() => toggleRow(String(row.RELAY_ID))}><td className="lc-select-col"><input aria-label={`Выбрать ${row.RELAY_NAME}`} type="checkbox" checked={selectedRows.has(String(row.RELAY_ID))} onClick={(event) => event.stopPropagation()} onChange={() => toggleRow(String(row.RELAY_ID))} /></td><td>{row.POINT_CODE}</td><td>{row.POINT_NAME}</td><td>{row.RELAY_NAME}</td><td><span className={`lc-state ${row.CURRENT_STATE == null ? "unknown" : row.CURRENT_STATE ? "on" : "off"}`}>{stateText(row.CURRENT_STATE)}</span></td><td>{statusText(row.COMMAND_STATUS)}</td><td>{stateText(row.DB_STATE)}</td><td>{formatDate(row.DB_AT)}</td><td>{stateText(row.DEVICE_STATE)}</td><td>{formatDate(row.DEVICE_AT)}</td><td>{stateText(row.DESIRED_STATE)}</td></tr>)}</tbody></> : <><colgroup><col style={{ width: 35 }} /><col style={{ width: 150 }} /><col style={{ width: 300 }} /><col style={{ width: 200 }} /><col style={{ width: 120 }} /><col style={{ width: 230 }} /><col style={{ width: 120 }} /><col style={{ width: 190 }} /></colgroup><thead><tr><th className="lc-select-col"><input aria-label="Выбрать все строки" type="checkbox" checked={rows.length > 0 && rows.every((row) => selectedRows.has(String(row.LIMIT_ID)))} onChange={toggleAllRows} /></th><th>Код точки</th><th>Имя точки</th><th>Параметр</th><th>Значение</th><th>Статус выполнения команды</th><th>Данные из</th><th>Обновлено</th></tr></thead><tbody>{rows.map((row, index) => <tr key={`${row.LIMIT_ID ?? "limit"}-${row.PARAMETER_CODE ?? index}`} className={selectedRows.has(String(row.LIMIT_ID)) ? "selected" : ""} onClick={() => toggleRow(String(row.LIMIT_ID))}><td className="lc-select-col"><input aria-label={`Выбрать ${row.PARAMETER_NAME}`} type="checkbox" checked={selectedRows.has(String(row.LIMIT_ID))} onClick={(event) => event.stopPropagation()} onChange={() => toggleRow(String(row.LIMIT_ID))} /></td><td>{row.POINT_CODE}</td><td>{row.POINT_NAME}</td><td>{row.PARAMETER_NAME}</td><td><strong>{Number(row.LIMIT_VALUE).toLocaleString("ru-RU")} {row.UNIT}</strong></td><td>{statusText(row.COMMAND_STATUS)}</td><td>{row.DATA_SOURCE}</td><td>{formatDate(row.UPDATED_AT)}</td></tr>)}</tbody></>}
           </table>
+          {!loading && !rows.length && <div className="lc-empty-state"><IcGrid size={72} /><span>Список пустой</span></div>}
         </div>
 
         <div className="lc-statusbar"><span>Обновлено: {formatDate(updatedAt)}</span><span>Следующее обновление: {formatDate(nextUpdate)}</span><label>Автоматическое обновление <input type="checkbox" checked={autoRefresh} onChange={(event) => setAutoRefresh(event.target.checked)} /></label><span>{rows.length ? `Записей: ${rows.length}` : "Список пустой"}</span><button title="Экспорт CSV" disabled={!rows.length} onClick={exportRows}><IcSave size={16} /></button><button title="Настройки" onClick={() => setModal("settings")}><IcGear size={16} /></button></div>

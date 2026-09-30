@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import ArchiveTable from "../components/ArchiveTable";
 import "../archives.css";
 import { calendarRange, dateInUTC8 } from "../lib/archiveQuality";
+import ArchiveViewer from "./ArchiveViewer";
 import {
   IcExpand, IcSave, IcSync, IcPlus, IcMinus, IcCollapse, IcGrid,
   IcClock, IcChevron, IcSearch, IcFunnel, IcReset, IcInfo, IcHelp, IcGear,
@@ -15,6 +17,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 
 export default function Archives() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryPointID = searchParams.get("point");
+  const queryView = searchParams.get("view");
   const requestId = useRef(0);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -30,12 +36,23 @@ export default function Archives() {
   const [to, setTo] = useState(dateInUTC8());
   const [rows, setRows] = useState<Row[] | null>(null);
   const [tab, setTab] = useState("res");
+  const [viewerOpen, setViewerOpen] = useState(queryView === "profile");
 
 
   useEffect(() => {
     api.get("groups?limit=5000").then((e) => setGroups((e.data as Row[]) || []));
     api.get("points?limit=1000").then((e) => setPoints((e.data as Row[]) || []));
   }, []);
+
+  useEffect(() => {
+    if (!queryPointID || !points.length) return;
+    const point = points.find((item) => String(item.POINT_ID) === queryPointID || String(item.POINT_CODE) === queryPointID);
+    if (point) setSel(point);
+  }, [points, queryPointID]);
+
+  useEffect(() => {
+    setViewerOpen(queryView === "profile");
+  }, [queryView]);
 
   useEffect(() => {
     ++requestId.current;
@@ -157,6 +174,16 @@ export default function Archives() {
     finally { if (id === requestId.current) setBusy(false); }
   }
 
+  function viewProfile() {
+    if (!sel) return;
+    setViewerOpen(true);
+  }
+
+  if (viewerOpen) {
+    if (!sel) return <div className="aempty"><div className="toshi-loader" /><div>Загрузка точки учета...</div></div>;
+    return <ArchiveViewer point={sel} day={to} onClose={() => { setViewerOpen(false); navigate("/archives"); }} />;
+  }
+
   return (
     <div className="aw">
       <div className="aw__title">
@@ -253,7 +280,7 @@ export default function Archives() {
       <div className="aw__actions">
         <button className="abtn green"><IcGear size={15} color="#fff" /> Настройки</button>
         <button className="abtn blue" onClick={view} disabled={!sel || measurement === "" || busy}><IcEye size={15} color="#fff" /> Просмотр</button>
-        <button className="abtn blue" disabled title="График будет доступен после подключения временного ряда"><IcEye size={15} color="#fff" /> Просмотр (гр.)</button>
+        <button className="abtn blue" onClick={viewProfile} disabled={!sel}><IcEye size={15} color="#fff" /> Просмотр (гр.)</button>
       </div>
     </div>
   );
