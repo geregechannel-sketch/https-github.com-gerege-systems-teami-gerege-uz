@@ -30,12 +30,22 @@ type SchemeView = {
   summary: Row;
   db_time: string;
 };
+type OverviewTile = { TITLE: string; STAT: string; COLOR?: string; DATE_VALUE?: string };
 
 const SchemeIcon = MENU_ICONS.schema;
 
 function formatDate(value: unknown) {
   const date = new Date(String(value || ""));
   return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("ru-RU");
+}
+
+function formatTileDate(value: unknown) {
+  const source = String(value || "");
+  if (/^\d{2}-\d{2}-\d{4}\s\d{2}:\d{2}:\d{2}$/.test(source)) return source;
+  const date = new Date(source);
+  if (Number.isNaN(date.getTime())) return "—";
+  const pad = (number: number) => String(number).padStart(2, "0");
+  return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
 function statusColor(signal?: Row) {
@@ -51,6 +61,7 @@ export default function Schemes() {
   const navigate = useNavigate();
   const mode = rawMode === "viewer" ? "viewer" : "overview";
   const [catalog, setCatalog] = useState<Row[]>([]);
+  const [overviewTiles, setOverviewTiles] = useState<OverviewTile[]>([]);
   const [selectedID, setSelectedID] = useState<number | null>(null);
   const [pendingID, setPendingID] = useState<number | null>(null);
   const [view, setView] = useState<SchemeView | null>(null);
@@ -100,6 +111,13 @@ export default function Schemes() {
   useEffect(() => {
     loadCatalog();
   }, []);
+
+  useEffect(() => {
+    if (mode !== "overview") return;
+    api.post<OverviewTile[]>("homedashboard/data", {}).then((env) => {
+      if (env.success) setOverviewTiles(env.data || []);
+    });
+  }, [mode]);
 
   useEffect(() => {
     if (mode === "viewer" && selectedID) loadView(selectedID);
@@ -209,22 +227,30 @@ export default function Schemes() {
   if (!catalog.length && !error) return <div className="toshi-loader" />;
 
   return (
-    <div className="aw sch" ref={workspaceRef}>
-      <div className="aw__title">
+    <div className={`aw sch sch--${mode}`} ref={workspaceRef}>
+      {mode === "viewer" && <div className="aw__title">
         <button className="sch-title-icon" title="На весь экран" aria-label="На весь экран" onClick={toggleFullscreen}><IcExpand size={14} /></button>
         <span>Схемы - {mode === "viewer" ? "Просмотр схем" : "Обзор"}</span>
         <span className="sp" />
         {mode === "viewer" && <button className="ic" aria-label="Обновить" title="Обновить" onClick={() => loadView()}><IcSync size={14} /></button>}
-      </div>
+      </div>}
 
       {error && <div className="sch-message error">{error}<button onClick={() => setError("")}>×</button></div>}
       {notice && <div className="sch-message success">{notice}<button onClick={() => setNotice("")}>×</button></div>}
 
       {mode === "overview" ? (
         <div className="sch-overview">
+          <div className="sch-kpis">
+            {overviewTiles.map((tile) => (
+              <article key={tile.TITLE} style={{ background: tile.COLOR || "#3cb478" }}>
+                <strong>{tile.TITLE}</strong>
+                <time>{formatTileDate(tile.DATE_VALUE)}</time>
+                <span>{tile.STAT}</span>
+              </article>
+            ))}
+          </div>
           <section className="sch-hub-card">
-            <SchemeIcon size={28} />
-            <div><h2>Просмотр схем</h2><p>Просмотр мнемосхем.</p><small>{catalog.length} схем · живые телесигналы TOSH</small></div>
+            <div><h2>Просмотр схем</h2><p>Просмотр мнемосхем.</p></div>
             <button onClick={() => navigate("/schemes/viewer")}>Открыть</button>
           </section>
         </div>

@@ -12,12 +12,13 @@
   flex-direction: column;
 }
 
-.toshi-shell__main--gis .toshi-header { display: none; }
+.toshi-shell__main--source .toshi-header { display: none; }
 .toshi-content--gis { padding: 0; overflow: hidden; }
+.toshi-content--schemes-overview { padding: 8px 14px; overflow: auto; }
 
 .tm-menu {
-  width: 240px;
-  flex: 0 0 240px;
+  width: 216px;
+  flex: 0 0 216px;
   background: var(--menuBg);
   color: var(--menuTextColor);
   height: 100%;
@@ -28,6 +29,35 @@
      (any *-auto turns the other axis into a clipping container). */
   overflow: visible;
 }
+.tm-menu.is-collapsed { width: 0; flex-basis: 0; border: 0; overflow: hidden; }
+.tm-menu--source { position: relative; }
+.tm-menu--source .tm-brand { padding-top: 42px; }
+.tm-source-menu-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+.tm-source-menu-reopen {
+  position: fixed;
+  z-index: 1150;
+  top: 10px;
+  left: 10px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 3px;
+  background: #2b3036;
+  color: #fff;
+  cursor: pointer;
+}
 .tm-body { flex: 1 1 auto; overflow: visible; }
 .tm-brand {
   display: flex;
@@ -35,7 +65,7 @@
   gap: 8px;
   padding: 16px 16px;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.3px;
   color: #fff;
   text-decoration: none;
@@ -69,7 +99,7 @@
   color: var(--menuTextColor);
   cursor: pointer;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 12px;
 }
 .tm-link:hover,
 .tm-item.is-open > .tm-link {
@@ -80,6 +110,7 @@
   background: rgba(255, 255, 255, 0.12);
   color: var(--textColorHover);
 }
+.tm-link.has-active-child { color: #f5aa16; }
 .tm-caret {
   width: 22px;
   height: 22px;
@@ -111,6 +142,15 @@
 .tm-item:hover > .tm-flyout {
   display: block;
 }
+.tm-item.is-open > .tm-flyout {
+  position: static;
+  display: block;
+  min-width: 0;
+  border-left: 0;
+  background: rgb(255 255 255 / 7%);
+  box-shadow: none;
+}
+.tm-item.is-open > .tm-flyout .tm-link { padding-left: 16px; }
 .tm-flyout .tm-link {
   padding: 9px 16px;
 }
@@ -141,8 +181,10 @@
 .tm-backdrop { display: none; }
 
 @media (max-width: 760px) {
-  .toshi-shell__main--gis .toshi-header { display: flex; }
+  .toshi-shell__main--source .toshi-header { display: flex; }
   .toshi-content--gis { padding: 0; }
+  .toshi-content--schemes-overview { padding: 8px; }
+  .tm-source-menu-toggle, .tm-source-menu-reopen { display: none; }
 
   .tm-menu {
     position: fixed;

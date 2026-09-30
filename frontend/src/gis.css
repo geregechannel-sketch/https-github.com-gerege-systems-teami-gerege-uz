@@ -33,7 +33,7 @@
 }
 
 .gis-tool-button {
-  width: 36px;
+  width: 32px;
   display: grid;
   place-items: center;
   border-radius: 3px;
@@ -88,6 +88,19 @@
   color: #6c7c87;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
+}
+
+.gis-search__menu {
+  width: 29px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  margin-right: -7px;
+  border: 0;
+  border-left: 1px solid #d6dde2;
+  background: transparent;
+  color: #647680;
+  cursor: pointer;
 }
 
 .gis-search__results {
@@ -148,7 +161,7 @@
 .gis-summary {
   position: absolute;
   z-index: 500;
-  top: 58px;
+  top: 108px;
   left: 12px;
   width: 440px;
   border: 1px solid #cbd4da;
@@ -241,9 +254,9 @@
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 15px;
-  height: 15px;
-  border: 2px solid #0c7b31;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #0c7b31;
   border-radius: 50% 50% 50% 0;
   background: #28b74f;
   box-shadow: 1px 2px 3px rgb(0 0 0 / 42%);
@@ -252,16 +265,35 @@
 
 .gis-marker i {
   position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 4px;
-  height: 4px;
+  top: 3px;
+  left: 3px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: #c9ffd5;
 }
 
 .gis-marker--stale { border-color: #676f74; background: #929a9f; }
 .gis-marker--selected { border-color: #806000; background: #f2c94c; }
+
+.gis-compass {
+  position: absolute;
+  z-index: 580;
+  top: 54px;
+  left: 13px;
+  width: 32px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c8d0d5;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 94%);
+  color: #3c4950;
+  box-shadow: 0 1px 3px rgb(20 45 60 / 18%);
+  cursor: pointer;
+}
+
+.gis-compass span { font-size: 15px; transform: scaleX(.65); }
 
 .gis-detail {
   position: absolute;
@@ -344,7 +376,8 @@
   .gis-search { order: 3; width: calc(100% - 42px); height: 36px; }
   .gis-map-select { min-width: 122px; }
   .gis-legend-button span { display: none; }
-  .gis-summary { top: 96px; width: calc(100% - 24px); }
+  .gis-summary { top: 142px; width: calc(100% - 24px); }
+  .gis-compass { top: 98px; }
   .gis-summary dl > div { grid-template-columns: minmax(170px, 1fr) minmax(70px, .8fr); }
   .gis-detail { top: auto; bottom: 12px; width: calc(100% - 24px); max-height: 44%; }
   .gis-legend { top: 96px; }

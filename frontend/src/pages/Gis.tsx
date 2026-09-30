@@ -5,7 +5,7 @@ import { api } from "../api";
 import { IcChevron, IcFunnel, IcHome, IcInfo, IcReset, IcSearch } from "../icons";
 import "../gis.css";
 
-const CENTER: [number, number] = [48.0793, 114.5550];
+const CENTER: [number, number] = [48.1158, 114.5726];
 const INITIAL_ZOOM = 16;
 
 const MAP_STYLES = {
@@ -37,30 +37,27 @@ type MapItem = {
   searchText: string;
 };
 
-const GIS_LANES = [
-  { count: 10, start: [48.0854, 114.5508], step: [-0.00043, 0.00072] },
-  { count: 15, start: [48.0838, 114.5497], step: [-0.00042, 0.00065] },
-  { count: 16, start: [48.0824, 114.5513], step: [-0.00042, 0.00064] },
-  { count: 16, start: [48.0803, 114.5498], step: [-0.00043, 0.00066] },
-  { count: 13, start: [48.0779, 114.5514], step: [-0.00036, 0.00069] },
-  { count: 10, start: [48.0830, 114.5572], step: [-0.00048, 0.00054] },
-  { count: 7, start: [48.0808, 114.5468], step: [-0.00031, 0.00091] },
+const SOURCE_MARKER_OFFSETS = [
+  [189, -229],
+  [83, -128], [60, -107], [292, -127], [239, -93], [52, -59], [195, -55], [241, -56], [275, -48], [320, -82],
+  [141, -26], [157, -12], [190, -42], [212, -35], [233, -27], [256, -20], [284, -38], [303, -54], [326, -70],
+  [119, 11], [139, 33], [173, 11], [207, -8], [230, -2], [260, 10], [287, -7],
+  [32, 78], [57, 79], [80, 78], [129, 66], [149, 66], [203, 68], [229, 54], [249, 74],
+  [126, 126], [150, 147], [176, 121], [209, 95], [249, 91], [278, 112],
+  [167, 177], [188, 156], [211, 136], [235, 120], [268, 131], [289, 148],
 ] as const;
 
+const LATITUDE_PER_PIXEL = 0.0000144;
+const LONGITUDE_PER_PIXEL = 0.0000215;
+
 function locationFor(index: number): [number, number] {
-  let offset = index;
-  for (let laneIndex = 0; laneIndex < GIS_LANES.length; laneIndex += 1) {
-    const lane = GIS_LANES[laneIndex];
-    if (offset < lane.count) {
-      const jitter = ((offset * 7 + laneIndex * 3) % 5 - 2) * 0.000055;
-      return [
-        lane.start[0] + lane.step[0] * offset + jitter,
-        lane.start[1] + lane.step[1] * offset - jitter,
-      ];
-    }
-    offset -= lane.count;
-  }
-  return CENTER;
+  const anchor = SOURCE_MARKER_OFFSETS[index % SOURCE_MARKER_OFFSETS.length];
+  const overlapPass = Math.floor(index / SOURCE_MARKER_OFFSETS.length);
+  const pixelNudge = overlapPass ? ((index * 3) % 5) - 2 : 0;
+  return [
+    CENTER[0] - (anchor[1] + pixelNudge) * LATITUDE_PER_PIXEL,
+    CENTER[1] + (anchor[0] - pixelNudge) * LONGITUDE_PER_PIXEL,
+  ];
 }
 
 function markerIcon(item: MapItem, selected: boolean) {
@@ -68,9 +65,9 @@ function markerIcon(item: MapItem, selected: boolean) {
   return L.divIcon({
     className: "gis-marker-shell",
     html: `<span class="gis-marker gis-marker--${state}"><i></i></span>`,
-    iconSize: [22, 30],
-    iconAnchor: [11, 28],
-    tooltipAnchor: [0, -25],
+    iconSize: [18, 25],
+    iconAnchor: [9, 23],
+    tooltipAnchor: [0, -21],
   });
 }
 
@@ -144,7 +141,7 @@ export default function Gis() {
       api.get<Row[]>("groups?limit=5000"),
     ]).then(([pointEnv, meterEnv, typeEnv, groupEnv]) => {
       if (!mounted) return;
-      const points = pointEnv.data || [];
+      const points = (pointEnv.data || []).filter((point) => Number(point.POINT_INTERNAL || 0) === 0);
       const meters = meterEnv.data || [];
       const loadedGroups = groupEnv.data || [];
       const typeNames = new Map((typeEnv.data || []).map((row) => [String(row.METER_TYPE_ID), String(row.METER_TYPE_NAME || "")]));
@@ -252,6 +249,9 @@ export default function Gis() {
             placeholder="Текст для поиска объекта"
           />
           {query && <span className="gis-search__count">{visibleItems.length}</span>}
+          <button className="gis-search__menu" onClick={() => setSearchOpen((value) => !value)} aria-label="Параметры поиска">
+            <IcChevron size={14} />
+          </button>
           {suggestions.length > 0 && (
             <div className="gis-search__results">
               {suggestions.map((item) => (
@@ -281,6 +281,8 @@ export default function Gis() {
           <span>Обозначения</span>
         </button>
       </div>
+
+      <button className="gis-compass" onClick={resetMap} title="Ориентация на север" aria-label="Ориентация на север"><span>▲</span></button>
 
       <section className="gis-summary" aria-label="Сводка объекта">
         <header>

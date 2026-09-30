@@ -25,16 +25,22 @@ function target(n: MenuNode): string | undefined {
 function Item({ node }: { node: MenuNode }) {
   const nav = useNavigate();
   const loc = useLocation();
-  const [open, setOpen] = useState(false);
   const t = target(node);
   const active = t && loc.pathname === t;
   const hasChildren = !!node.children?.length;
+  const childActive = !!node.children?.some((child) => target(child) === loc.pathname);
+  const routeExpanded = Boolean(active && hasChildren) || childActive;
+  const [open, setOpen] = useState(routeExpanded);
   const Ico = node.icon ? MENU_ICONS[node.icon] : null;
+
+  useEffect(() => {
+    if (routeExpanded) setOpen(true);
+  }, [routeExpanded]);
 
   return (
     <li className={`tm-item${open ? " is-open" : ""}`}>
       <div
-        className={"tm-link" + (active ? " is-active" : "")}
+        className={`tm-link${active ? " is-active" : ""}${childActive ? " has-active-child" : ""}`}
         onClick={() => (t ? nav(t) : hasChildren ? setOpen((value) => !value) : undefined)}
       >
         {Ico && <span className="tm-ico"><Ico size={16} /></span>}
@@ -65,7 +71,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const nav = useNavigate();
   const loc = useLocation();
   const isGis = loc.pathname === "/gis";
+  const isSchemesOverview = loc.pathname === "/schemes/overview";
+  const isSourceLayout = isGis || isSchemesOverview;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuCollapsed, setMenuCollapsed] = useState(false);
   useEffect(() => setMenuOpen(false), [loc.pathname]);
   const user = (() => {
     try {
@@ -81,7 +90,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="toshi-shell">
-      <nav id="app-menu" className={`tm-menu${menuOpen ? " is-open" : ""}`}>
+      <nav id="app-menu" className={`tm-menu${isSourceLayout ? " tm-menu--source" : ""}${menuOpen ? " is-open" : ""}${menuCollapsed ? " is-collapsed" : ""}`}>
+        {isSourceLayout && (
+          <button className="tm-source-menu-toggle" onClick={() => setMenuCollapsed(true)} title="Скрыть меню" aria-label="Скрыть меню">☰</button>
+        )}
         <Link to="/" className="tm-brand">
           TEAMI ENTERPRISE <small>3.0</small>
         </Link>
@@ -113,7 +125,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </nav>
       {menuOpen && <button className="tm-backdrop is-open" onClick={() => setMenuOpen(false)} aria-label="Закрыть меню" />}
 
-      <div className={`toshi-shell__main${isGis ? " toshi-shell__main--gis" : ""}`}>
+      {isSourceLayout && menuCollapsed && (
+        <button className="tm-source-menu-reopen" onClick={() => setMenuCollapsed(false)} title="Показать меню" aria-label="Показать меню">☰</button>
+      )}
+
+      <div className={`toshi-shell__main${isSourceLayout ? " toshi-shell__main--source" : ""}`}>
         <header className="toshi-header" style={{ flex: "0 0 auto", justifyContent: "space-between", position: "relative" }}>
           <button className="toshi-header__btn" title="Меню" aria-controls="app-menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>☰</button>
           <img src={logo} alt="TOSH ELECTROAPPARAT" className="toshi-header__logo" />
@@ -129,7 +145,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {hbtn("Выход", <IcLogout size={15} />, () => { api.logout(); nav("/login"); })}
           </div>
         </header>
-        <main className={`toshi-content${isGis ? " toshi-content--gis" : ""}`}>{children}</main>
+        <main className={`toshi-content${isGis ? " toshi-content--gis" : ""}${isSchemesOverview ? " toshi-content--schemes-overview" : ""}`}>{children}</main>
       </div>
     </div>
   );
