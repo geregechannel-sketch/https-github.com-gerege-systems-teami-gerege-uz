@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { api } from "../api";
-import { IcChevron, IcFunnel, IcHome, IcInfo, IcReset, IcSearch } from "../icons";
+import { IcChevron, IcExpand, IcFunnel, IcHome, IcInfo, IcReset, IcSearch, IcSync } from "../icons";
 import "../gis.css";
 
 const CENTER: [number, number] = [48.1158, 114.5726];
@@ -25,6 +25,15 @@ const MAP_STYLES = {
 
 type Row = Record<string, any>;
 type MapStyle = keyof typeof MAP_STYLES;
+
+type GisReading = {
+  code: string;
+  parameter: string;
+  pointLabel: string;
+  time: string;
+};
+
+type ReadingsPayload = { rows: Row[]; total: number };
 
 type MapItem = {
   point: Row;
@@ -49,6 +58,13 @@ const SOURCE_MARKER_OFFSETS = [
 
 const LATITUDE_PER_PIXEL = 0.0000144;
 const LONGITUDE_PER_PIXEL = 0.0000215;
+
+const DAILY_PARAMETERS = [
+  { code: "A_PLUS", label: "A+ энергия за сутки" },
+  { code: "A_MINUS", label: "A- энергия за сутки" },
+  { code: "R_PLUS", label: "R+ энергия за сутки" },
+  { code: "R_MINUS", label: "R- энергия за сутки" },
+] as const;
 
 function locationFor(index: number): [number, number] {
   const anchor = SOURCE_MARKER_OFFSETS[index % SOURCE_MARKER_OFFSETS.length];
@@ -80,12 +96,36 @@ function clockText(value: Date) {
   }).format(value);
 }
 
+function isoDate(value: Date) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function readingTime(value: unknown) {
+  const date = value ? new Date(String(value)) : new Date();
+  if (!value) {
+    date.setDate(date.getDate() - 1);
+    date.setHours(0, 0, 0, 0);
+  }
+  if (Number.isNaN(date.getTime())) return String(value || "");
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+}
+
 export default function Gis() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const tileRef = useRef<L.TileLayer | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const previousViewRef = useRef<{ center: L.LatLng; zoom: number } | null>(null);
+  const detailRequestRef = useRef(0);
   const [items, setItems] = useState<MapItem[]>([]);
   const [selected, setSelected] = useState<MapItem | null>(null);
   const [query, setQuery] = useState("");
@@ -98,6 +138,14 @@ export default function Gis() {
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [detailReadings, setDetailReadings] = useState<GisReading[]>([]);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState("");
+  const [detailSection, setDetailSection] = useState("");
+  const [detailFilterOpen, setDetailFilterOpen] = useState(false);
+  const [detailParameterFilter, setDetailParameterFilter] = useState<Set<string>>(
+    () => new Set(DAILY_PARAMETERS.map((parameter) => parameter.code)),
+  );
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -197,7 +245,20 @@ export default function Gis() {
     });
   }, [visibleItems, selected]);
 
+  useEffect(() => {
+    if (!selected) {
+      detailRequestRef.current += 1;
+      setDetailReadings([]);
+      return;
+    }
+    setDetailSection("");
+    setDetailFilterOpen(false);
+    setDetailParameterFilter(new Set(DAILY_PARAMETERS.map((parameter) => parameter.code)));
+    void loadDetailReadings(selected);
+  }, [selected]);
+
   const recentCount = items.filter((item) => item.recent).length;
+  const visibleDetailReadings = detailReadings.filter((row) => detailParameterFilter.has(row.code));
 
   function focusItem(item: MapItem) {
     setSelected(item);
@@ -226,6 +287,69 @@ export default function Gis() {
     if (!map || !previous) return;
     previousViewRef.current = { center: map.getCenter(), zoom: map.getZoom() };
     map.setView(previous.center, previous.zoom, { animate: true });
+  }
+
+  async function loadDetailReadings(item: MapItem) {
+    const requestID = ++detailRequestRef.current;
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    const day = isoDate(date);
+    setDetailLoading(true);
+    setDetailError("");
+    try {
+      const env = await api.post<ReadingsPayload>("readings/query", {
+        point_ids: [Number(item.point.POINT_ID)],
+        parameters: DAILY_PARAMETERS.map((parameter) => parameter.code),
+        from: day,
+        to: day,
+      });
+      if (requestID !== detailRequestRef.current) return;
+      if (!env.success) throw new Error(env.message || "Не удалось обновить показания");
+      const sourceRows = env.data?.rows || [];
+      const rowByCode = new Map<string, Row>();
+      sourceRows.forEach((row) => {
+        const code = String(row.PARAMETER_CODE || "");
+        if (!rowByCode.has(code)) rowByCode.set(code, row);
+      });
+      const pointLabel = String(item.point.POINT_NAME || item.point.POINT_CODE || "");
+      setDetailReadings(DAILY_PARAMETERS.map((parameter) => {
+        const row = rowByCode.get(parameter.code);
+        return {
+          code: parameter.code,
+          parameter: parameter.label,
+          pointLabel,
+          time: readingTime(row?.READING_TIME),
+        };
+      }));
+    } catch (loadError: any) {
+      if (requestID !== detailRequestRef.current) return;
+      const pointLabel = String(item.point.POINT_NAME || item.point.POINT_CODE || "");
+      setDetailReadings(DAILY_PARAMETERS.map((parameter) => ({
+        code: parameter.code,
+        parameter: parameter.label,
+        pointLabel,
+        time: readingTime(null),
+      })));
+      setDetailError(loadError?.message || "Не удалось обновить показания");
+    } finally {
+      if (requestID === detailRequestRef.current) setDetailLoading(false);
+    }
+  }
+
+  function exportDetailReadings() {
+    if (!selected) return;
+    const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+    const rows = [
+      ["Точка/группа", "Параметр", "Время"],
+      ...visibleDetailReadings.map((row) => [row.pointLabel, row.parameter, row.time]),
+    ];
+    const csv = `\uFEFF${rows.map((row) => row.map(quote).join(";")).join("\r\n")}`;
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${selected.point.POINT_CODE || "gis-readings"}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -315,27 +439,93 @@ export default function Gis() {
       )}
 
       {selected && (
-        <aside className="gis-detail">
-          <header>
-            <span>Данные точки учета</span>
-            <button onClick={() => setSelected(null)} aria-label="Закрыть">×</button>
-          </header>
-          <div className="gis-detail__body">
-            <h3>{selected.point.POINT_NAME || selected.point.POINT_CODE}</h3>
-            <table>
-              <tbody>
-                <MetaRow k="Код точки" v={selected.point.POINT_CODE} />
-                <MetaRow k="Группа" v={selected.groupName} />
-                <MetaRow k="Состояние" v={selected.recent ? "Есть показания" : "Нет актуальных показаний"} />
-                <MetaRow k="Счётчик" v={selected.meter.METER_NUMBER} />
-                <MetaRow k="Тип счётчика" v={selected.typeName} />
-                <MetaRow k="Класс точности" v={selected.meter.METER_CLASS} />
-              </tbody>
-            </table>
-            <div className="gis-detail__actions">
-              <a href={`/m/points?search=${encodeURIComponent(selected.point.POINT_CODE || "")}`}>Точка</a>
-              <a href={`/meters?search=${encodeURIComponent(selected.meter.METER_NUMBER || selected.point.POINT_CODE || "")}`}>Счётчик</a>
+        <aside className="gis-detail" aria-label="Показания точки учета">
+          <header className="gis-detail__title">
+            <span title={`${selected.groupName} ${selected.point.POINT_NAME || selected.point.POINT_CODE}`.trim()}>
+              {[selected.groupName, selected.point.POINT_NAME || selected.point.POINT_CODE].filter(Boolean).join(". ")}
+            </span>
+            <div>
+              <a href={`/m/points?search=${encodeURIComponent(selected.point.POINT_CODE || "")}`} title="Открыть точку" aria-label="Открыть точку">
+                <IcExpand size={14} />
+              </a>
+              <button onClick={() => setSelected(null)} title="Закрыть" aria-label="Закрыть">×</button>
             </div>
+          </header>
+
+          <div className="gis-detail__section-title">
+            <b>Показания</b>
+            <button onClick={() => loadDetailReadings(selected)} disabled={detailLoading} title="Обновить" aria-label="Обновить">
+              <IcSync size={17} />
+            </button>
+          </div>
+
+          <div className="gis-detail__readings">
+            <div className="gis-detail__table-scroll">
+              <table>
+                <thead><tr><th>Точка/группа</th><th>Параметр</th><th>Время</th></tr></thead>
+                <tbody>
+                  {visibleDetailReadings.map((row) => (
+                    <tr key={row.code}>
+                      <td title={row.pointLabel}>{row.pointLabel}</td>
+                      <td>{row.parameter}</td>
+                      <td>{row.time}</td>
+                    </tr>
+                  ))}
+                  {detailLoading && !detailReadings.length && <tr><td colSpan={3} className="gis-detail__empty">Загрузка...</td></tr>}
+                </tbody>
+              </table>
+            </div>
+            <div className="gis-detail__table-status">
+              <span>{detailError ? "Нет связи. Показаны последние данные." : "Выделенных нет."} Всего {visibleDetailReadings.length}</span>
+              <button
+                className={`gis-detail__filter${detailFilterOpen ? " active" : ""}`}
+                onClick={() => setDetailFilterOpen((value) => !value)}
+                title="Фильтр"
+                aria-label="Фильтр"
+                aria-expanded={detailFilterOpen}
+              ><IcFunnel size={18} /></button>
+              <button className="gis-detail__excel" onClick={exportDetailReadings} title="Экспорт Excel" aria-label="Экспорт Excel"><span>X</span></button>
+              {detailFilterOpen && (
+                <div className="gis-detail__filter-menu">
+                  <b>Параметры</b>
+                  {DAILY_PARAMETERS.map((parameter) => (
+                    <label key={parameter.code}>
+                      <input
+                        type="checkbox"
+                        checked={detailParameterFilter.has(parameter.code)}
+                        onChange={() => setDetailParameterFilter((current) => {
+                          const next = new Set(current);
+                          next.has(parameter.code) ? next.delete(parameter.code) : next.add(parameter.code);
+                          return next;
+                        })}
+                      />
+                      <span>{parameter.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="gis-detail__accordions">
+            <DetailSection label="Информация объекта" id="info" open={detailSection} onToggle={setDetailSection}>
+              <dl>
+                <KV k="Код точки" v={String(selected.point.POINT_CODE || "")} />
+                <KV k="Группа" v={selected.groupName} />
+                <KV k="Состояние" v={selected.recent ? "Есть показания" : "Нет актуальных показаний"} />
+                <KV k="Счётчик" v={String(selected.meter.METER_NUMBER || "")} />
+                <KV k="Тип счётчика" v={selected.typeName} />
+                <KV k="Класс точности" v={String(selected.meter.METER_CLASS || "")} />
+              </dl>
+            </DetailSection>
+            <DetailSection label="События" id="events" open={detailSection} onToggle={setDetailSection}><p>Событий нет.</p></DetailSection>
+            <DetailSection label="Подтверждение событий" id="ack" open={detailSection} onToggle={setDetailSection}><p>Подтверждений нет.</p></DetailSection>
+            <DetailSection label="Ссылки" id="links" open={detailSection} onToggle={setDetailSection}>
+              <nav>
+                <a href={`/m/points?search=${encodeURIComponent(selected.point.POINT_CODE || "")}`}>Точка учета</a>
+                <a href={`/meters?search=${encodeURIComponent(selected.meter.METER_NUMBER || selected.point.POINT_CODE || "")}`}>Счётчик</a>
+              </nav>
+            </DetailSection>
           </div>
         </aside>
       )}
@@ -352,11 +542,18 @@ function KV({ k, v }: { k: string; v: string }) {
   );
 }
 
-function MetaRow({ k, v }: { k: string; v: any }) {
+function DetailSection({ label, id, open, onToggle, children }: {
+  label: string;
+  id: string;
+  open: string;
+  onToggle: (id: string) => void;
+  children: React.ReactNode;
+}) {
+  const expanded = open === id;
   return (
-    <tr>
-      <th>{k}</th>
-      <td>{v ?? ""}</td>
-    </tr>
+    <section className={`gis-detail__accordion${expanded ? " open" : ""}`}>
+      <button onClick={() => onToggle(expanded ? "" : id)} aria-expanded={expanded}>{label}</button>
+      {expanded && <div className="gis-detail__accordion-body">{children}</div>}
+    </section>
   );
 }
