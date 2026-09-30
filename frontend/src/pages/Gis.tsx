@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { api } from "../api";
-import { IcChevron, IcExpand, IcFunnel, IcHome, IcInfo, IcReset, IcSearch, IcSync } from "../icons";
+import { IcChevron, IcExpand, IcFunnel, IcGrid, IcHome, IcInfo, IcReset, IcSearch, IcSync } from "../icons";
 import "../gis.css";
 
 const CENTER: [number, number] = [48.1158, 114.5726];
@@ -141,11 +141,14 @@ export default function Gis() {
   const [detailReadings, setDetailReadings] = useState<GisReading[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState("");
-  const [detailSection, setDetailSection] = useState("");
+  const [detailSection, setDetailSection] = useState("readings");
   const [detailFilterOpen, setDetailFilterOpen] = useState(false);
   const [detailParameterFilter, setDetailParameterFilter] = useState<Set<string>>(
     () => new Set(DAILY_PARAMETERS.map((parameter) => parameter.code)),
   );
+  const [detailEvents, setDetailEvents] = useState<Row[]>([]);
+  const [detailEventsLoading, setDetailEventsLoading] = useState(false);
+  const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -251,10 +254,12 @@ export default function Gis() {
       setDetailReadings([]);
       return;
     }
-    setDetailSection("");
+    setDetailSection("readings");
     setDetailFilterOpen(false);
     setDetailParameterFilter(new Set(DAILY_PARAMETERS.map((parameter) => parameter.code)));
+    setSelectedEvents(new Set());
     void loadDetailReadings(selected);
+    void loadDetailEvents(selected);
   }, [selected]);
 
   const recentCount = items.filter((item) => item.recent).length;
@@ -334,6 +339,43 @@ export default function Gis() {
     } finally {
       if (requestID === detailRequestRef.current) setDetailLoading(false);
     }
+  }
+
+  async function loadDetailEvents(item: MapItem) {
+    const today = isoDate(new Date());
+    setDetailEventsLoading(true);
+    try {
+      const env = await api.post<Row[]>("eventlog/query", {
+        category: "all",
+        from: today,
+        to: today,
+        search: String(item.point.POINT_NAME || item.point.POINT_CODE || ""),
+        limit: 200,
+        offset: 0,
+      });
+      setDetailEvents(env.success ? env.data || [] : []);
+    } catch {
+      setDetailEvents([]);
+    } finally {
+      setDetailEventsLoading(false);
+    }
+  }
+
+  function toggleDetailEvent(id: string) {
+    setSelectedEvents((current) => {
+      const next = new Set(current);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function acknowledgeDetailEvents(all: boolean) {
+    const ids = all
+      ? new Set(detailEvents.filter((row) => !row.EV_ACKNOWLEDGED).map((row) => String(row.EV_ID)))
+      : selectedEvents;
+    if (!ids.size) return;
+    setDetailEvents((current) => current.map((row) => ids.has(String(row.EV_ID)) ? { ...row, EV_ACKNOWLEDGED: true } : row));
+    setSelectedEvents(new Set());
   }
 
   function exportDetailReadings() {
@@ -439,7 +481,7 @@ export default function Gis() {
       )}
 
       {selected && (
-        <aside className="gis-detail" aria-label="Показания точки учета">
+        <aside className={`gis-detail${["events", "ack", "links"].includes(detailSection) ? " gis-detail--wide" : ""}`} aria-label="Показания точки учета">
           <header className="gis-detail__title">
             <span title={`${selected.groupName} ${selected.point.POINT_NAME || selected.point.POINT_CODE}`.trim()}>
               {[selected.groupName, selected.point.POINT_NAME || selected.point.POINT_CODE].filter(Boolean).join(". ")}
@@ -452,63 +494,64 @@ export default function Gis() {
             </div>
           </header>
 
-          <div className="gis-detail__section-title">
-            <b>Показания</b>
-            <button onClick={() => loadDetailReadings(selected)} disabled={detailLoading} title="Обновить" aria-label="Обновить">
-              <IcSync size={17} />
-            </button>
-          </div>
-
-          <div className="gis-detail__readings">
-            <div className="gis-detail__table-scroll">
-              <table>
-                <thead><tr><th>Точка/группа</th><th>Параметр</th><th>Время</th></tr></thead>
-                <tbody>
-                  {visibleDetailReadings.map((row) => (
-                    <tr key={row.code}>
-                      <td title={row.pointLabel}>{row.pointLabel}</td>
-                      <td>{row.parameter}</td>
-                      <td>{row.time}</td>
-                    </tr>
-                  ))}
-                  {detailLoading && !detailReadings.length && <tr><td colSpan={3} className="gis-detail__empty">Загрузка...</td></tr>}
-                </tbody>
-              </table>
-            </div>
-            <div className="gis-detail__table-status">
-              <span>{detailError ? "Нет связи. Показаны последние данные." : "Выделенных нет."} Всего {visibleDetailReadings.length}</span>
-              <button
-                className={`gis-detail__filter${detailFilterOpen ? " active" : ""}`}
-                onClick={() => setDetailFilterOpen((value) => !value)}
-                title="Фильтр"
-                aria-label="Фильтр"
-                aria-expanded={detailFilterOpen}
-              ><IcFunnel size={18} /></button>
-              <button className="gis-detail__excel" onClick={exportDetailReadings} title="Экспорт Excel" aria-label="Экспорт Excel"><span>X</span></button>
-              {detailFilterOpen && (
-                <div className="gis-detail__filter-menu">
-                  <b>Параметры</b>
-                  {DAILY_PARAMETERS.map((parameter) => (
-                    <label key={parameter.code}>
-                      <input
-                        type="checkbox"
-                        checked={detailParameterFilter.has(parameter.code)}
-                        onChange={() => setDetailParameterFilter((current) => {
-                          const next = new Set(current);
-                          next.has(parameter.code) ? next.delete(parameter.code) : next.add(parameter.code);
-                          return next;
-                        })}
-                      />
-                      <span>{parameter.label}</span>
-                    </label>
-                  ))}
+          <div className="gis-detail__panels">
+            <DetailPanel
+              label="Показания"
+              id="readings"
+              open={detailSection}
+              onToggle={setDetailSection}
+              action={<button onClick={() => loadDetailReadings(selected)} disabled={detailLoading} title="Обновить" aria-label="Обновить"><IcSync size={17} /></button>}
+            >
+              <div className="gis-detail__readings">
+                <div className="gis-detail__table-scroll">
+                  <table>
+                    <thead><tr><th>Точка/группа</th><th>Параметр</th><th>Время</th></tr></thead>
+                    <tbody>
+                      {visibleDetailReadings.map((row) => (
+                        <tr key={row.code}>
+                          <td title={row.pointLabel}>{row.pointLabel}</td>
+                          <td>{row.parameter}</td>
+                          <td>{row.time}</td>
+                        </tr>
+                      ))}
+                      {detailLoading && !detailReadings.length && <tr><td colSpan={3} className="gis-detail__empty">Загрузка...</td></tr>}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-            </div>
-          </div>
+                <div className="gis-detail__table-status">
+                  <span>{detailError ? "Нет связи. Показаны последние данные." : "Выделенных нет."} Всего {visibleDetailReadings.length}</span>
+                  <button
+                    className={`gis-detail__filter${detailFilterOpen ? " active" : ""}`}
+                    onClick={() => setDetailFilterOpen((value) => !value)}
+                    title="Фильтр"
+                    aria-label="Фильтр"
+                    aria-expanded={detailFilterOpen}
+                  ><IcFunnel size={18} /></button>
+                  <button className="gis-detail__excel" onClick={exportDetailReadings} title="Экспорт Excel" aria-label="Экспорт Excel"><span>X</span></button>
+                  {detailFilterOpen && (
+                    <div className="gis-detail__filter-menu">
+                      <b>Параметры</b>
+                      {DAILY_PARAMETERS.map((parameter) => (
+                        <label key={parameter.code}>
+                          <input
+                            type="checkbox"
+                            checked={detailParameterFilter.has(parameter.code)}
+                            onChange={() => setDetailParameterFilter((current) => {
+                              const next = new Set(current);
+                              next.has(parameter.code) ? next.delete(parameter.code) : next.add(parameter.code);
+                              return next;
+                            })}
+                          />
+                          <span>{parameter.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </DetailPanel>
 
-          <div className="gis-detail__accordions">
-            <DetailSection label="Информация объекта" id="info" open={detailSection} onToggle={setDetailSection}>
+            <DetailPanel label="Информация объекта" id="info" open={detailSection} onToggle={setDetailSection}>
               <dl>
                 <KV k="Код точки" v={String(selected.point.POINT_CODE || "")} />
                 <KV k="Группа" v={selected.groupName} />
@@ -517,15 +560,40 @@ export default function Gis() {
                 <KV k="Тип счётчика" v={selected.typeName} />
                 <KV k="Класс точности" v={String(selected.meter.METER_CLASS || "")} />
               </dl>
-            </DetailSection>
-            <DetailSection label="События" id="events" open={detailSection} onToggle={setDetailSection}><p>Событий нет.</p></DetailSection>
-            <DetailSection label="Подтверждение событий" id="ack" open={detailSection} onToggle={setDetailSection}><p>Подтверждений нет.</p></DetailSection>
-            <DetailSection label="Ссылки" id="links" open={detailSection} onToggle={setDetailSection}>
-              <nav>
-                <a href={`/m/points?search=${encodeURIComponent(selected.point.POINT_CODE || "")}`}>Точка учета</a>
-                <a href={`/meters?search=${encodeURIComponent(selected.meter.METER_NUMBER || selected.point.POINT_CODE || "")}`}>Счётчик</a>
-              </nav>
-            </DetailSection>
+            </DetailPanel>
+
+            <DetailPanel
+              label="События"
+              id="events"
+              open={detailSection}
+              onToggle={setDetailSection}
+              action={<button onClick={() => loadDetailEvents(selected)} disabled={detailEventsLoading} title="Обновить" aria-label="Обновить события"><IcSync size={17} /></button>}
+            >
+              <EventDetailGrid rows={detailEvents} loading={detailEventsLoading} mode="events" selected={selectedEvents} onSelect={toggleDetailEvent} />
+            </DetailPanel>
+
+            <DetailPanel
+              label="Подтверждение событий"
+              id="ack"
+              open={detailSection}
+              onToggle={setDetailSection}
+              action={<button onClick={() => loadDetailEvents(selected)} disabled={detailEventsLoading} title="Обновить" aria-label="Обновить подтверждения"><IcSync size={17} /></button>}
+            >
+              <div className="gis-detail__ack">
+                <EventDetailGrid rows={detailEvents.filter((row) => !row.EV_ACKNOWLEDGED)} loading={detailEventsLoading} mode="ack" selected={selectedEvents} onSelect={toggleDetailEvent} />
+                <div className="gis-detail__ack-actions">
+                  <button disabled={!selectedEvents.size} onClick={() => acknowledgeDetailEvents(false)}>Подтвердить</button>
+                  <button disabled={!detailEvents.some((row) => !row.EV_ACKNOWLEDGED)} onClick={() => acknowledgeDetailEvents(true)}>Подтвердить все</button>
+                </div>
+              </div>
+            </DetailPanel>
+
+            <DetailPanel label="Ссылки" id="links" open={detailSection} onToggle={setDetailSection}>
+              <ul className="gis-detail__links">
+                <li><a href={`/archives?point=${encodeURIComponent(selected.point.POINT_ID)}&view=profile`}>Суточный профиль</a></li>
+                <li><a href={`/quality_reports?point=${encodeURIComponent(selected.point.POINT_ID)}`}>Качество показаний</a></li>
+              </ul>
+            </DetailPanel>
           </div>
         </aside>
       )}
@@ -542,18 +610,68 @@ function KV({ k, v }: { k: string; v: string }) {
   );
 }
 
-function DetailSection({ label, id, open, onToggle, children }: {
+function DetailPanel({ label, id, open, onToggle, action, children }: {
   label: string;
   id: string;
   open: string;
   onToggle: (id: string) => void;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const expanded = open === id;
   return (
-    <section className={`gis-detail__accordion${expanded ? " open" : ""}`}>
-      <button onClick={() => onToggle(expanded ? "" : id)} aria-expanded={expanded}>{label}</button>
-      {expanded && <div className="gis-detail__accordion-body">{children}</div>}
+    <section className={`gis-detail__panel${expanded ? " open" : ""}`}>
+      <div className="gis-detail__panel-head">
+        <button onClick={() => onToggle(id)} aria-expanded={expanded}>{label}</button>
+        {expanded && action}
+      </div>
+      {expanded && <div className="gis-detail__panel-body">{children}</div>}
     </section>
+  );
+}
+
+function EventDetailGrid({ rows, loading, mode, selected, onSelect }: {
+  rows: Row[];
+  loading: boolean;
+  mode: "events" | "ack";
+  selected: Set<string>;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div className="gis-detail__event-grid">
+      <table>
+        <thead><tr>
+          <th>Время события</th>
+          {mode === "events" && <th>Ошибка</th>}
+          <th>Объект связи</th>
+          <th>Объект учета</th>
+          <th>Сообщение события</th>
+          {mode === "ack" && <th>Подтвердил</th>}
+        </tr></thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.EV_ID} className={selected.has(String(row.EV_ID)) ? "selected" : ""} onClick={() => onSelect(String(row.EV_ID))}>
+              <td>{readingTime(row.EV_TIME)}</td>
+              {mode === "events" && <td>{["ERROR", "CRITICAL"].includes(String(row.EV_PRIORITY)) ? "Да" : "Нет"}</td>}
+              <td>{row.EV_SOURCE || "—"}</td>
+              <td>{row.EV_POINT_NAME || "—"}</td>
+              <td>{row.EV_TEXT || "—"}</td>
+              {mode === "ack" && <td>{row.EV_ACKNOWLEDGED ? "ADMIN" : "—"}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!rows.length && !loading && <EmptyGridState />}
+      {loading && <div className="gis-detail__grid-loading">Загрузка...</div>}
+    </div>
+  );
+}
+
+function EmptyGridState() {
+  return (
+    <div className="gis-detail__empty-state">
+      <IcGrid size={66} />
+      <span>Список пустой</span>
+    </div>
   );
 }

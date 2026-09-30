@@ -15,6 +15,7 @@
 .toshi-shell__main--source .toshi-header { display: none; }
 .toshi-content--gis { padding: 0; overflow: hidden; }
 .toshi-content--schemes-overview { padding: 8px 14px; overflow: auto; }
+.toshi-content--archives { padding: 8px 10px; overflow: hidden; }
 
 .tm-menu {
   width: 216px;
@@ -184,6 +185,7 @@
   .toshi-shell__main--source .toshi-header { display: flex; }
   .toshi-content--gis { padding: 0; }
   .toshi-content--schemes-overview { padding: 8px; }
+  .toshi-content--archives { padding: 8px; overflow: auto; }
   .tm-source-menu-toggle, .tm-source-menu-reopen { display: none; }
 
   .tm-menu {

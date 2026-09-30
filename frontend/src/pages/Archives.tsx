@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import "../archives.css";
+import ArchiveViewer from "./ArchiveViewer";
 import {
   IcExpand, IcSave, IcSync, IcPlus, IcMinus, IcCollapse, IcGrid,
   IcClock, IcChevron, IcSearch, IcFunnel, IcReset, IcInfo, IcHelp, IcGear,
@@ -14,6 +16,9 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 const ddmmyyyy = (s: string) => s.split("-").reverse().join("-");
 
 export default function Archives() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryPointID = searchParams.get("point");
   const [groups, setGroups] = useState<Row[]>([]);
   const [points, setPoints] = useState<Row[]>([]);
   const [q, setQ] = useState("");
@@ -26,11 +31,18 @@ export default function Archives() {
   const [tab, setTab] = useState("res");
   const [paramOpen, setParamOpen] = useState<Set<string>>(new Set(["Суточный профиль: Получасовые", "Р мощность"]));
   const [selParam, setSelParam] = useState<string>("Р мощность");
+  const [viewerOpen, setViewerOpen] = useState(searchParams.get("view") === "profile");
 
   useEffect(() => {
     api.get("groups?limit=5000").then((e) => setGroups((e.data as Row[]) || []));
     api.get("points?limit=1000").then((e) => setPoints((e.data as Row[]) || []));
   }, []);
+
+  useEffect(() => {
+    if (!queryPointID || !points.length) return;
+    const point = points.find((item) => String(item.POINT_ID) === queryPointID || String(item.POINT_CODE) === queryPointID);
+    if (point) setSel(point);
+  }, [points, queryPointID]);
 
   // Build the group tree (children + points per group). Roots = groups whose
   // parent is null/absent from the set; skip system groups so only the topology
@@ -147,10 +159,14 @@ export default function Archives() {
     if (kind === "year") f.setFullYear(now.getFullYear() - 1);
     setFrom(iso(f)); setTo(iso(now));
   }
-  async function view() {
+  function view() {
     if (!sel) return;
-    const env = await api.post("archives/point", { POINT_ID: sel.POINT_ID, ML_ID: 1, MD_ID: 1, AGGS_ID: 1, FROM: from, TO: to });
-    setRows((env.data as Row[]) || []);
+    setViewerOpen(true);
+  }
+
+  if (viewerOpen) {
+    if (!sel) return <div className="aempty"><div className="toshi-loader" /><div>Загрузка точки учета...</div></div>;
+    return <ArchiveViewer point={sel} day={to} onClose={() => { setViewerOpen(false); navigate("/archives"); }} />;
   }
 
   return (

@@ -72,7 +72,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const loc = useLocation();
   const isGis = loc.pathname === "/gis";
   const isSchemesOverview = loc.pathname === "/schemes/overview";
-  const isSourceLayout = isGis || isSchemesOverview;
+  const isArchives = loc.pathname === "/archives";
+  const isSourceLayout = isGis || isSchemesOverview || isArchives;
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuCollapsed, setMenuCollapsed] = useState(false);
   useEffect(() => setMenuOpen(false), [loc.pathname]);
@@ -145,7 +146,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {hbtn("Выход", <IcLogout size={15} />, () => { api.logout(); nav("/login"); })}
           </div>
         </header>
-        <main className={`toshi-content${isGis ? " toshi-content--gis" : ""}${isSchemesOverview ? " toshi-content--schemes-overview" : ""}`}>{children}</main>
+        <main className={`toshi-content${isGis ? " toshi-content--gis" : ""}${isSchemesOverview ? " toshi-content--schemes-overview" : ""}${isArchives ? " toshi-content--archives" : ""}`}>{children}</main>
       </div>
     </div>
   );
