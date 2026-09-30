@@ -12,6 +12,9 @@
   flex-direction: column;
 }
 
+.toshi-shell__main--gis .toshi-header { display: none; }
+.toshi-content--gis { padding: 0; overflow: hidden; }
+
 .tm-menu {
   width: 240px;
   flex: 0 0 240px;
@@ -138,6 +141,9 @@
 .tm-backdrop { display: none; }
 
 @media (max-width: 760px) {
+  .toshi-shell__main--gis .toshi-header { display: flex; }
+  .toshi-content--gis { padding: 0; }
+
   .tm-menu {
     position: fixed;
     inset: 0 auto 0 0;

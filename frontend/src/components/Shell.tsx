@@ -64,6 +64,7 @@ function Item({ node }: { node: MenuNode }) {
 export default function Shell({ children }: { children: React.ReactNode }) {
   const nav = useNavigate();
   const loc = useLocation();
+  const isGis = loc.pathname === "/gis";
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [loc.pathname]);
   const user = (() => {
@@ -112,7 +113,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </nav>
       {menuOpen && <button className="tm-backdrop is-open" onClick={() => setMenuOpen(false)} aria-label="Закрыть меню" />}
 
-      <div className="toshi-shell__main">
+      <div className={`toshi-shell__main${isGis ? " toshi-shell__main--gis" : ""}`}>
         <header className="toshi-header" style={{ flex: "0 0 auto", justifyContent: "space-between", position: "relative" }}>
           <button className="toshi-header__btn" title="Меню" aria-controls="app-menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>☰</button>
           <img src={logo} alt="TOSH ELECTROAPPARAT" className="toshi-header__logo" />
@@ -128,7 +129,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {hbtn("Выход", <IcLogout size={15} />, () => { api.logout(); nav("/login"); })}
           </div>
         </header>
-        <main className="toshi-content">{children}</main>
+        <main className={`toshi-content${isGis ? " toshi-content--gis" : ""}`}>{children}</main>
       </div>
     </div>
   );

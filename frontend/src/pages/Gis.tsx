@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { api } from "../api";
-import { IcInfo, IcReset, IcSearch } from "../icons";
+import { IcChevron, IcFunnel, IcHome, IcInfo, IcReset, IcSearch } from "../icons";
 import "../gis.css";
 
-const CENTER: [number, number] = [48.083, 114.535];
+const CENTER: [number, number] = [48.0793, 114.5550];
+const INITIAL_ZOOM = 16;
 
 const MAP_STYLES = {
   osm: {
@@ -36,10 +37,41 @@ type MapItem = {
   searchText: string;
 };
 
+const GIS_LANES = [
+  { count: 10, start: [48.0854, 114.5508], step: [-0.00043, 0.00072] },
+  { count: 15, start: [48.0838, 114.5497], step: [-0.00042, 0.00065] },
+  { count: 16, start: [48.0824, 114.5513], step: [-0.00042, 0.00064] },
+  { count: 16, start: [48.0803, 114.5498], step: [-0.00043, 0.00066] },
+  { count: 13, start: [48.0779, 114.5514], step: [-0.00036, 0.00069] },
+  { count: 10, start: [48.0830, 114.5572], step: [-0.00048, 0.00054] },
+  { count: 7, start: [48.0808, 114.5468], step: [-0.00031, 0.00091] },
+] as const;
+
 function locationFor(index: number): [number, number] {
-  const angle = (index * 137.5 * Math.PI) / 180;
-  const ring = 0.004 + (index % 22) * 0.0009;
-  return [CENTER[0] + Math.sin(angle) * ring * 0.7, CENTER[1] + Math.cos(angle) * ring];
+  let offset = index;
+  for (let laneIndex = 0; laneIndex < GIS_LANES.length; laneIndex += 1) {
+    const lane = GIS_LANES[laneIndex];
+    if (offset < lane.count) {
+      const jitter = ((offset * 7 + laneIndex * 3) % 5 - 2) * 0.000055;
+      return [
+        lane.start[0] + lane.step[0] * offset + jitter,
+        lane.start[1] + lane.step[1] * offset - jitter,
+      ];
+    }
+    offset -= lane.count;
+  }
+  return CENTER;
+}
+
+function markerIcon(item: MapItem, selected: boolean) {
+  const state = selected ? "selected" : item.recent ? "recent" : "stale";
+  return L.divIcon({
+    className: "gis-marker-shell",
+    html: `<span class="gis-marker gis-marker--${state}"><i></i></span>`,
+    iconSize: [22, 30],
+    iconAnchor: [11, 28],
+    tooltipAnchor: [0, -25],
+  });
 }
 
 function clockText(value: Date) {
@@ -56,13 +88,15 @@ export default function Gis() {
   const mapRef = useRef<L.Map | null>(null);
   const tileRef = useRef<L.TileLayer | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
+  const previousViewRef = useRef<{ center: L.LatLng; zoom: number } | null>(null);
   const [items, setItems] = useState<MapItem[]>([]);
-  const [groups, setGroups] = useState<Row[]>([]);
   const [selected, setSelected] = useState<MapItem | null>(null);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [mapStyle, setMapStyle] = useState<MapStyle>("osm");
   const [legendOpen, setLegendOpen] = useState(false);
+  const [recentOnly, setRecentOnly] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
@@ -75,7 +109,7 @@ export default function Gis() {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const map = L.map(containerRef.current, { zoomControl: false }).setView(CENTER, 14);
+    const map = L.map(containerRef.current, { zoomControl: false }).setView(CENTER, INITIAL_ZOOM);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     mapRef.current = map;
     markerLayerRef.current = L.layerGroup().addTo(map);
@@ -132,7 +166,6 @@ export default function Gis() {
           searchText: [point.POINT_CODE, point.POINT_NAME, groupName, meter.METER_NUMBER, typeName].join(" ").toLowerCase(),
         };
       });
-      setGroups(loadedGroups);
       setItems(next);
       setUpdatedAt(new Date());
       setError(pointEnv.success ? "" : pointEnv.message || "Не удалось загрузить объекты карты");
@@ -149,8 +182,8 @@ export default function Gis() {
 
   const normalizedQuery = query.trim().toLowerCase();
   const visibleItems = useMemo(
-    () => normalizedQuery ? items.filter((item) => item.searchText.includes(normalizedQuery)) : items,
-    [items, normalizedQuery],
+    () => items.filter((item) => (!recentOnly || item.recent) && (!normalizedQuery || item.searchText.includes(normalizedQuery))),
+    [items, normalizedQuery, recentOnly],
   );
   const suggestions = normalizedQuery && searchOpen ? visibleItems.slice(0, 7) : [];
 
@@ -160,13 +193,7 @@ export default function Gis() {
     layer.clearLayers();
     visibleItems.forEach((item) => {
       const isSelected = selected?.point.POINT_ID === item.point.POINT_ID;
-      L.circleMarker([item.lat, item.lng], {
-        radius: isSelected ? 10 : 8,
-        color: isSelected ? "#8a6500" : item.recent ? "#167144" : "#a23b3b",
-        weight: isSelected ? 3 : 2,
-        fillColor: isSelected ? "#f2c94c" : item.recent ? "#2ecc71" : "#e66a6a",
-        fillOpacity: 1,
-      })
+      L.marker([item.lat, item.lng], { icon: markerIcon(item, isSelected) })
         .bindTooltip(`${item.point.POINT_CODE || ""} ${item.point.POINT_NAME || ""}`.trim())
         .on("click", () => setSelected(item))
         .addTo(layer);
@@ -174,26 +201,34 @@ export default function Gis() {
   }, [visibleItems, selected]);
 
   const recentCount = items.filter((item) => item.recent).length;
-  const substationCount = useMemo(() => {
-    const ids = new Set<string>();
-    groups.forEach((group) => {
-      if (/(КТП|ТП)\s*[\d№]/i.test(String(group.GR_NAME || ""))) ids.add(String(group.GR_ID));
-    });
-    return ids.size;
-  }, [groups]);
 
   function focusItem(item: MapItem) {
     setSelected(item);
     setQuery(String(item.point.POINT_CODE || item.point.POINT_NAME || ""));
     setSearchOpen(false);
-    mapRef.current?.setView([item.lat, item.lng], 17, { animate: true });
+    moveMap([item.lat, item.lng], 17);
+  }
+
+  function moveMap(center: L.LatLngExpression, zoom: number) {
+    const map = mapRef.current;
+    if (!map) return;
+    previousViewRef.current = { center: map.getCenter(), zoom: map.getZoom() };
+    map.setView(center, zoom, { animate: true });
   }
 
   function resetMap() {
     setQuery("");
     setSearchOpen(false);
     setSelected(null);
-    mapRef.current?.setView(CENTER, 14, { animate: true });
+    moveMap(CENTER, INITIAL_ZOOM);
+  }
+
+  function restorePreviousView() {
+    const map = mapRef.current;
+    const previous = previousViewRef.current;
+    if (!map || !previous) return;
+    previousViewRef.current = { center: map.getCenter(), zoom: map.getZoom() };
+    map.setView(previous.center, previous.zoom, { animate: true });
   }
 
   return (
@@ -201,7 +236,10 @@ export default function Gis() {
       <div ref={containerRef} className="gis-map" />
 
       <div className="gis-toolbar">
-        <button className="gis-tool-button" onClick={resetMap} title="Сброс ориентации карты" aria-label="Сброс ориентации карты">
+        <button className="gis-tool-button gis-tool-button--home" onClick={resetMap} title="Исходный вид" aria-label="Исходный вид">
+          <IcHome size={17} />
+        </button>
+        <button className="gis-tool-button gis-tool-button--back" onClick={restorePreviousView} title="Предыдущий вид" aria-label="Предыдущий вид">
           <IcReset size={15} />
         </button>
         <div className="gis-search">
@@ -225,13 +263,19 @@ export default function Gis() {
             </div>
           )}
         </div>
-        <select className="gis-object-select" value="UZ" aria-label="Объект карты" disabled>
-          <option value="UZ">UZ (Монголия)</option>
-        </select>
         <span className="gis-toolbar__spacer" />
         <select className="gis-map-select" value={mapStyle} onChange={(event) => setMapStyle(event.target.value as MapStyle)} aria-label="Тип карты">
           {Object.entries(MAP_STYLES).map(([key, style]) => <option key={key} value={key}>{style.label}</option>)}
         </select>
+        <button
+          className={`gis-tool-button gis-filter-button${recentOnly ? " active" : ""}`}
+          onClick={() => setRecentOnly((value) => !value)}
+          title="Только точки с показаниями"
+          aria-label="Только точки с показаниями"
+          aria-pressed={recentOnly}
+        >
+          <IcFunnel size={16} />
+        </button>
         <button className={`gis-legend-button${legendOpen ? " active" : ""}`} onClick={() => setLegendOpen((value) => !value)}>
           <IcInfo size={14} />
           <span>Обозначения</span>
@@ -239,18 +283,23 @@ export default function Gis() {
       </div>
 
       <section className="gis-summary" aria-label="Сводка объекта">
-        <header>UZ (Монголия)</header>
-        {loading ? <div className="gis-summary__loading">Загрузка...</div> : (
+        <header>
+          <span>UZ (Монголия)</span>
+          <button onClick={() => setSummaryOpen((value) => !value)} aria-label={summaryOpen ? "Свернуть" : "Развернуть"}>
+            <IcChevron size={18} />
+          </button>
+        </header>
+        {summaryOpen && (loading ? <div className="gis-summary__loading">Загрузка...</div> : (
           <dl>
             <KV k="Время обновления" v={updatedAt ? clockText(updatedAt) : "—"} />
             <KV k="Текущее время" v={clockText(now)} />
             <KV k="Количество точек учета объекта" v={String(items.length)} />
             <KV k="Есть показания за последние 2 сутки" v={String(recentCount)} />
             <KV k="Наименование объекта" v="UZ (Монголия)" />
-            <KV k="Общее количество ТП/КТП" v={String(substationCount)} />
+            <KV k="Общее количество ТП/КТП" v="" />
           </dl>
-        )}
-        {error && <div className="gis-summary__error">{error}</div>}
+        ))}
+        {summaryOpen && error && <div className="gis-summary__error">{error}</div>}
       </section>
 
       {legendOpen && (
