@@ -73,7 +73,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const isGis = loc.pathname === "/gis";
   const isSchemesOverview = loc.pathname === "/schemes/overview";
   const isArchives = loc.pathname === "/archives";
-  const isSourceLayout = isGis || isSchemesOverview || isArchives;
+  const isLoadControl = loc.pathname.startsWith("/load-control/");
+  const isSourceLayout = isGis || isSchemesOverview || isArchives || isLoadControl;
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuCollapsed, setMenuCollapsed] = useState(false);
   useEffect(() => setMenuOpen(false), [loc.pathname]);
@@ -91,7 +92,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="toshi-shell">
-      <nav id="app-menu" className={`tm-menu${isSourceLayout ? " tm-menu--source" : ""}${menuOpen ? " is-open" : ""}${menuCollapsed ? " is-collapsed" : ""}`}>
+      <nav id="app-menu" className={`tm-menu${isSourceLayout ? " tm-menu--source" : ""}${isLoadControl ? " tm-menu--load-control" : ""}${menuOpen ? " is-open" : ""}${menuCollapsed ? " is-collapsed" : ""}`}>
         {isSourceLayout && (
           <button className="tm-source-menu-toggle" onClick={() => setMenuCollapsed(true)} title="Скрыть меню" aria-label="Скрыть меню">☰</button>
         )}
@@ -146,7 +147,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {hbtn("Выход", <IcLogout size={15} />, () => { api.logout(); nav("/login"); })}
           </div>
         </header>
-        <main className={`toshi-content${isGis ? " toshi-content--gis" : ""}${isSchemesOverview ? " toshi-content--schemes-overview" : ""}${isArchives ? " toshi-content--archives" : ""}`}>{children}</main>
+        <main className={`toshi-content${isGis ? " toshi-content--gis" : ""}${isSchemesOverview ? " toshi-content--schemes-overview" : ""}${isArchives ? " toshi-content--archives" : ""}${isLoadControl ? " toshi-content--load-control" : ""}`}>{children}</main>
       </div>
     </div>
   );

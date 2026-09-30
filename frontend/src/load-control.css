@@ -1,52 +1,68 @@
-.lc { min-height: calc(100vh - 76px); color: var(--textColor); }
+.lc { height: calc(100vh - 20px); min-height: 0; color: var(--textColor); }
 .lc *, .lc *::before, .lc *::after { box-sizing: border-box; }
 .lc button, .lc input, .lc select { font: inherit; }
 .lc-message { min-height: 32px; display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; color: #fff; }
 .lc-message.error { background: #d95d62; }
 .lc-message.success { background: #35a874; }
 .lc-message button { border: 0; background: transparent; color: inherit; font-size: 18px; cursor: pointer; }
-.lc-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(310px, 34%) minmax(650px, 1fr); gap: 8px; padding: 8px; }
+.lc-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(330px, 400px) minmax(580px, 1fr); gap: 0; padding: 10px; }
 .lc-pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--borderColor); background: var(--contentBg); }
+.lc-selector { border-right: 0; }
 .lc-pane-head { min-height: 29px; display: flex; align-items: center; padding: 6px 10px; color: #fff; background: var(--panelHeadBg); font-weight: 600; }
-.lc-tree-tools { min-height: 44px; display: flex; align-items: center; gap: 6px; padding: 7px; border-bottom: 1px solid var(--borderColor); }
-.lc-tree-tools label, .lc-search-row label { flex: 1; min-width: 0; height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 8px; border: 1px solid var(--borderColor); border-radius: 3px; background: var(--inputBg); }
+.lc-tree-tools { min-height: 46px; display: flex; align-items: center; gap: 5px; padding: 7px 9px; border-bottom: 1px solid var(--borderColor); }
+.lc-tree-tools label, .lc-search-row label { flex: 1; min-width: 0; height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 8px; border: 1px solid var(--borderColor); border-radius: 2px; background: var(--inputBg); }
 .lc-tree-tools input, .lc-search-row input { flex: 1; min-width: 0; border: 0; outline: 0; color: var(--inputColor); background: transparent; }
-.lc-tree-tools button { width: 31px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 3px; color: #fff; background: var(--btnLightblueBg); cursor: pointer; }
-.lc-tree-tools button:last-child { background: #e78383; font-size: 18px; }
-.lc-root-select { display: grid; grid-template-columns: 105px 1fr; gap: 7px; align-items: center; padding: 7px; border-bottom: 1px solid var(--borderColor); }
+.lc-tree-tools select { width: 88px; height: 30px; min-width: 0; border: 1px solid var(--borderColor); border-radius: 2px; color: var(--inputColor); background: var(--inputBg); }
+.lc-tree-tools button { width: 31px; height: 30px; flex: 0 0 31px; display: grid; place-items: center; border: 0; border-radius: 2px; color: #fff; background: var(--btnLightblueBg); cursor: pointer; }
+.lc-tree-tools button.lc-meter-button { width: 27px; flex-basis: 27px; padding: 0; border: 0; color: #32383d; background: transparent; }
+.lc-tree-tools button.lc-meter-button svg { fill: currentColor; }
+.lc-tree-tools button.green { background: #78cba4; }
+.lc-tree-tools button.blue { background: #5d7bcc; }
+.lc-tree-tools button.red { background: #e56f73; }
+.lc-root-select { display: grid; grid-template-columns: 105px 1fr; gap: 7px; align-items: center; padding: 7px 9px; border-bottom: 1px solid var(--borderColor); }
 .lc-root-select select { min-width: 0; height: 29px; border: 1px solid var(--borderColor); padding: 0 7px; color: var(--inputColor); background: var(--inputBg); }
-.lc-tree { flex: 1; min-height: 180px; overflow: auto; padding: 5px 0; }
-.lc-tree-group { width: 100%; min-height: 28px; display: flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--textColor); text-align: left; cursor: pointer; }
+.lc-tree { flex: 1; min-height: 180px; overflow: auto; padding: 6px 8px; }
+.lc-tree-group { width: 100%; min-height: 27px; display: flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--textColor); text-align: left; cursor: pointer; }
 .lc-tree-group:hover, .lc-tree-point:hover { background: var(--rowHoverBg); }
-.lc-tree-group > span { width: 15px; height: 15px; border: 1px solid var(--borderColor); border-radius: 2px; line-height: 12px; text-align: center; }
-.lc-tree-point { min-height: 29px; display: grid; grid-template-columns: 16px 15px minmax(0, 1fr) auto; gap: 6px; align-items: center; padding-right: 8px; cursor: pointer; }
-.lc-tree-point input { accent-color: var(--checkboxCheckedColor); }
+.lc-tree-toggle { width: 14px; height: 14px; flex: 0 0 14px; border: 1px solid var(--borderColor); border-radius: 1px; line-height: 11px; text-align: center; }
+.lc-tree-kind { width: 19px; height: 19px; flex: 0 0 19px; display: grid; place-items: center; border: 1px solid #5f7585; color: #31414b; background: #edf2f4; }
+.lc-tree-kind svg { fill: currentColor; }
+.lc-tree-kind--0 { border-color: #4f83c8; color: #2a6fb8; background: #eef7ff; }
+.lc-tree-kind--1 { border-color: #56af64; color: #378d45; background: #effbf1; }
+.lc-tree-kind--2 { border-color: #55b968; color: #309144; background: #edfff1; }
+.lc-tree-kind--3 { border-color: #66717a; color: #20262b; background: #fff; }
+.lc-tree-kind--service { border-color: #59636a; color: #20262b; background: #fff; }
+.lc-tree-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-tree-service { padding-left: 7px; }
+.lc-tree-point { min-height: 27px; display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 6px; align-items: center; padding-right: 8px; color: #9a9a9a; cursor: pointer; }
+.lc-tree-point.selected { color: #fff; background: #66b8e8; }
+.lc-tree-check { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.lc-point-icon { width: 15px; color: #e6c100; font-size: 21px; font-weight: 700; line-height: 18px; text-align: center; }
+.lc-tree-point.selected .lc-point-icon { color: #fff; }
 .lc-tree-point span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lc-tree-point small { min-width: 22px; padding: 2px 5px; border-radius: 3px; color: #fff; background: #58a9d5; text-align: center; }
-.lc-tree-footer { min-height: 38px; display: flex; align-items: center; gap: 6px; padding: 5px 7px; border-top: 1px solid var(--borderColor); }
+.lc-tree-footer { min-height: 38px; display: flex; align-items: center; gap: 5px; padding: 5px 9px; border-top: 1px solid var(--borderColor); }
 .lc-tree-footer > span { flex: 1; text-align: right; }
 .lc-tree-footer button { min-height: 27px; padding: 0 8px; border: 0; border-radius: 3px; color: #fff; background: var(--btnLightblueBg); cursor: pointer; }
 .lc-tree-footer button:disabled { opacity: .42; cursor: default; }
-.lc-tree-footer button:nth-last-child(-n+2) { width: 29px; padding: 0; display: grid; place-items: center; color: var(--textColor); border: 1px solid var(--borderColor); background: var(--wellBg); }
-.lc-legend-button { min-height: 31px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 7px 7px; border: 0; border-radius: 3px; color: #fff; background: #5879cf; cursor: pointer; }
+.lc-tree-footer button:nth-last-child(-n+3) { width: 29px; padding: 0; display: grid; place-items: center; color: #fff; border: 0; background: #5d76ca; }
+.lc-legend-button { min-height: 31px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 9px 8px; border: 0; border-radius: 1px; color: #fff; background: #5879cf; cursor: pointer; }
 .lc-tabs { min-height: 31px; display: flex; border-bottom: 1px solid var(--borderColor); }
 .lc-tabs button { min-width: 138px; padding: 7px 14px; border: 0; border-right: 1px solid var(--borderColor); color: var(--textColor); background: var(--wellBg); cursor: pointer; }
 .lc-tabs button.active { color: #fff; background: #218bc8; }
 .lc-filters { border-bottom: 1px solid var(--borderColor); }
-.lc-filter-row { min-height: 43px; display: flex; align-items: end; gap: 9px; padding: 6px 8px; }
+.lc-filter-row { min-height: 47px; display: flex; align-items: end; gap: 9px; padding: 2px 10px; }
 .lc-filter-row > span { margin-right: auto; align-self: center; }
 .lc-filter-row label { min-width: 280px; display: grid; gap: 3px; font-size: 11px; }
 .lc-filter-row select { min-width: 0; height: 29px; border: 1px solid var(--borderColor); padding: 0 8px; color: var(--inputColor); background: var(--inputBg); }
-.lc-filter-row.triple { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; }
+.lc-filter-row.triple { min-height: 64px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; padding: 7px 10px; border-top: 1px solid var(--borderColor); }
 .lc-filter-row.triple label { min-width: 0; }
 .lc-search-row { display: flex; gap: 6px; padding: 0 8px 7px; }
 .lc-search-row button { min-height: 30px; padding: 0 12px; border: 0; border-radius: 3px; color: #fff; background: #37ae75; cursor: pointer; }
 .lc-search-row button.red { background: #df6267; }
-.lc-table-wrap { flex: 1; min-height: 180px; overflow: auto; }
-.lc-table { width: 100%; min-width: 1250px; border-collapse: separate; border-spacing: 0; color: var(--gridTextColor); font-size: 11px; }
+.lc-table-wrap { position: relative; flex: 1; min-height: 180px; overflow: auto; }
+.lc-table { width: 100%; min-width: 1215px; border-collapse: separate; border-spacing: 0; color: var(--gridTextColor); font-size: 11px; }
 .lc-table th, .lc-table td { min-height: 35px; padding: 7px 8px; border-right: 1px solid var(--gridBorderColor); border-bottom: 1px solid var(--gridBorderColor); text-align: left; white-space: nowrap; }
 .lc-table th { position: sticky; top: 0; z-index: 2; background: #8199a3; color: #fff; font-weight: 600; }
-.lc-table th:first-child, .lc-table td:first-child { width: 34px; text-align: center; }
 .lc-table tbody tr { cursor: pointer; }
 .lc-table tbody tr:nth-child(odd) { background: var(--rowOddBg); }
 .lc-table tbody tr:nth-child(even) { background: var(--rowEvenBg); }
@@ -57,18 +73,19 @@
 .lc-state.on { color: #166c46; background: #d8f2e5; }
 .lc-state.off { color: #87471d; background: #f8e4d1; }
 .lc-state.unknown { color: #58636d; background: #e2e7ea; }
-.lc-empty { height: 170px !important; text-align: center !important; color: var(--treeEmptyColor); font-size: 18px; }
+.lc-empty-state { position: sticky; left: 0; width: 100%; min-width: 620px; height: calc(100% - 34px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #d2d2d2; font-size: 24px; pointer-events: none; }
+.lc-empty-state svg { fill: currentColor; }
 .lc-statusbar { min-height: 38px; display: flex; align-items: center; gap: 10px; padding: 5px 7px; border-top: 1px solid var(--borderColor); }
 .lc-statusbar label { margin-left: auto; display: flex; align-items: center; gap: 5px; }
 .lc-statusbar input { accent-color: var(--checkboxCheckedColor); }
 .lc-statusbar button { width: 31px; height: 29px; display: grid; place-items: center; border: 0; border-radius: 3px; color: #fff; background: #43a66b; cursor: pointer; }
 .lc-statusbar button:last-child { background: #5d75c7; }
 .lc-statusbar button:disabled { opacity: .42; cursor: default; }
-.lc-actions { display: grid; gap: 6px; padding: 0 7px 7px; border-top: 1px solid var(--borderColor); }
+.lc-actions { display: grid; gap: 6px; padding: 0 0 0; border-top: 1px solid var(--borderColor); }
 .lc-actions > div { display: grid; gap: 5px; }
 .lc-actions .primary { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-top: 7px; }
 .lc-actions .secondary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.lc-actions button { min-height: 31px; min-width: 0; padding: 5px 8px; border: 0; border-radius: 3px; color: #fff; background: #78b9df; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-actions button { min-height: 31px; min-width: 0; padding: 5px 8px; border: 0; border-radius: 1px; color: #fff; background: #78b9df; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lc-actions button.green { background: #82cda9; }
 .lc-actions button.orange { background: #f0bc87; }
 .lc-actions button.red { background: #ee9599; }
@@ -99,7 +116,7 @@
 .lc-form button:disabled { opacity: .42; cursor: default; }
 
 @media (max-width: 1100px) {
-  .lc-layout { grid-template-columns: minmax(285px, 32%) minmax(620px, 1fr); }
+  .lc-layout { grid-template-columns: 380px minmax(620px, 1fr); }
   .lc-statusbar { flex-wrap: wrap; }
   .lc-statusbar label { margin-left: 0; }
 }

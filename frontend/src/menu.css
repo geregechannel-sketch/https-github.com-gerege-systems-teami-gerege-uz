@@ -16,6 +16,7 @@
 .toshi-content--gis { padding: 0; overflow: hidden; }
 .toshi-content--schemes-overview { padding: 8px 14px; overflow: auto; }
 .toshi-content--archives { padding: 8px 10px; overflow: hidden; }
+.toshi-content--load-control { padding: 10px; overflow: hidden; }
 
 .tm-menu {
   width: 216px;
@@ -32,6 +33,7 @@
 }
 .tm-menu.is-collapsed { width: 0; flex-basis: 0; border: 0; overflow: hidden; }
 .tm-menu--source { position: relative; }
+.tm-menu--load-control { width: 210px; flex-basis: 210px; }
 .tm-menu--source .tm-brand { padding-top: 42px; }
 .tm-source-menu-toggle {
   position: absolute;
@@ -186,6 +188,7 @@
   .toshi-content--gis { padding: 0; }
   .toshi-content--schemes-overview { padding: 8px; }
   .toshi-content--archives { padding: 8px; overflow: auto; }
+  .toshi-content--load-control { padding: 8px; overflow: auto; }
   .tm-source-menu-toggle, .tm-source-menu-reopen { display: none; }
 
   .tm-menu {
