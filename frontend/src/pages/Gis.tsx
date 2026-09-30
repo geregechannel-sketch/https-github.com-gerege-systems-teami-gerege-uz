@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { Link } from "react-router-dom";
 import { api } from "../api";
 import { IcChevron, IcExpand, IcFunnel, IcGrid, IcHome, IcInfo, IcReset, IcSearch, IcSync } from "../icons";
 import "../gis.css";
@@ -590,8 +591,16 @@ export default function Gis() {
 
             <DetailPanel label="Ссылки" id="links" open={detailSection} onToggle={setDetailSection}>
               <ul className="gis-detail__links">
-                <li><a href={`/archives?point=${encodeURIComponent(selected.point.POINT_ID)}&view=profile`}>Суточный профиль</a></li>
-                <li><a href={`/quality_reports?point=${encodeURIComponent(selected.point.POINT_ID)}`}>Качество показаний</a></li>
+                <li>
+                  <Link to={`/archives?point=${encodeURIComponent(String(selected.point.POINT_ID || selected.point.POINT_CODE || ""))}&view=profile`}>
+                    Суточный профиль
+                  </Link>
+                </li>
+                <li>
+                  <Link to={`/quality_reports?point=${encodeURIComponent(String(selected.point.POINT_ID || selected.point.POINT_CODE || ""))}`}>
+                    Качество показаний
+                  </Link>
+                </li>
               </ul>
             </DetailPanel>
           </div>

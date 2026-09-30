@@ -686,15 +686,40 @@
 .gis-detail__ack-actions button:disabled { opacity: .58; cursor: default; }
 
 .gis-detail__links {
-  margin: 10px 0 0;
-  padding-left: 31px;
-  color: #737d83;
+  list-style: none;
+  margin: 7px 0 0;
+  padding: 0 10px;
   font-size: 14px;
-  line-height: 1.45;
 }
 
-.gis-detail__links a { color: #0000ee; text-decoration: none; }
-.gis-detail__links a:hover { text-decoration: underline; }
+.gis-detail__links li { margin: 0; }
+
+.gis-detail__links a {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  min-height: 27px;
+  width: 100%;
+  padding: 2px 8px;
+  color: #0000ee;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gis-detail__links a::before {
+  content: "\25E6";
+  flex: 0 0 13px;
+  color: #737d83;
+  font-size: 16px;
+}
+
+.gis-detail__links a:hover,
+.gis-detail__links a:focus-visible {
+  background: #eef6fb;
+  text-decoration: underline;
+  outline: 1px solid #7abce4;
+}
 
 .gis-workspace .leaflet-control-zoom a { color: #526879; }
 

@@ -19,6 +19,7 @@ export default function Archives() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryPointID = searchParams.get("point");
+  const queryView = searchParams.get("view");
   const [groups, setGroups] = useState<Row[]>([]);
   const [points, setPoints] = useState<Row[]>([]);
   const [q, setQ] = useState("");
@@ -31,7 +32,7 @@ export default function Archives() {
   const [tab, setTab] = useState("res");
   const [paramOpen, setParamOpen] = useState<Set<string>>(new Set(["Суточный профиль: Получасовые", "Р мощность"]));
   const [selParam, setSelParam] = useState<string>("Р мощность");
-  const [viewerOpen, setViewerOpen] = useState(searchParams.get("view") === "profile");
+  const [viewerOpen, setViewerOpen] = useState(queryView === "profile");
 
   useEffect(() => {
     api.get("groups?limit=5000").then((e) => setGroups((e.data as Row[]) || []));
@@ -43,6 +44,10 @@ export default function Archives() {
     const point = points.find((item) => String(item.POINT_ID) === queryPointID || String(item.POINT_CODE) === queryPointID);
     if (point) setSel(point);
   }, [points, queryPointID]);
+
+  useEffect(() => {
+    setViewerOpen(queryView === "profile");
+  }, [queryView]);
 
   // Build the group tree (children + points per group). Roots = groups whose
   // parent is null/absent from the set; skip system groups so only the topology
