@@ -151,3 +151,7 @@
   the identified deploy key returns Permission denied (publickey). An authorized
   owner/operator can deploy the tested improvement branch without granting this
   account direct write access. Full findings: docs/11-runtime-parity-audit.md.
+- The first improvement-branch CI found CVE-2026-93749 in transitive source-map-js
+  1.2.1. Updated only its lockfile entry to patched 1.2.2, retaining the npm audit
+  gate. The local audit reports zero known vulnerabilities; frontend tests and
+  builds are rechecked with the patched dependency.

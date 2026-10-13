@@ -93,6 +93,10 @@ issued to production during the audit. Browser credentials were not exported.
   verifies both deployed commit IDs and verifies marker MIME type.
 - Missing static assets return 404 instead of the SPA shell. The improvement
   branch now runs CI; automatic production deploy remains limited to main/master.
+- CI exposed the transitive `source-map-js` 1.2.1 dependency advisory
+  [CVE-2026-93749](https://github.com/7rulnik/source-map-js/releases/tag/v1.2.2).
+  Only that lockfile entry was upgraded to patched 1.2.2; the security gate stays
+  enabled. The subsequent npm audit reports zero known vulnerabilities.
 
 ## Verification
 
