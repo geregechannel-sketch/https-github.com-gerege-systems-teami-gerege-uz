@@ -15,6 +15,7 @@ backend/.env
 # frontend
 frontend/node_modules/
 frontend/dist/
+frontend/dist-preview/
 frontend/.vite/
 
 frontend/.test-build/

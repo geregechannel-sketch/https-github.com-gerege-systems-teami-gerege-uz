@@ -155,3 +155,6 @@
   1.2.1. Updated only its lockfile entry to patched 1.2.2, retaining the npm audit
   gate. The local audit reports zero known vulnerabilities; frontend tests and
   builds are rechecked with the patched dependency.
+- Fixed offline-preview packaging: production public GIS directories are no
+  longer copied into the self-contained artifact. Imported preview assets still
+  inline; production GIS PNG delivery is preserved. Ignored the generated bundle.

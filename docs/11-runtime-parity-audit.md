@@ -97,6 +97,9 @@ issued to production during the audit. Browser credentials were not exported.
   [CVE-2026-93749](https://github.com/7rulnik/source-map-js/releases/tag/v1.2.2).
   Only that lockfile entry was upgraded to patched 1.2.2; the security gate stays
   enabled. The subsequent npm audit reports zero known vulnerabilities.
+- The offline preview build excludes production public assets; imported assets
+  remain inlined. Added GIS PNG directories no longer break its strict single-file
+  packaging. Production's public marker assets are unchanged.
 
 ## Verification
 

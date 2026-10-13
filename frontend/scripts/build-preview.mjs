@@ -7,6 +7,7 @@ import path from 'node:path';
 const root = fileURLToPath(new URL('..', import.meta.url));
 await build({
   root, configFile: false, plugins: [react()], base: './',
+  publicDir: false,
   resolve: { alias: [{ find: '../api', replacement: path.join(root, 'src/preview/api.ts') }] },
   build: { outDir: 'dist-preview', assetsInlineLimit: 1024 * 1024,
     rollupOptions: { input: path.join(root, 'preview.html'), output: { inlineDynamicImports: true } } },
