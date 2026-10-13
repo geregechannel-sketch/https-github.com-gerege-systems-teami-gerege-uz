@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/emcos/ec3-backend/internal/auth"
+	"github.com/emcos/ec3-backend/internal/config"
 	"github.com/emcos/ec3-backend/internal/httpx"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -631,6 +632,10 @@ func (h *Telesignals) Command(w http.ResponseWriter, r *http.Request) {
 		httpx.Fail(w, http.StatusBadRequest, "unsupported signal command")
 		return
 	}
+	if !config.SimulationEnabled() {
+		httpx.Fail(w, http.StatusNotImplemented, "Device command adapter is not connected; no signal command sent")
+		return
+	}
 	var exists bool
 	if err := h.pool.QueryRow(r.Context(), `SELECT EXISTS(SELECT 1 FROM tele_signals WHERE signal_id=$1)`, id).Scan(&exists); err != nil || !exists {
 		httpx.Fail(w, http.StatusNotFound, "signal not found")
@@ -647,7 +652,7 @@ func (h *Telesignals) Command(w http.ResponseWriter, r *http.Request) {
 		httpx.Fail(w, http.StatusInternalServerError, "signal command failed")
 		return
 	}
-	httpx.OK(w, map[string]interface{}{"COMMAND_ID": commandID, "STATUS": "COMPLETED", "MESSAGE": message})
+	httpx.OK(w, map[string]interface{}{"COMMAND_ID": commandID, "STATUS": "COMPLETED", "MESSAGE": "Simulation: " + message, "SOURCE": "SIM", "DEVICE_CONFIRMED": false})
 }
 
 func (h *Telesignals) Rules(w http.ResponseWriter, r *http.Request) {

@@ -181,6 +181,7 @@ func TestDashboard(t *testing.T) {
 }
 
 func TestReadingsEndToEnd(t *testing.T) {
+	t.Setenv("DEVICE_SIMULATION_ENABLED", "true")
 	srv, _ := setup(t)
 	tok := login(t, srv, "admin", "admin123")
 
@@ -226,6 +227,7 @@ func TestReadingsEndToEnd(t *testing.T) {
 }
 
 func TestMonitorLive(t *testing.T) {
+	t.Setenv("DEVICE_SIMULATION_ENABLED", "true")
 	srv, pool := setup(t)
 	tok := login(t, srv, "admin", "admin123")
 	if err := handlers.SimulateTick(context.Background(), pool); err != nil {
@@ -337,6 +339,7 @@ func TestReportingEndToEnd(t *testing.T) {
 }
 
 func TestTelesignalsEndToEnd(t *testing.T) {
+	t.Setenv("DEVICE_SIMULATION_ENABLED", "true")
 	srv, _ := setup(t)
 	tok := login(t, srv, "admin", "admin123")
 
@@ -426,6 +429,7 @@ func TestSchemesEndToEnd(t *testing.T) {
 }
 
 func TestLoadControlEndToEnd(t *testing.T) {
+	t.Setenv("DEVICE_SIMULATION_ENABLED", "true")
 	srv, _ := setup(t)
 	tok := login(t, srv, "admin", "admin123")
 

@@ -46,11 +46,11 @@ func TestGeneratedEndpointsRespond(t *testing.T) {
 		}
 	}
 
-	// generated sub-actions respond with the envelope (methods per the model config)
+	// A registered source action must not pretend to execute through a grid.
 	subs := [][2]string{{"GET", "pointmenuv2/top_gr"}, {"POST", "bga/execute"}}
 	for _, s := range subs {
 		code, r := do(t, srv, s[0], "/ec3api/v1/"+s[1], tok, map[string]interface{}{})
-		if code != 200 || !r.Success {
+		if code != 501 || r.Success {
 			t.Fatalf("%s %s: code=%d success=%v msg=%s", s[0], s[1], code, r.Success, r.Message)
 		}
 	}
@@ -82,4 +82,82 @@ func TestGeneratedEndpointsRespond(t *testing.T) {
 		}
 	}
 	_ = json.Marshal
+}
+
+func TestEveryModelReadRoute(t *testing.T) {
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+	reg := resource.NewRegistry()
+	resource.RegisterCore(reg)
+	resource.RegisterGenerated(reg)
+	resource.RegisterExtras(reg)
+	stored, virtual := 0, 0
+	for _, name := range reg.Names() {
+		m, _ := reg.Get(name)
+		if m.Virtual {
+			virtual++
+		} else {
+			stored++
+		}
+		for _, method := range []string{"GET", "POST"} {
+			path := "/ec3api/v1/" + name
+			if method == "POST" {
+				path += "/query"
+			}
+			code, result := do(t, srv, method, path, tok, map[string]interface{}{"limit": 1})
+			want := 200
+			if !m.List {
+				want = 405
+			} else if m.Virtual {
+				want = 501
+			}
+			if name == "measurementsarchives" && method == "GET" {
+				want = 400
+			}
+			if name == "schemes" && method == "GET" {
+				want = 200
+			}
+			if code != want || (want != 200 && result.Success) {
+				t.Errorf("%s %s: got %d (%s), want %d", method, path, code, result.Message, want)
+			}
+		}
+	}
+	t.Logf("models audited: %d stored, %d virtual; two read/grid requests per model", stored, virtual)
+}
+
+func TestEverySourceSubActionRoute(t *testing.T) {
+	t.Setenv("DEVICE_SIMULATION_ENABLED", "false")
+	srv, _ := setup(t)
+	tok := login(t, srv, "admin", "admin123")
+	implemented := map[string]int{
+		"POST archives/point":      400,
+		"GET qualityreports/cnt":   200,
+		"GET qualityreports/holes": 200,
+		"GET appinfo/db_time":      200,
+	}
+	checked, unsupported, dedicated := 0, 0, 0
+	for _, spec := range resource.GeneratedSubActions() {
+		if spec.Action == "query" {
+			continue
+		}
+		path := spec.Base + "/" + spec.Action
+		for _, method := range []string{"GET", "POST"} {
+			if (method == "GET" && !spec.Get) || (method == "POST" && !spec.Post) {
+				continue
+			}
+			want := 501
+			if expected, ok := implemented[method+" "+path]; ok {
+				want = expected
+				dedicated++
+			} else {
+				unsupported++
+			}
+			code, response := do(t, srv, method, "/ec3api/v1/"+path, tok, map[string]interface{}{})
+			checked++
+			if code != want || (want == 501 && response.Success) {
+				t.Errorf("%s %s: %d %s, want %d", method, path, code, response.Message, want)
+			}
+		}
+	}
+	t.Logf("source action methods audited: %d requests, %d unsupported, %d dedicated handlers", checked, unsupported, dedicated)
 }

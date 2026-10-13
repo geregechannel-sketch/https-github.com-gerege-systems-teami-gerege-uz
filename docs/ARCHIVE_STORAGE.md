@@ -1,8 +1,8 @@
 # Local archive read contract
 
-This implements local archive reads, not an automatic TEAMI connection. No production data or credentials are included and no ingestion API is exposed yet.
+This implements local archive reads and the explicitly provisioned one-shot `cmd/teamisync` importer. No production credentials or public ingestion API are included; continuous automatic synchronization is not established.
 
-`archive_samples` stores explicitly mapped point/ML/MD/AGGS, interval start/end, exact numeric value, unit, original status, source reference and receipt time. A future source adapter must verify source ID mapping and preserve provenance before loading data. There are no default readings. A database administrator can still write this table; provenance is not cryptographically verified.
+`archive_samples` stores explicitly mapped point/ML/MD/AGGS, interval start/end, exact numeric value, unit, original status, source reference and receipt time. The source adapter requires explicit source ID mapping and preserves read-time, timezone, tariff metadata and immutable receipts. Missing values remain in receipts. There are no default readings. A database administrator can still write this table; provenance is not cryptographically verified.
 
 GET measurementsarchives?POINT_ID=... lists combinations present in local samples. POST archives/point accepts POINT_ID, ML_ID, MD_ID, AGGS_ID, FROM, TO and optional INCLUDE_OVERLAP (default false). Timestamps require RFC3339 offsets; start-inclusive/end-exclusive interval-start selection is used. Intervals are returned intact, never prorated or aggregated. Results use UTC timestamps, numeric strings and unchanged source status. The UI chooses whole calendar dates in UTC+08:00 and converts the end date to the following midnight. Other archive actions still return 501.
 

@@ -2,6 +2,13 @@
 
 Audit date: 2026-09-30
 
+Scope correction (2026-10-13): this audit establishes screen/module presence,
+not complete API or physical-device parity. See [the runtime re-audit](11-runtime-parity-audit.md)
+for unsupported source methods, production differences and corrected data flows.
+The runtime audit also corrects this report's geometry claim: the 46 positions
+were visually traced offsets, not verified coordinates. The recorded source
+response contains 39 valid coordinates and one malformed coordinate.
+
 ## Method
 
 - Opened the source TEAMI and local TOSH applications in separate authenticated browser tabs.

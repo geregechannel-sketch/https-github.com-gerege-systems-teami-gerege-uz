@@ -6,7 +6,7 @@ import "../archives.css";
 import "../load-control.css";
 
 type Row = Record<string, any>;
-type Catalog = { groups: Row[]; points: Row[]; summary: Row; filters: Row };
+type Catalog = { groups: Row[]; points: Row[]; summary: Row; filters: Row; capabilities?: {device_commands: boolean; simulation: boolean} };
 type Mode = "relays" | "limits";
 
 const LoadIcon = MENU_ICONS.load;
@@ -22,7 +22,7 @@ function stateText(value: unknown) {
 }
 
 function statusText(value: unknown) {
-  return ({ COMPLETED: "Выполнено", CANCELLED: "Отменено", IDLE: "Ожидание" } as Row)[String(value)] || String(value || "—");
+  return ({ COMPLETED: "Выполнено", CONFIGURED: "Настроено локально", CANCELLED: "Отменено", IDLE: "Ожидание" } as Row)[String(value)] || String(value || "—");
 }
 
 export default function LoadControl() {
@@ -46,6 +46,7 @@ export default function LoadControl() {
   const [notice, setNotice] = useState("");
   const [modal, setModal] = useState<"legend" | "settings" | "limit" | null>(null);
   const [limitValue, setLimitValue] = useState("80");
+  const deviceCommandsAvailable = Boolean(catalog?.capabilities?.device_commands || catalog?.capabilities?.simulation);
 
   async function loadCatalog() {
     const env = await api.get<Catalog>("loadcontrol/catalog");
@@ -198,6 +199,10 @@ export default function LoadControl() {
   }
 
   async function runCommand(action: string, allIfEmpty = false, value?: number) {
+    if (!["READ_DB", "STATUS", "SET"].includes(action) && !deviceCommandsAvailable) {
+      setError("Адаптер устройства не подключён. Команда не отправлена.");
+      return;
+    }
     const idKey = mode === "relays" ? "RELAY_ID" : "LIMIT_ID";
     const ids = selectedRows.size ? Array.from(selectedRows).map(Number) : allIfEmpty ? rows.map((row) => Number(row[idKey])) : [];
     if (!ids.length) return;
@@ -268,7 +273,33 @@ export default function LoadControl() {
 
         <div className="lc-statusbar"><span>Обновлено: {formatDate(updatedAt)}</span><span>Следующее обновление: {formatDate(nextUpdate)}</span><label>Автоматическое обновление <input type="checkbox" checked={autoRefresh} onChange={(event) => setAutoRefresh(event.target.checked)} /></label><span>{rows.length ? `Записей: ${rows.length}` : "Список пустой"}</span><button title="Экспорт CSV" disabled={!rows.length} onClick={exportRows}><IcSave size={16} /></button><button title="Настройки" onClick={() => setModal("settings")}><IcGear size={16} /></button></div>
 
-        {mode === "relays" ? <div className="lc-actions"><div className="primary"><button className="green" disabled={!selectedRows.size} onClick={() => runCommand("ENABLE")}>Включить</button><button className="orange" disabled={!selectedRows.size} onClick={() => runCommand("DISABLE")}>Отключить</button><button className="red" disabled={!selectedRows.size} onClick={() => runCommand("CANCEL")}>Отменить выполнение</button></div><div className="secondary"><button disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Обновить состояния из БД</button><button disabled={!rows.length} onClick={() => runCommand("READ_DEVICE", true)}>Обновить состояния из устройства</button><button disabled={!rows.length} onClick={() => runCommand("STATUS", true)}>Обновить статусы выполнения</button><button className="green" disabled={!rows.length} onClick={() => runCommand("COLLECT", true)}>Собрать</button><button className="green full" disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Считать из БД</button></div></div> : <div className="lc-actions"><div className="primary"><button className="green" disabled={!selectedRows.size} onClick={() => setModal("limit")}>Установить лимиты</button><button className="orange" disabled={!selectedRows.size} onClick={() => runCommand("INITIATE")}>Инициировать запись в счетчики</button><button className="red" disabled={!selectedRows.size} onClick={() => runCommand("CANCEL")}>Отменить команду записи</button></div><div className="secondary"><button disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Обновить лимиты из БД</button><button disabled={!rows.length} onClick={() => runCommand("READ_DEVICE", true)}>Обновить лимиты из устройства</button><button disabled={!rows.length} onClick={() => runCommand("STATUS", true)}>Обновить статусы выполнения</button><button className="green" disabled={!rows.length} onClick={() => runCommand("COLLECT", true)}>Собрать</button><button className="green full" disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Считать из БД</button></div></div>}
+        {mode === "relays" ? <div className="lc-actions">
+          <div className="primary">
+            <button className="green" disabled={!selectedRows.size || !deviceCommandsAvailable} onClick={() => runCommand("ENABLE")}>Включить</button>
+            <button className="orange" disabled={!selectedRows.size || !deviceCommandsAvailable} onClick={() => runCommand("DISABLE")}>Отключить</button>
+            <button className="red" disabled={!selectedRows.size || !deviceCommandsAvailable} onClick={() => runCommand("CANCEL")}>Отменить выполнение</button>
+          </div>
+          <div className="secondary">
+            <button disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Обновить состояния из БД</button>
+            <button disabled={!rows.length || !deviceCommandsAvailable} title={deviceCommandsAvailable ? undefined : "Адаптер устройства не подключён"} onClick={() => runCommand("READ_DEVICE", true)}>Обновить состояния из устройства</button>
+            <button disabled={!rows.length} onClick={() => runCommand("STATUS", true)}>Обновить статусы выполнения</button>
+            <button className="green" disabled={!rows.length || !deviceCommandsAvailable} onClick={() => runCommand("COLLECT", true)}>Собрать</button>
+            <button className="green full" disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Считать из БД</button>
+          </div>
+        </div> : <div className="lc-actions">
+          <div className="primary">
+            <button className="green" disabled={!selectedRows.size} onClick={() => setModal("limit")}>Установить лимиты</button>
+            <button className="orange" disabled={!selectedRows.size || !deviceCommandsAvailable} onClick={() => runCommand("INITIATE")}>Инициировать запись в счетчики</button>
+            <button className="red" disabled={!selectedRows.size || !deviceCommandsAvailable} onClick={() => runCommand("CANCEL")}>Отменить команду записи</button>
+          </div>
+          <div className="secondary">
+            <button disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Обновить лимиты из БД</button>
+            <button disabled={!rows.length || !deviceCommandsAvailable} title={deviceCommandsAvailable ? undefined : "Адаптер устройства не подключён"} onClick={() => runCommand("READ_DEVICE", true)}>Обновить лимиты из устройства</button>
+            <button disabled={!rows.length} onClick={() => runCommand("STATUS", true)}>Обновить статусы выполнения</button>
+            <button className="green" disabled={!rows.length || !deviceCommandsAvailable} onClick={() => runCommand("COLLECT", true)}>Собрать</button>
+            <button className="green full" disabled={!rows.length} onClick={() => runCommand("READ_DB", true)}>Считать из БД</button>
+          </div>
+        </div>}
       </section>
     </div>
 

@@ -111,8 +111,8 @@ func (q *Quality) Count(w http.ResponseWriter, r *http.Request) {
 	httpx.OK(w, map[string]interface{}{"CNT": len(ids), "POINT_ID": ids})
 }
 
-// Holes reports configuration-backed data availability for each selected point.
-// Imported archive engines can replace this calculation without changing the API.
+// Holes exposes channel configuration. Enabled channels alone do not prove
+// archive completeness, so period colors remain unknown without an archive adapter.
 func (q *Quality) Holes(w http.ResponseWriter, r *http.Request) {
 	ids, err := q.selectedPointIDs(r.Context(), pointIDsFromRequest(r))
 	if err != nil {
@@ -150,16 +150,7 @@ func (q *Quality) Holes(w http.ResponseWriter, r *http.Request) {
 			httpx.Fail(w, http.StatusInternalServerError, "quality report scan failed")
 			return
 		}
-		status := 1
-		if active == 0 {
-			status = 3
-		} else if active < total {
-			status = 2
-		}
 		colors := make([]int, periods)
-		for index := range colors {
-			colors[index] = status
-		}
 		data = append(data, map[string]interface{}{
 			"POINT_ID":       id,
 			"POINT_CODE":     code,
@@ -171,6 +162,7 @@ func (q *Quality) Holes(w http.ResponseWriter, r *http.Request) {
 			"COLOR":          colors,
 			"CHANNEL_COUNT":  total,
 			"ACTIVE_COUNT":   active,
+			"EVIDENCE":       "CONFIGURATION_ONLY",
 		})
 	}
 	if err := rows.Err(); err != nil {

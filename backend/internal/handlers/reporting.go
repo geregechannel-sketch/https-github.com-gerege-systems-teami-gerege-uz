@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/emcos/ec3-backend/internal/auth"
+	"github.com/emcos/ec3-backend/internal/config"
 	"github.com/emcos/ec3-backend/internal/httpx"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -61,7 +62,7 @@ type reportPointAggregate struct {
 	ID                          int64
 	Code, Name, Meter           string
 	ActiveCount                 int64
-	ActiveMin, ActiveMax        sql.NullFloat64
+	ActiveFirst, ActiveLast     sql.NullFloat64
 	ActiveMinus, ReactivePlus   sql.NullFloat64
 	ReactiveMinus               sql.NullFloat64
 	Voltage, Current, Frequency sql.NullFloat64
@@ -228,11 +229,11 @@ func (h *Reporting) pointAggregates(ctx context.Context, pointIDs []int64, from,
 	rows, err := h.pool.Query(ctx, `
 		SELECT p.point_id, p.point_code, p.point_name, COALESCE(m.meter_number,''),
 		       count(rv.reading_id) FILTER (WHERE rv.parameter_code='A_PLUS'),
-		       min(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='A_PLUS'),
-		       max(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='A_PLUS'),
-		       max(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='A_MINUS'),
-		       max(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='R_PLUS'),
-		       max(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='R_MINUS'),
+		       (array_agg(rv.reading_value::float8 ORDER BY rv.reading_time,rv.reading_id) FILTER (WHERE rv.parameter_code='A_PLUS'))[1],
+		       (array_agg(rv.reading_value::float8 ORDER BY rv.reading_time DESC,rv.reading_id DESC) FILTER (WHERE rv.parameter_code='A_PLUS'))[1],
+		       (array_agg(rv.reading_value::float8 ORDER BY rv.reading_time DESC,rv.reading_id DESC) FILTER (WHERE rv.parameter_code='A_MINUS'))[1],
+		       (array_agg(rv.reading_value::float8 ORDER BY rv.reading_time DESC,rv.reading_id DESC) FILTER (WHERE rv.parameter_code='R_PLUS'))[1],
+		       (array_agg(rv.reading_value::float8 ORDER BY rv.reading_time DESC,rv.reading_id DESC) FILTER (WHERE rv.parameter_code='R_MINUS'))[1],
 		       avg(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='VOLTAGE'),
 		       avg(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='CURRENT'),
 		       avg(rv.reading_value::float8) FILTER (WHERE rv.parameter_code='FREQUENCY')
@@ -243,9 +244,10 @@ func (h *Reporting) pointAggregates(ctx context.Context, pointIDs []int64, from,
 		) active_mounting ON true
 		LEFT JOIN meters m ON m.meter_id=active_mounting.meter_id
 		LEFT JOIN reading_values rv ON rv.point_id=p.point_id AND rv.reading_time >= $2 AND rv.reading_time < $3
+		  AND ($4 OR rv.source NOT IN ('SIM','COLLECT','RECOLLECT'))
 		WHERE p.point_id=ANY($1)
 		GROUP BY p.point_id, p.point_code, p.point_name, m.meter_number
-		ORDER BY p.point_code`, pointIDs, from, to)
+		ORDER BY p.point_code`, pointIDs, from, to, config.SimulationEnabled())
 	if err != nil {
 		return nil, err
 	}
@@ -254,20 +256,13 @@ func (h *Reporting) pointAggregates(ctx context.Context, pointIDs []int64, from,
 	for rows.Next() {
 		var item reportPointAggregate
 		if err := rows.Scan(&item.ID, &item.Code, &item.Name, &item.Meter, &item.ActiveCount,
-			&item.ActiveMin, &item.ActiveMax, &item.ActiveMinus, &item.ReactivePlus,
+			&item.ActiveFirst, &item.ActiveLast, &item.ActiveMinus, &item.ReactivePlus,
 			&item.ReactiveMinus, &item.Voltage, &item.Current, &item.Frequency); err != nil {
 			return nil, err
 		}
 		result = append(result, item)
 	}
 	return result, rows.Err()
-}
-
-func pointValue(value sql.NullFloat64, fallback float64) float64 {
-	if value.Valid {
-		return value.Float64
-	}
-	return fallback
 }
 
 func pointColumns(extra ...reportColumn) []reportColumn {
@@ -306,51 +301,34 @@ func (h *Reporting) buildReport(ctx context.Context, definition reportDefinition
 	if err != nil {
 		return nil, nil, err
 	}
-	expected := int(to.Sub(from) / (15 * time.Minute))
 	data := make([]map[string]interface{}, 0, len(aggregates))
 	for _, item := range aggregates {
-		base := 1000 + float64(item.ID)*17.31 + float64(from.YearDay())*.11
-		start := pointValue(item.ActiveMin, base)
-		end := pointValue(item.ActiveMax, base+18.4+float64(item.ID)*.73)
 		common := map[string]interface{}{"POINT_CODE": item.Code, "POINT_NAME": item.Name, "METER_NUMBER": item.Meter}
 		switch definition.Code {
 		case "DAILY_CONSUMPTION":
-			common["START_VALUE"] = roundReport(start, 3)
-			common["END_VALUE"] = roundReport(end, 3)
-			common["CONSUMPTION"] = roundReport(math.Max(0, end-start), 3)
-			common["STATUS"] = map[bool]string{true: "OK", false: "РАСЧЕТНО"}[item.ActiveCount > 0]
+			common["START_VALUE"] = storedReportValue(item.ActiveFirst, 3)
+			common["END_VALUE"] = storedReportValue(item.ActiveLast, 3)
+			common["CONSUMPTION"] = nil
+			common["STATUS"] = "Требуется подтверждение типа показаний"
 		case "END_OF_DAY":
-			common["A_PLUS"] = roundReport(end, 3)
-			common["A_MINUS"] = roundReport(pointValue(item.ActiveMinus, base*.08), 3)
-			common["R_PLUS"] = roundReport(pointValue(item.ReactivePlus, base*.21), 3)
-			common["R_MINUS"] = roundReport(pointValue(item.ReactiveMinus, base*.04), 3)
+			common["A_PLUS"] = storedReportValue(item.ActiveLast, 3)
+			common["A_MINUS"] = storedReportValue(item.ActiveMinus, 3)
+			common["R_PLUS"] = storedReportValue(item.ReactivePlus, 3)
+			common["R_MINUS"] = storedReportValue(item.ReactiveMinus, 3)
 		case "ARCHIVE_QUALITY":
 			actual := int(item.ActiveCount)
-			missing := expected - actual
-			if missing < 0 {
-				missing = 0
-			}
-			completeness := 0.0
-			if expected > 0 {
-				completeness = math.Min(100, float64(actual)*100/float64(expected))
-			}
-			common["EXPECTED"] = expected
+			common["EXPECTED"] = nil
 			common["RECEIVED"] = actual
-			common["MISSING"] = missing
-			common["COMPLETENESS"] = roundReport(completeness, 1)
-			common["STATUS"] = map[bool]string{true: "ПОЛНО", false: "НЕПОЛНО"}[missing == 0]
+			common["MISSING"] = nil
+			common["COMPLETENESS"] = nil
+			common["STATUS"] = "Частота опроса не подтверждена"
 		case "TECHNICAL_VALUES":
-			common["VOLTAGE"] = roundReport(pointValue(item.Voltage, 219.4+float64(item.ID)*.3), 2)
-			common["CURRENT"] = roundReport(pointValue(item.Current, 8.6+float64(item.ID)*.4), 2)
-			common["FREQUENCY"] = roundReport(pointValue(item.Frequency, 49.98+float64(item.ID%3)*.01), 2)
-			common["STATUS"] = "НОРМА"
+			common["VOLTAGE"] = storedReportValue(item.Voltage, 2)
+			common["CURRENT"] = storedReportValue(item.Current, 2)
+			common["FREQUENCY"] = storedReportValue(item.Frequency, 2)
+			common["STATUS"] = "Пороговые значения не подтверждены"
 		case "POINT_BALANCE":
-			consumption := math.Max(0, end-start)
-			losses := consumption * .025
-			common["INPUT"] = roundReport(consumption, 3)
-			common["LOSSES"] = roundReport(losses, 3)
-			common["BALANCE"] = roundReport(consumption-losses, 3)
-			common["LOSS_PERCENT"] = 2.5
+			common["INPUT"], common["LOSSES"], common["BALANCE"], common["LOSS_PERCENT"] = nil, nil, nil, nil
 		}
 		data = append(data, common)
 	}
@@ -369,6 +347,13 @@ func (h *Reporting) buildReport(ctx context.Context, definition reportDefinition
 		columns = pointColumns(reportColumn{Key: "INPUT", Label: "Приход", Unit: "кВт·ч"}, reportColumn{Key: "LOSSES", Label: "Потери", Unit: "кВт·ч"}, reportColumn{Key: "BALANCE", Label: "Баланс", Unit: "кВт·ч"}, reportColumn{Key: "LOSS_PERCENT", Label: "Потери", Unit: "%"})
 	}
 	return columns, data, nil
+}
+
+func storedReportValue(value sql.NullFloat64, digits int) interface{} {
+	if !value.Valid {
+		return nil
+	}
+	return roundReport(value.Float64, digits)
 }
 
 // Preview generates report rows and records a completed run in the journal.

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/emcos/ec3-backend/internal/auth"
+	"github.com/emcos/ec3-backend/internal/config"
 	"github.com/emcos/ec3-backend/internal/httpx"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -182,9 +183,10 @@ func (h *Readings) Filter(w http.ResponseWriter, r *http.Request) {
 	pointRows.Close()
 
 	httpx.OK(w, map[string]interface{}{
-		"groups":     groups,
-		"points":     points,
-		"parameters": readingParameters,
+		"groups":       groups,
+		"points":       points,
+		"parameters":   readingParameters,
+		"capabilities": map[string]interface{}{"device_collection": false, "simulation": config.SimulationEnabled()},
 		"connections": map[string]interface{}{
 			"downlinks": []map[string]string{{"id": "AUTO", "name": "Автоматически"}, {"id": "TCP", "name": "TCP/IP"}, {"id": "GSM", "name": "GSM/CSD"}},
 			"protocols": []map[string]string{{"id": "AUTO", "name": "Автоматически"}, {"id": "DLMS", "name": "DLMS/COSEM"}, {"id": "IEC", "name": "IEC 62056-21"}},
@@ -236,8 +238,9 @@ func (h *Readings) Query(w http.ResponseWriter, r *http.Request) {
 		LEFT JOIN meters m ON m.meter_id=rv.meter_id
 		WHERE rv.point_id=ANY($1) AND rv.parameter_code=ANY($2)
 		  AND rv.reading_time BETWEEN $3 AND $4
+		  AND ($5 OR rv.source NOT IN ('SIM','COLLECT','RECOLLECT'))
 		ORDER BY rv.reading_time DESC, p.point_code, rv.parameter_code
-		LIMIT 10000`, pointIDs, codes, from, to)
+		LIMIT 10000`, pointIDs, codes, from, to, config.SimulationEnabled())
 	if err != nil {
 		httpx.Fail(w, http.StatusInternalServerError, "reading query failed")
 		return
@@ -269,9 +272,8 @@ func (h *Readings) Query(w http.ResponseWriter, r *http.Request) {
 	httpx.OK(w, map[string]interface{}{"rows": data, "total": len(data), "from": from, "to": to})
 }
 
-// CreateTask records a collection request and executes the local DAS adapter.
-// The adapter produces deterministic quarter-hour data and can later be
-// replaced by an asynchronous device worker without changing the endpoint.
+// CreateTask runs the explicitly enabled demo adapter. Without a device worker,
+// a production collection request cannot report success or manufacture values.
 func (h *Readings) CreateTask(w http.ResponseWriter, r *http.Request) {
 	var req readingsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -281,6 +283,10 @@ func (h *Readings) CreateTask(w http.ResponseWriter, r *http.Request) {
 	action := strings.ToUpper(strings.TrimSpace(req.Action))
 	if action != "COLLECT" && action != "RECOLLECT" {
 		httpx.Fail(w, http.StatusBadRequest, "invalid reading action")
+		return
+	}
+	if !config.SimulationEnabled() {
+		httpx.Fail(w, http.StatusNotImplemented, "Device collection adapter is not connected; no readings collected")
 		return
 	}
 	from, to, ok := readingRange(req.From, req.To)
@@ -345,8 +351,9 @@ func (h *Readings) CreateTask(w http.ResponseWriter, r *http.Request) {
 			ON CONFLICT (point_id, parameter_code, reading_time) DO UPDATE SET
 				meter_id=EXCLUDED.meter_id, reading_value=EXCLUDED.reading_value,
 				unit=EXCLUDED.unit, status='OK', source=EXCLUDED.source,
-				collected_at=now(), job_id=EXCLUDED.job_id`,
-			pointIDs, parameter.Code, from, to, parameter.Unit, base, action, jobID)
+				collected_at=now(), job_id=EXCLUDED.job_id
+			WHERE reading_values.source IN ('SIM','COLLECT','RECOLLECT')`,
+			pointIDs, parameter.Code, from, to, parameter.Unit, base, "SIM", jobID)
 		if execErr != nil {
 			_, _ = h.pool.Exec(r.Context(), `UPDATE reading_jobs SET status='FAILED', message=$2, finished_at=now() WHERE job_id=$1`, jobID, execErr.Error())
 			httpx.Fail(w, http.StatusInternalServerError, "reading collection failed")
@@ -356,13 +363,14 @@ func (h *Readings) CreateTask(w http.ResponseWriter, r *http.Request) {
 		progress := 5 + ((index + 1) * 90 / len(parameters))
 		_, _ = h.pool.Exec(r.Context(), `UPDATE reading_jobs SET progress=$2 WHERE job_id=$1`, jobID, progress)
 	}
-	message := "Считывание завершено"
+	message := "Simulation completed; no device readings collected"
 	_, _ = h.pool.Exec(r.Context(), `
 		UPDATE reading_jobs SET status='COMPLETED', progress=100, message=$2, finished_at=now()
 		WHERE job_id=$1`, jobID, message)
 	httpx.OK(w, map[string]interface{}{
 		"JOB_ID": jobID, "STATUS": "COMPLETED", "PROGRESS": 100,
 		"AFFECTED_ROWS": inserted, "MESSAGE": message,
+		"SOURCE": "SIM", "DEVICE_CONFIRMED": false,
 	})
 }
 

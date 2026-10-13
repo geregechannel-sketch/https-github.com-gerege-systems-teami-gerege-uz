@@ -2,6 +2,7 @@ package apitest
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -73,6 +74,10 @@ func TestArchiveStoreIsAtomicAndIdempotent(t *testing.T) {
 	code, result := do(t, srv, "POST", "/ec3api/v1/archives/point", token, map[string]interface{}{"POINT_ID": target, "ML_ID": 44, "MD_ID": 15, "AGGS_ID": 15, "FROM": "2026-09-14T00:00:00+08:00", "TO": "2026-09-15T00:00:00+08:00"})
 	if code != 200 || !result.Success || result.TotalCount == nil || *result.TotalCount != 2 {
 		t.Fatal("stored readings not available through local archive API")
+	}
+	var records []map[string]interface{}
+	if err := json.Unmarshal(result.Data, &records); err != nil || records[0]["SOURCE_READ_TIME"] != "2026-09-14T03:58:10Z" || records[0]["TARIFF_ID"] != "0" {
+		t.Fatalf("source read-time or tariff provenance unavailable: %v", err)
 	}
 	badMapping := mapping
 	badMapping.Zone = nil

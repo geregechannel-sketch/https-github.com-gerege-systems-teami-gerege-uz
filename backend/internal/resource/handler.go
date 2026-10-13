@@ -91,7 +91,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, m *Model) {
 		return
 	}
 	if m.Virtual {
-		httpx.OKList(w, []interface{}{}, 0)
+		httpx.Fail(w, http.StatusNotImplemented, "Model has no storage adapter; data not available")
 		return
 	}
 	limit := grid.ClampLimit(atoi(r.URL.Query().Get("limit")), defaultLimit, maxLimit)
@@ -124,7 +124,7 @@ func (h *Handler) Query(w http.ResponseWriter, r *http.Request, m *Model) {
 		return
 	}
 	if m.Virtual {
-		httpx.OKList(w, []interface{}{}, 0)
+		httpx.Fail(w, http.StatusNotImplemented, "Model has no storage adapter; data not available")
 		return
 	}
 	var req grid.Request
@@ -391,10 +391,8 @@ func normalize(v interface{}) interface{} {
 	return v
 }
 
-// SubAction serves a generic {model}/{action} endpoint. GET lists the base
-// model's table (filtered by matching query params), POST runs a grid query.
-// If the base has no table (virtual or unknown), it returns an empty envelope so
-// the endpoint still exists, authenticates and enforces RBAC.
+// SubAction keeps unimplemented source routes explicit. Dedicated handlers
+// take precedence in the router; a storage grid cannot execute a source action.
 func (h *Handler) SubAction(w http.ResponseWriter, r *http.Request, base *Model) {
 	// Archive actions need a dedicated time-series implementation. A generic grid
 	// ignores the requested point/period and must never masquerade as an archive.
@@ -416,22 +414,15 @@ func (h *Handler) SubAction(w http.ResponseWriter, r *http.Request, base *Model)
 		return
 	}
 
-	if base == nil {
-		if _, ok := auth.FromContext(r.Context()); !ok {
-			httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
-			return
-		}
-		httpx.OKList(w, []interface{}{}, 0)
+	if _, ok := auth.FromContext(r.Context()); !ok {
+		httpx.Fail(w, http.StatusUnauthorized, "unauthenticated")
 		return
 	}
-	// borrow the base model but force list/query to be allowed
-	m := *base
-	m.List = true
-	if r.Method == http.MethodGet {
-		h.List(w, r, &m)
+	if base != nil && !h.canRead(r, base) {
+		httpx.Fail(w, http.StatusForbidden, "Insufficient privileges")
 		return
 	}
-	h.Query(w, r, &m)
+	httpx.Fail(w, http.StatusNotImplemented, "Source action adapter is not implemented; no operation performed")
 }
 
 func atoi(s string) int { n, _ := strconv.Atoi(s); return n }

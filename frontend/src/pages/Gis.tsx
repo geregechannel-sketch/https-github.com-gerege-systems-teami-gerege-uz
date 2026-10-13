@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { IcChevron, IcExpand, IcFunnel, IcGrid, IcHome, IcInfo, IcReset, IcSearch, IcSync } from "../icons";
 import "../gis.css";
+import { resolveGisGeometry, type RecordedCoordinate } from "../lib/gisGeometry";
 
-const CENTER: [number, number] = [48.116295, 114.580217];
-const OBJECT_COORDINATE_ORIGIN: [number, number] = [48.1158, 114.5726];
+const CENTER: [number, number] = [48.075, 114.535];
 const INITIAL_ZOOM = 16;
 
 const MAP_STYLES = {
@@ -36,30 +36,18 @@ type GisReading = {
 };
 
 type ReadingsPayload = { rows: Row[]; total: number };
+type GeometryReference = {capturedAt:string; points:RecordedCoordinate[]; map:{X1:number; X2:number; Y1:number; Y2:number}};
 
 type MapItem = {
   point: Row;
   meter: Row;
   groupName: string;
   typeName: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   recent: boolean;
   searchText: string;
 };
-
-const SOURCE_MARKER_OFFSETS = [
-  [189, -229],
-  [83, -128], [60, -107], [292, -127], [239, -93], [52, -59], [195, -55], [241, -56], [275, -48], [320, -82],
-  [141, -26], [157, -12], [190, -42], [212, -35], [233, -27], [256, -20], [284, -38], [303, -54], [326, -70],
-  [119, 11], [139, 33], [173, 11], [207, -8], [230, -2], [260, 10], [287, -7],
-  [32, 78], [57, 79], [80, 78], [129, 66], [149, 66], [203, 68], [229, 54], [249, 74],
-  [126, 126], [150, 147], [176, 121], [209, 95], [249, 91], [278, 112],
-  [167, 177], [188, 156], [211, 136], [235, 120], [268, 131], [289, 148],
-] as const;
-
-const LATITUDE_PER_PIXEL = 0.0000144;
-const LONGITUDE_PER_PIXEL = 0.0000215;
 
 const DAILY_PARAMETERS = [
   { code: "A_PLUS", label: "A+ энергия за сутки" },
@@ -67,14 +55,6 @@ const DAILY_PARAMETERS = [
   { code: "R_PLUS", label: "R+ энергия за сутки" },
   { code: "R_MINUS", label: "R- энергия за сутки" },
 ] as const;
-
-function locationFor(index: number): [number, number] {
-  const anchor = SOURCE_MARKER_OFFSETS[index % SOURCE_MARKER_OFFSETS.length];
-  return [
-    OBJECT_COORDINATE_ORIGIN[0] - anchor[1] * LATITUDE_PER_PIXEL,
-    OBJECT_COORDINATE_ORIGIN[1] + anchor[0] * LONGITUDE_PER_PIXEL,
-  ];
-}
 
 function markerIcon(item: MapItem, selected: boolean) {
   return L.icon({
@@ -104,11 +84,8 @@ function isoDate(value: Date) {
 }
 
 function readingTime(value: unknown) {
-  const date = value ? new Date(String(value)) : new Date();
-  if (!value) {
-    date.setDate(date.getDate() - 1);
-    date.setHours(0, 0, 0, 0);
-  }
+  if (!value) return "—";
+  const date = new Date(String(value));
   if (Number.isNaN(date.getTime())) return String(value || "");
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -128,6 +105,8 @@ export default function Gis() {
   const detailRequestRef = useRef(0);
   const [items, setItems] = useState<MapItem[]>([]);
   const [selected, setSelected] = useState<MapItem | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number,number]>(CENTER);
+  const [geometryCapturedAt, setGeometryCapturedAt] = useState("");
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [mapStyle, setMapStyle] = useState<MapStyle>("osm");
@@ -191,19 +170,31 @@ export default function Gis() {
       api.get<Row[]>("measuringdevices?limit=5000"),
       api.get<Row[]>("measuringdevicetypes?limit=1000"),
       api.get<Row[]>("groups?limit=5000"),
-    ]).then(([pointEnv, meterEnv, typeEnv, groupEnv]) => {
+      api.get<Row[]>("gis/availability"),
+      api.get<GeometryReference>("gis/reference"),
+    ]).then(([pointEnv, meterEnv, typeEnv, groupEnv, availabilityEnv, geometryEnv]) => {
       if (!mounted) return;
       const points = (pointEnv.data || []).filter((point) => Number(point.POINT_INTERNAL || 0) === 0);
       const meters = meterEnv.data || [];
+      const observations = new Map((availabilityEnv.data || []).map(row => [String(row.POINT_ID),row]));
+      const meterByID = new Map(meters.map(row => [String(row.METER_ID),row]));
       const loadedGroups = groupEnv.data || [];
       const typeNames = new Map((typeEnv.data || []).map((row) => [String(row.METER_TYPE_ID), String(row.METER_TYPE_NAME || "")]));
       const groupNames = new Map(loadedGroups.map((row) => [String(row.GR_ID), String(row.GR_NAME || row.GR_CODE || "")]));
-      const next = points.map((point, index): MapItem => {
-        const meter = meters[index] || {};
-        const [lat, lng] = locationFor(index);
+      const reference = geometryEnv.success ? geometryEnv.data : undefined;
+      setGeometryCapturedAt(reference?.capturedAt || "");
+      if (reference?.map) {
+        const center:[number,number] = [(reference.map.Y1+reference.map.Y2)/2,(reference.map.X1+reference.map.X2)/2];
+        setMapCenter(center);
+        mapRef.current?.setView(center,INITIAL_ZOOM);
+      }
+      const next = points.map((point): MapItem => {
+        const observation = observations.get(String(point.POINT_ID));
+        const meter = meterByID.get(String(observation?.METER_ID)) || {};
+        const {lat,lng} = resolveGisGeometry(point, points, reference?.points || []);
         const groupName = groupNames.get(String(point.GR_ID)) || "";
         const typeName = typeNames.get(String(meter.METER_TYPE_ID)) || String(meter.METER_TYPE_NAME || "");
-        const recent = Number(point.POINT_AUTO_READ_ENABLED ?? point.POINT_ENABLED ?? 0) === 1;
+        const recent = Boolean(observation?.LAST_READING_AT);
         return {
           point,
           meter,
@@ -217,7 +208,7 @@ export default function Gis() {
       });
       setItems(next);
       setUpdatedAt(new Date());
-      setError(pointEnv.success ? "" : pointEnv.message || "Не удалось загрузить объекты карты");
+      setError(!pointEnv.success ? pointEnv.message || "Не удалось загрузить объекты карты" : !availabilityEnv.success ? "Не удалось подтвердить время показаний" : !geometryEnv.success ? "Не удалось получить координаты источника" : "");
       setLoading(false);
     }).catch(() => {
       if (!mounted) return;
@@ -241,6 +232,7 @@ export default function Gis() {
     if (!layer) return;
     layer.clearLayers();
     visibleItems.forEach((item) => {
+      if (item.lat == null || item.lng == null) return;
       const isSelected = selected?.point.POINT_ID === item.point.POINT_ID;
       L.marker([item.lat, item.lng], { icon: markerIcon(item, isSelected) })
         .bindTooltip(`${item.point.POINT_CODE || ""} ${item.point.POINT_NAME || ""}`.trim())
@@ -270,7 +262,7 @@ export default function Gis() {
     setSelected(item);
     setQuery(String(item.point.POINT_CODE || item.point.POINT_NAME || ""));
     setSearchOpen(false);
-    moveMap([item.lat, item.lng], 17);
+    if (item.lat != null && item.lng != null) moveMap([item.lat, item.lng], 17);
   }
 
   function moveMap(center: L.LatLngExpression, zoom: number) {
@@ -284,7 +276,7 @@ export default function Gis() {
     setQuery("");
     setSearchOpen(false);
     setSelected(null);
-    moveMap(CENTER, INITIAL_ZOOM);
+    moveMap(mapCenter, INITIAL_ZOOM);
   }
 
   function restorePreviousView() {
@@ -381,7 +373,7 @@ export default function Gis() {
 
   function exportDetailReadings() {
     if (!selected) return;
-    const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+    const quote = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
     const rows = [
       ["Точка/группа", "Параметр", "Время"],
       ...visibleDetailReadings.map((row) => [row.pointLabel, row.parameter, row.time]),
@@ -466,6 +458,8 @@ export default function Gis() {
             <KV k="Есть показания за последние 2 сутки" v={String(recentCount)} />
             <KV k="Наименование объекта" v="UZ (Монголия)" />
             <KV k="Общее количество ТП/КТП" v="" />
+            <KV k="Координаты: снимок" v={geometryCapturedAt.slice(0,10) || "—"} />
+            <KV k="Без подтвержденных координат" v={String(items.filter(item => item.lat == null || item.lng == null).length)} />
           </dl>
         ))}
         {summaryOpen && error && <div className="gis-summary__error">{error}</div>}

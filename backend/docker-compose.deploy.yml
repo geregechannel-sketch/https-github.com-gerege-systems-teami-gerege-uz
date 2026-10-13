@@ -15,7 +15,10 @@ services:
     restart: unless-stopped
 
   api:
-    build: .
+    build:
+      context: .
+      args:
+        BUILD_COMMIT: ${BUILD_COMMIT:-unknown}
     depends_on:
       db:
         condition: service_healthy
@@ -25,6 +28,7 @@ services:
       SEED_ADMIN_USER: ${SEED_ADMIN_USER:-admin}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-admin123}
       ADDR: ":8080"
+      DEVICE_SIMULATION_ENABLED: "false"
     # Host nginx (ports 80/443) reverse-proxies toshi.gerege.mn -> here.
     ports:
       - "127.0.0.1:8080:8080"

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/emcos/ec3-backend/internal/auth"
+	"github.com/emcos/ec3-backend/internal/config"
 	"github.com/emcos/ec3-backend/internal/httpx"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -113,8 +114,9 @@ func (h *LoadControl) Catalog(w http.ResponseWriter, r *http.Request) {
 	}
 	httpx.OK(w, map[string]interface{}{
 		"groups": groups, "points": points,
-		"summary": map[string]interface{}{"RELAYS": relays, "LIMITS": limits, "ENABLED_RELAYS": enabledRelays, "UPDATED_AT": time.Now()},
-		"filters": map[string]interface{}{"CHANNEL_TYPES": []string{"GSM", "PLC"}, "READING_POINT_TYPES": []string{"DCU"}, "DATA_LOCATIONS": []string{"DEVICE", "DATABASE"}},
+		"capabilities": map[string]interface{}{"device_commands": false, "simulation": config.SimulationEnabled()},
+		"summary":      map[string]interface{}{"RELAYS": relays, "LIMITS": limits, "ENABLED_RELAYS": enabledRelays, "UPDATED_AT": time.Now()},
+		"filters":      map[string]interface{}{"CHANNEL_TYPES": []string{"GSM", "PLC"}, "READING_POINT_TYPES": []string{"DCU"}, "DATA_LOCATIONS": []string{"DEVICE", "DATABASE"}},
 	})
 }
 
@@ -234,6 +236,15 @@ func (h *LoadControl) RelayCommand(w http.ResponseWriter, r *http.Request) {
 		httpx.Fail(w, http.StatusBadRequest, "unsupported relay command")
 		return
 	}
+	if action == "READ_DB" || action == "STATUS" {
+		h.storedState(w, r, "load_control_relays", "relay_id", req.IDs, action)
+		return
+	}
+	if !config.SimulationEnabled() {
+		httpx.Fail(w, http.StatusNotImplemented, "Device command adapter is not connected; relay state unchanged")
+		return
+	}
+	message = "Simulation: " + message
 	query := `UPDATE load_control_relays SET command_status='COMPLETED',updated_at=now() WHERE relay_id=ANY($1)`
 	switch action {
 	case "ENABLE":
@@ -257,7 +268,7 @@ func (h *LoadControl) RelayCommand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, _ = h.pool.Exec(r.Context(), `INSERT INTO load_control_commands (target_type,target_id,action,requested_by,status,message,finished_at) SELECT 'RELAY',unnest($1::bigint[]),$2,$3,'COMPLETED',$4,now()`, req.IDs, action, loadUserName(r), message)
-	httpx.OK(w, map[string]interface{}{"ACTION": action, "UPDATED": result.RowsAffected(), "MESSAGE": message})
+	httpx.OK(w, map[string]interface{}{"ACTION": action, "UPDATED": result.RowsAffected(), "MESSAGE": message, "SOURCE": "SIM", "DEVICE_CONFIRMED": false})
 }
 
 func (h *LoadControl) LimitCommand(w http.ResponseWriter, r *http.Request) {
@@ -272,10 +283,24 @@ func (h *LoadControl) LimitCommand(w http.ResponseWriter, r *http.Request) {
 		httpx.Fail(w, http.StatusBadRequest, "unsupported limit command")
 		return
 	}
+	if action == "READ_DB" || action == "STATUS" {
+		h.storedState(w, r, "load_control_limits", "limit_id", req.IDs, action)
+		return
+	}
+	if !config.SimulationEnabled() && action != "SET" {
+		httpx.Fail(w, http.StatusNotImplemented, "Device command adapter is not connected; device limits unchanged")
+		return
+	}
+	source, commandStatus := "SIM", "COMPLETED"
+	if action == "SET" && !config.SimulationEnabled() {
+		source, commandStatus, message = "OPERATOR", "CONFIGURED", "Limit saved locally; not written to a device"
+	} else {
+		message = "Simulation: " + message
+	}
 	var updated int64
 	var err error
 	if action == "SET" {
-		commandTag, execErr := h.pool.Exec(r.Context(), `UPDATE load_control_limits SET limit_value=$2,command_status='COMPLETED',data_source='OPERATOR',updated_at=now() WHERE limit_id=ANY($1)`, req.IDs, *req.Value)
+		commandTag, execErr := h.pool.Exec(r.Context(), `UPDATE load_control_limits SET limit_value=$2,command_status=$3,data_source='OPERATOR',updated_at=now() WHERE limit_id=ANY($1)`, req.IDs, *req.Value, commandStatus)
 		if execErr != nil {
 			err = execErr
 		} else {
@@ -301,8 +326,22 @@ func (h *LoadControl) LimitCommand(w http.ResponseWriter, r *http.Request) {
 		httpx.Fail(w, http.StatusNotFound, "limits not found")
 		return
 	}
-	_, _ = h.pool.Exec(r.Context(), `INSERT INTO load_control_commands (target_type,target_id,action,requested_by,status,message,finished_at) SELECT 'LIMIT',unnest($1::bigint[]),$2,$3,'COMPLETED',$4,now()`, req.IDs, action, loadUserName(r), message)
-	httpx.OK(w, map[string]interface{}{"ACTION": action, "UPDATED": updated, "MESSAGE": message})
+	_, _ = h.pool.Exec(r.Context(), `INSERT INTO load_control_commands (target_type,target_id,action,requested_by,status,message,finished_at) SELECT 'LIMIT',unnest($1::bigint[]),$2,$3,$5,$4,now()`, req.IDs, action, loadUserName(r), message, commandStatus)
+	httpx.OK(w, map[string]interface{}{"ACTION": action, "UPDATED": updated, "MESSAGE": message, "SOURCE": source, "DEVICE_CONFIRMED": false})
+}
+
+// Database refreshes never change device state, timestamps or command status.
+func (h *LoadControl) storedState(w http.ResponseWriter, r *http.Request, table, key string, ids []int64, action string) {
+	var matched int64
+	if err := h.pool.QueryRow(r.Context(), "SELECT count(*) FROM "+table+" WHERE "+key+"=ANY($1)", ids).Scan(&matched); err != nil {
+		httpx.Fail(w, http.StatusInternalServerError, "stored state query failed")
+		return
+	}
+	if matched == 0 {
+		httpx.Fail(w, http.StatusNotFound, "load-control records not found")
+		return
+	}
+	httpx.OK(w, map[string]interface{}{"ACTION": action, "UPDATED": 0, "MATCHED": matched, "SOURCE": "DATABASE", "DEVICE_CONFIRMED": false, "MESSAGE": "Stored states available; no device request sent"})
 }
 
 func loadNullableBool(value sql.NullBool) interface{} {

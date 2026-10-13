@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -103,7 +104,7 @@ func (h *Archives) Point(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 	defer cancel()
-	rows, err := h.pool.Query(ctx, `SELECT begin_time,end_time,value::text,unit,source_status,source_ref,received_at FROM archive_samples WHERE point_id=$1 AND ml_id=$2 AND md_id=$3 AND aggs_id=$4 AND (begin_time >= $5 OR ($7 AND end_time > $5)) AND begin_time < $6 ORDER BY begin_time LIMIT 10001`, q.Point, q.ML, q.MD, q.Agg, from, to, q.IncludeOverlap)
+	rows, err := h.pool.Query(ctx, `SELECT begin_time,end_time,value::text,unit,source_status,source_ref,received_at,source_read_time,source_payload->>'TFF_ID',source_payload->>'HAS_ACT' FROM archive_samples WHERE point_id=$1 AND ml_id=$2 AND md_id=$3 AND aggs_id=$4 AND (begin_time >= $5 OR ($7 AND end_time > $5)) AND begin_time < $6 ORDER BY begin_time LIMIT 10001`, q.Point, q.ML, q.MD, q.Agg, from, to, q.IncludeOverlap)
 	if err != nil {
 		httpx.Fail(w, http.StatusServiceUnavailable, "Архив недоступен")
 		return
@@ -113,11 +114,23 @@ func (h *Archives) Point(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var bt, et, received time.Time
 		var value, unit, status, source string
-		if err := rows.Scan(&bt, &et, &value, &unit, &status, &source, &received); err != nil {
+		var sourceReadTime sql.NullTime
+		var tariff, act sql.NullString
+		if err := rows.Scan(&bt, &et, &value, &unit, &status, &source, &received, &sourceReadTime, &tariff, &act); err != nil {
 			httpx.Fail(w, http.StatusInternalServerError, "Invalid archive row")
 			return
 		}
-		data = append(data, map[string]interface{}{"POINT_ID": q.Point, "ML_ID": q.ML, "MD_ID": q.MD, "AGGS_ID": q.Agg, "BT": bt.UTC().Format(time.RFC3339Nano), "ET": et.UTC().Format(time.RFC3339Nano), "VALUE": value, "UNIT": unit, "SOURCE_STATUS": status, "SOURCE_REF": source, "RECEIVED_AT": received.UTC().Format(time.RFC3339Nano)})
+		var readAt, tariffID, hasAct interface{}
+		if sourceReadTime.Valid {
+			readAt = sourceReadTime.Time.UTC().Format(time.RFC3339Nano)
+		}
+		if tariff.Valid {
+			tariffID = tariff.String
+		}
+		if act.Valid {
+			hasAct = act.String
+		}
+		data = append(data, map[string]interface{}{"POINT_ID": q.Point, "ML_ID": q.ML, "MD_ID": q.MD, "AGGS_ID": q.Agg, "BT": bt.UTC().Format(time.RFC3339Nano), "ET": et.UTC().Format(time.RFC3339Nano), "VALUE": value, "UNIT": unit, "SOURCE_STATUS": status, "SOURCE_REF": source, "RECEIVED_AT": received.UTC().Format(time.RFC3339Nano), "SOURCE_READ_TIME": readAt, "TARIFF_ID": tariffID, "HAS_ACT": hasAct})
 	}
 	if rows.Err() != nil {
 		httpx.Fail(w, http.StatusServiceUnavailable, "Архив недоступен")

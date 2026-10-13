@@ -25,6 +25,7 @@ type FilterPayload = {
   groups: Row[];
   points: Row[];
   parameters: Parameter[];
+  capabilities?: { device_collection: boolean; simulation: boolean };
   connections: {
     downlinks: ConnectionOption[];
     protocols: ConnectionOption[];
@@ -311,7 +312,7 @@ export default function Readings() {
                     <td>{row.SOURCE}</td>
                   </tr>
                 ))}
-                {!result.rows.length && <tr><td colSpan={8} className="rd-empty">Данные не найдены. Выполните «Сбор».</td></tr>}
+                {!result.rows.length && <tr><td colSpan={8} className="rd-empty">Нет сохранённых показаний за выбранный период.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -405,8 +406,8 @@ export default function Readings() {
             <span className="sp" />
             <button className="rd-action settings" onClick={() => setShowSettings(true)}><IcGear size={17} />Настройки</button>
             <button className="rd-action" disabled={!canRun} onClick={viewReadings}><IcEye size={17} />{busy === "view" ? "Загрузка..." : "Просмотр"}</button>
-            <button className="rd-action" disabled={!canRun} onClick={() => runTask("RECOLLECT")}><IcSync size={17} />{busy === "RECOLLECT" ? "Выполняется..." : "Пересбор"}</button>
-            <button className="rd-action" disabled={!canRun} onClick={() => runTask("COLLECT")}><ReadIcon size={17} />{busy === "COLLECT" ? "Выполняется..." : "Сбор"}</button>
+            <button className="rd-action" disabled={!canRun || !(filter?.capabilities?.device_collection || filter?.capabilities?.simulation)} title={filter?.capabilities?.simulation ? "Симуляция" : "Адаптер устройства не подключён"} onClick={() => runTask("RECOLLECT")}><IcSync size={17} />{busy === "RECOLLECT" ? "Выполняется..." : "Пересбор"}</button>
+            <button className="rd-action" disabled={!canRun || !(filter?.capabilities?.device_collection || filter?.capabilities?.simulation)} title={filter?.capabilities?.simulation ? "Симуляция" : "Адаптер устройства не подключён"} onClick={() => runTask("COLLECT")}><ReadIcon size={17} />{busy === "COLLECT" ? "Выполняется..." : "Сбор"}</button>
             <button className="rd-action process" onClick={() => loadJobs(true)}><span className="rd-live-dot" />Процесс связи</button>
           </div>
         </>

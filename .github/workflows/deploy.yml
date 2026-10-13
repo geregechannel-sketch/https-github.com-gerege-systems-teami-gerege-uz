@@ -18,10 +18,30 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Validate deployment configuration
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+        run: |
+          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_SSH_KEY JWT_SECRET POSTGRES_PASSWORD SEED_ADMIN_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing deployment secret: $name"
+              exit 1
+            fi
+          done
+          echo "BUILD_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "VITE_BUILD_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Build frontend
         uses: actions/setup-node@v4
@@ -31,11 +51,15 @@ jobs:
         working-directory: frontend
 
       - name: Setup SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keygen -y -P '' -f ~/.ssh/id_ed25519 >/dev/null
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Sync backend + frontend to server
         run: |
@@ -63,6 +87,7 @@ jobs:
           JWT_SECRET=${JWT_SECRET}
           SEED_ADMIN_USER=admin
           SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
+          BUILD_COMMIT=${BUILD_COMMIT}
           ENV
           # install host nginx site (self-contained: static SPA + /ec3api proxy + TLS).
           # Only apply once the Let's Encrypt cert exists, so nginx -t never fails.
@@ -98,3 +123,7 @@ jobs:
           done
           curl -fsS https://toshi.gerege.mn/health
           curl -fsS https://toshi.gerege.mn/ | grep -q "TEAMI Enterprise" && echo "frontend OK"
+          curl -fsS https://toshi.gerege.mn/version.json > /tmp/frontend-version.json
+          curl -fsS https://toshi.gerege.mn/health > /tmp/backend-health.json
+          node -e 'const fs=require("fs"); const f=JSON.parse(fs.readFileSync("/tmp/frontend-version.json")); const h=JSON.parse(fs.readFileSync("/tmp/backend-health.json")); if(f.build_commit!==process.env.BUILD_COMMIT || h.data?.build_commit!==process.env.BUILD_COMMIT || h.data?.device_simulation!==false) process.exit(1);'
+          curl -fsSI https://toshi.gerege.mn/assets/gis/pinGreen.png | grep -qi 'content-type: image/png'

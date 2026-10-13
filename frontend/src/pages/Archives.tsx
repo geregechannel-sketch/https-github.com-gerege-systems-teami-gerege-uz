@@ -181,7 +181,7 @@ export default function Archives() {
 
   if (viewerOpen) {
     if (!sel) return <div className="aempty"><div className="toshi-loader" /><div>Загрузка точки учета...</div></div>;
-    return <ArchiveViewer point={sel} day={to} onClose={() => { setViewerOpen(false); navigate("/archives"); }} />;
+    return <ArchiveViewer point={sel} day={to} initialSeries={measurement === "" ? undefined : measurements[Number(measurement)]} onClose={() => { setViewerOpen(false); navigate("/archives"); }} />;
   }
 
   return (

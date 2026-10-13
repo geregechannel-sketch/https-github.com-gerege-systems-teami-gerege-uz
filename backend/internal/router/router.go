@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/emcos/ec3-backend/internal/auth"
+	"github.com/emcos/ec3-backend/internal/config"
 	"github.com/emcos/ec3-backend/internal/handlers"
 	"github.com/emcos/ec3-backend/internal/httpx"
 	"github.com/emcos/ec3-backend/internal/resource"
@@ -28,9 +29,20 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	meterRegistry := handlers.NewMeterRegistry(pool)
 	us := handlers.NewUserSettings(pool)
 	monitor := handlers.NewMonitor(pool)
+	gis := handlers.NewGIS(pool)
 
 	protected := func(fn http.HandlerFunc) http.Handler {
 		return mgr.Middleware(fn)
+	}
+	operator := func(fn http.HandlerFunc) http.Handler {
+		return protected(func(w http.ResponseWriter, r *http.Request) {
+			claims, _ := auth.FromContext(r.Context())
+			if !claims.Has("config") {
+				httpx.Fail(w, http.StatusForbidden, "config privilege required")
+				return
+			}
+			fn(w, r)
+		})
 	}
 
 	// Health (no auth)
@@ -39,7 +51,7 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 			httpx.Fail(w, http.StatusServiceUnavailable, "db down")
 			return
 		}
-		httpx.OK(w, map[string]interface{}{"status": "ok"})
+		httpx.OK(w, map[string]interface{}{"status": "ok", "build_commit": config.BuildCommit, "device_simulation": config.SimulationEnabled()})
 	})
 
 	// Auth (login is public; change_pw protected)
@@ -48,6 +60,8 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 
 	// Real-time monitor (monitor.toshi.gerege.mn)
 	mux.Handle("GET "+base+"monitor/live", protected(monitor.Live))
+	mux.Handle("GET "+base+"gis/availability", protected(gis.Availability))
+	mux.Handle("GET "+base+"gis/reference", protected(gis.Reference))
 
 	// Dashboard
 	mux.Handle("GET "+base+"homedashboard/query", protected(dash.Query))
@@ -84,7 +98,7 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	// flows behind a compact domain API.
 	handle("GET "+base+"readings/filter", protected(readings.Filter))
 	handle("POST "+base+"readings/query", protected(readings.Query))
-	handle("POST "+base+"readings/tasks", protected(readings.CreateTask))
+	handle("POST "+base+"readings/tasks", operator(readings.CreateTask))
 	handle("GET "+base+"readings/jobs", protected(readings.Jobs))
 
 	// Event register preserves TEAMI's category, date, source and detail flow.
@@ -98,28 +112,28 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	handle("GET "+base+"reporting/runs", protected(reporting.Runs))
 	handle("GET "+base+"reporting/runs/{id}", protected(reporting.RunResult))
 	handle("GET "+base+"reporting/automations", protected(reporting.Automations))
-	handle("POST "+base+"reporting/automations", protected(reporting.CreateAutomation))
-	handle("PUT "+base+"reporting/automations/{id}", protected(reporting.UpdateAutomation))
+	handle("POST "+base+"reporting/automations", operator(reporting.CreateAutomation))
+	handle("PUT "+base+"reporting/automations/{id}", operator(reporting.UpdateAutomation))
 
 	// Telesignals preserve the registry, history and operator-control workflows.
 	handle("GET "+base+"telesignals/catalog", protected(telesignals.Catalog))
 	handle("GET "+base+"telesignals/signals", protected(telesignals.List))
 	handle("GET "+base+"telesignals/signals/{id}", protected(telesignals.Get))
-	handle("POST "+base+"telesignals/signals", protected(telesignals.Create))
-	handle("PUT "+base+"telesignals/signals/{id}", protected(telesignals.Update))
-	handle("DELETE "+base+"telesignals/signals/{id}", protected(telesignals.Delete))
-	handle("PUT "+base+"telesignals/signals/{id}/state", protected(telesignals.State))
-	handle("POST "+base+"telesignals/signals/{id}/commands", protected(telesignals.Command))
+	handle("POST "+base+"telesignals/signals", operator(telesignals.Create))
+	handle("PUT "+base+"telesignals/signals/{id}", operator(telesignals.Update))
+	handle("DELETE "+base+"telesignals/signals/{id}", operator(telesignals.Delete))
+	handle("PUT "+base+"telesignals/signals/{id}/state", operator(telesignals.State))
+	handle("POST "+base+"telesignals/signals/{id}/commands", operator(telesignals.Command))
 	handle("GET "+base+"telesignals/types", protected(telesignals.Types))
-	handle("POST "+base+"telesignals/types", protected(telesignals.CreateType))
-	handle("PUT "+base+"telesignals/types/{id}", protected(telesignals.UpdateType))
-	handle("DELETE "+base+"telesignals/types/{id}", protected(telesignals.DeleteType))
+	handle("POST "+base+"telesignals/types", operator(telesignals.CreateType))
+	handle("PUT "+base+"telesignals/types/{id}", operator(telesignals.UpdateType))
+	handle("DELETE "+base+"telesignals/types/{id}", operator(telesignals.DeleteType))
 	handle("POST "+base+"telesignals/history/query", protected(telesignals.History))
-	handle("POST "+base+"telesignals/history", protected(telesignals.AddHistory))
-	handle("PUT "+base+"telesignals/history/{id}", protected(telesignals.UpdateHistory))
+	handle("POST "+base+"telesignals/history", operator(telesignals.AddHistory))
+	handle("PUT "+base+"telesignals/history/{id}", operator(telesignals.UpdateHistory))
 	handle("GET "+base+"telesignals/rules", protected(telesignals.Rules))
-	handle("POST "+base+"telesignals/rules", protected(telesignals.CreateRule))
-	handle("DELETE "+base+"telesignals/rules/{id}", protected(telesignals.DeleteRule))
+	handle("POST "+base+"telesignals/rules", operator(telesignals.CreateRule))
+	handle("DELETE "+base+"telesignals/rules/{id}", operator(telesignals.DeleteRule))
 
 	// Mnemonic diagrams combine a stored layout with current telesignal states.
 	handle("GET "+base+"schemes", protected(schemes.Catalog))
@@ -129,14 +143,14 @@ func New(pool *pgxpool.Pool, mgr *auth.Manager, reg *resource.Registry) http.Han
 	handle("GET "+base+"loadcontrol/catalog", protected(loadControl.Catalog))
 	handle("POST "+base+"loadcontrol/relays/query", protected(loadControl.Relays))
 	handle("POST "+base+"loadcontrol/limits/query", protected(loadControl.Limits))
-	handle("POST "+base+"loadcontrol/relays/command", protected(loadControl.RelayCommand))
-	handle("POST "+base+"loadcontrol/limits/command", protected(loadControl.LimitCommand))
+	handle("POST "+base+"loadcontrol/relays/command", operator(loadControl.RelayCommand))
+	handle("POST "+base+"loadcontrol/limits/command", operator(loadControl.LimitCommand))
 
 	// Meter registry joins classifier, mounting and point data into one workflow.
 	handle("GET "+base+"meterregistry/catalog", protected(meterRegistry.Catalog))
 	handle("POST "+base+"meterregistry/query", protected(meterRegistry.Query))
-	handle("POST "+base+"meterregistry/save", protected(meterRegistry.Save))
-	handle("DELETE "+base+"meterregistry/{id}", protected(meterRegistry.Delete))
+	handle("POST "+base+"meterregistry/save", operator(meterRegistry.Save))
+	handle("DELETE "+base+"meterregistry/{id}", operator(meterRegistry.Delete))
 
 	// Dedicated archive reads take precedence over generated grid placeholders.
 	archive := handlers.NewArchives(pool)

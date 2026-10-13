@@ -117,3 +117,37 @@
 - Exercised the GIS popup and downstream links end to end. Archive selection already worked; repaired the quality-report deep-link so it selects the requested point and expands its parent groups.
 - Kept TOSH operational advantages, including populated event/report/relay views and reference dictionaries, instead of copying source empty states.
 - Added the reproducible audit report at `docs/10-system-parity-audit.md`.
+
+## Session 6 - Runtime and production evidence audit (2026-10-13)
+- Rechecked authenticated TEAMI and production navigation: 11/11 primary routes
+  render on each. This is navigation coverage, not complete functional parity.
+- Audited 429 registered models (281 stored, 148 virtual), 858 model read/grid
+  requests and 718 generated source method requests. Of the latter, 715 have no
+  dedicated business implementation; unsupported routes now return explicit 501.
+- Production still uses the old frontend, circle markers and active simulated
+  readings. The PNG marker URL returns an HTML fallback. Physical device
+  read/write verification remains unestablished; no device commands were sent.
+- Made the simulator opt-in, production-disabled; excluded current and legacy
+  synthetic readings. Disconnected commands fail before persistence. Viewer
+  mutations require config privilege and local limit settings remain available
+  without claiming a confirmed device write.
+- Removed fabricated report/profile readings and loss assumptions. Profiles use
+  stored ML/MD/AGGS series, selected parameters, exact decimals, UTC+08 bounds,
+  original intervals and source metadata. Empty data remains empty.
+- Corrected the earlier GIS coordinate claim: index-based pixel slots were not
+  source coordinates. Protected dated reference data supplies 39 valid captured
+  coordinates. Exact-name mapping gives the local demo 18 located points and 69
+  unlocated records, with actual stored observation times and meter mountings.
+- Added a one-shot archive importer with explicit verified mapping/timezone and
+  transactional, idempotent storage. Continuous source collection and physical
+  transport/acknowledgements remain separate required integrations.
+- Added release commit metadata, deployment secret preflight, CI-tested SHA
+  checkout and frontend/backend/PNG verification. Missing assets now return 404.
+- Verified 78 Go tests with PostgreSQL 16.15 (zero failed/skipped), vet,
+  TypeScript, frontend build and 27 frontend tests. Local preview runs separately
+  on 127.0.0.1:4177 with simulation disabled. Desktop/mobile GIS renders checked;
+  relay browser-click delivery remains a UI verification gap.
+- Production deployment was not performed: official push returns HTTP 403 and
+  the identified deploy key returns Permission denied (publickey). An authorized
+  owner/operator can deploy the tested improvement branch without granting this
+  account direct write access. Full findings: docs/11-runtime-parity-audit.md.

@@ -21,7 +21,8 @@ import (
 
 func main() {
 	cfg := config.Load()
-	ctx := context.Background()
+	ctx, stopProcess := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stopProcess()
 
 	pool, err := db.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
@@ -44,8 +45,10 @@ func main() {
 	resource.RegisterGenerated(reg) // full ~983-endpoint surface
 	resource.RegisterExtras(reg)    // deep menu-leaf models (event logs, audit, stats, config)
 
-	// Simulated DAS feeding the real-time monitor; stops with the process.
-	go handlers.RunSimulator(ctx, pool, 15*time.Second)
+	if cfg.DeviceSimulation {
+		log.Println("device simulation enabled; readings are not device measurements")
+		go handlers.RunSimulator(ctx, pool, 15*time.Second)
+	}
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,
@@ -60,9 +63,7 @@ func main() {
 		}
 	}()
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
-	<-stop
+	<-ctx.Done()
 	log.Println("shutting down...")
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

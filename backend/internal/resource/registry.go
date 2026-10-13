@@ -23,8 +23,7 @@ type Model struct {
 	ReadPriv  string // privilege required to read (""=any authenticated)
 	WritePriv string // privilege required to create/update/delete
 
-	// Virtual models have no backing table; List/Query return an empty envelope
-	// so the endpoint still exists, authenticates and enforces RBAC.
+	// Virtual models have no backing table; List/Query explicitly return 501.
 	Virtual bool
 
 	// Enabled actions.

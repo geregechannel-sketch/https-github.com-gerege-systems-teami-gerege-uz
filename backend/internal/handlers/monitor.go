@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/emcos/ec3-backend/internal/config"
 	"github.com/emcos/ec3-backend/internal/httpx"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -35,7 +36,8 @@ func (h *Monitor) Live(w http.ResponseWriter, r *http.Request) {
 		LEFT JOIN meters m ON m.meter_id=rv.meter_id
 		LEFT JOIN meter_types mt ON mt.meter_type_id=m.meter_type_id
 		WHERE rv.reading_time > now() - interval '`+monitorWindow+`'
-		ORDER BY rv.point_id, rv.parameter_code, rv.reading_time DESC`)
+		AND rv.reading_time <= now() AND ($1 OR rv.source NOT IN ('SIM','COLLECT','RECOLLECT'))
+		ORDER BY rv.point_id, rv.parameter_code, rv.reading_time DESC`, config.SimulationEnabled())
 	if err != nil {
 		httpx.Fail(w, http.StatusInternalServerError, "monitor query failed")
 		return
@@ -69,7 +71,8 @@ func (h *Monitor) Live(w http.ResponseWriter, r *http.Request) {
 		SELECT date_trunc('minute', reading_time), parameter_code, avg(reading_value)::float8
 		FROM reading_values
 		WHERE reading_time > now() - interval '`+monitorWindow+`'
-		GROUP BY 1, 2 ORDER BY 1`)
+		AND reading_time <= now() AND ($1 OR source NOT IN ('SIM','COLLECT','RECOLLECT'))
+		GROUP BY 1, 2 ORDER BY 1`, config.SimulationEnabled())
 	if err != nil {
 		httpx.Fail(w, http.StatusInternalServerError, "monitor trend failed")
 		return
@@ -86,6 +89,10 @@ func (h *Monitor) Live(w http.ResponseWriter, r *http.Request) {
 		trend = append(trend, map[string]interface{}{"TIME": at, "PARAMETER_CODE": param, "VALUE": value})
 	}
 	rows.Close()
+	if rows.Err() != nil {
+		httpx.Fail(w, http.StatusInternalServerError, "monitor trend failed")
+		return
+	}
 
 	httpx.OK(w, map[string]interface{}{
 		"now":         time.Now(),
